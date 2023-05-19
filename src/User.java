@@ -13,25 +13,19 @@ public class User {
     private ArrayList<User> friends;
     private ArrayList<String> hobbies;
     private String job;
-    public User(String name,String username,String password,String emailAddress, String contactNo, String birthDate,char gender){
+    public User(String name,String username,String password,String birthDate,char gender){
         this.username = username;
         this.password = password;
         this.profilePic = null;
         this.name = name;
-        this.emailAddress = emailAddress;
-        this.contactNo = contactNo;
+        this.emailAddress = null;
+        this.contactNo = null;
         this.birthDate = birthDate;
         this.address = null;
         this.gender = gender;
         this.friends = new ArrayList<>();
         this.hobbies = new ArrayList<>();
         this.job = null;
-        Database database = new Database();
-        database.registerUser(this);
-        database.close();
-    }
-    public User(String username,String email,String phone,String password){
-        this(null,username,password,email,phone,null,'-');
     }
     public String getUsername(){
         return username;
