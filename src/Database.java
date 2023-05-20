@@ -110,19 +110,24 @@ public class Database {
         }
         return "Undefined Status";
     }// view available status
-    public List<Friend> viewFriends(int userId){
+    public List<Friend> viewFriendsRequests(int userId){
         List<Friend> friendsRequests = new ArrayList<>();
         String query =
-                "SELECT friend_id, status FROM user_friends WHERE user_id = ?";
+                "SELECT uf.user_id, uf.friend_id, s.status, u.name AS friend_name, u.username AS friend_username " +
+                "FROM user_friends uf " +
+                "JOIN status s ON uf.status = s.id " +
+                "JOIN users u ON uf.friend_id = u.user_id " +
+                "WHERE uf.user_id = ?";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1,userId);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()){
                 int friendId = resultSet.getInt("friend_id");
-                int statusId = resultSet.getInt("status");
-                String status = getStatus(statusId);
-                Friend friend = new Friend(friendId,status);
+                String status = resultSet.getString("status");
+                String friendName = resultSet.getString("friend_name");
+                String friendUsername = resultSet.getString("friend_username");
+                Friend friend = new Friend(friendId,status,friendName,friendUsername);
                 friendsRequests.add(friend);
             }
         }
@@ -131,7 +136,8 @@ public class Database {
         }
         return friendsRequests;
     }// view current friends, friend requests (received,sent)
-    public void insertStatus(int userId,int friendId,int statusId){// add 2 rows in database
+    public void insertStatus(int userId,int friendId,int statusId){
+        //***Note: always do twice, for send and receive
         //statusId = 1,2
         String query =
                 "INSERT INTO user_friends (user_id,friend_id,status) VALUES (?,?,?)";
@@ -145,11 +151,12 @@ public class Database {
         catch (SQLException e){
             e.printStackTrace();
         }
-    }// send request
+    }// send request, receive request
     public void updateStatus(int userId, int friendId,int statusId){// update 2 rows in database
+        //***Note: do once is enough
         //statusId = 3
         String query =
-                "UPDATE user_friends SET status_id = ? WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?";
+                "UPDATE user_friends SET status = ? WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1,statusId);
@@ -164,6 +171,7 @@ public class Database {
         }
     }// accept request
     public void removeStatus(int userId,int friendId){// remove 2 rows in database
+        //***Note: do once is enough
         String query =
                 "DELETE FROM user_friends WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)";
         try {
