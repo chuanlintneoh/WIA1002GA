@@ -1,6 +1,12 @@
 public class Hobby {
-    private int hobbyId;
-    private String hobbyName;
+    private final int hobbyId;
+    private final String hobbyName;
+    public Hobby(int hobbyId){
+        Database database = new Database();
+        this.hobbyId = hobbyId;
+        this.hobbyName = database.getHobby(hobbyId);
+        database.close();
+    }
     public Hobby(int hobbyId,String hobbyName){
         this.hobbyId = hobbyId;
         this.hobbyName = hobbyName;
@@ -10,5 +16,9 @@ public class Hobby {
     }
     public String getHobbyName(){
         return hobbyName;
+    }
+    @Override
+    public String toString(){
+        return String.format("Hobby ID: %d, Hobby Name: %s",hobbyId,hobbyName);
     }
 }

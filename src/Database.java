@@ -187,16 +187,17 @@ public class Database {
         }
     }// delete request, unfriend
     //hobbies & user_hobbies
-    public List<String> getHobbies(){
-        List<String> hobbies = new ArrayList<>();
+    public List<Hobby> getHobbies(){
+        List<Hobby> hobbies = new ArrayList<>();
         String query =
-                "SELECT hobby FROM hobbies";
+                "SELECT id, hobby FROM hobbies";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()){
-                String hobby = resultSet.getString("hobby");
-                hobbies.add(hobby);
+                int hobbyId = resultSet.getInt("id");
+                String hobbyName = resultSet.getString("hobby");
+                hobbies.add(new Hobby(hobbyId,hobbyName));
             }
         }
         catch (SQLException e){
@@ -204,6 +205,22 @@ public class Database {
         }
         return hobbies;
     }// view ALL available hobbies
+    public String getHobby(int hobbyId){
+        String query =
+                "SELECT hobby FROM hobbies WHERE id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,hobbyId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()){
+                return resultSet.getString("hobby");
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return "Undefined Hobby";
+    }
     public void insertHobby(String hobby){
         String query =
                 "INSERT INTO hobbies (hobby) VALUES (?)";
@@ -246,15 +263,15 @@ public class Database {
             e.printStackTrace();
         }
     }// clear user's hobbies list
-    public void editUserHobbies(int userId, List<Integer> editedHobbies){
+    public void editUserHobbies(int userId, List<Hobby> editedHobbies){
         clearUserHobbies(userId);
         String query =
                 "INSERT INTO user_hobbies (user_id, hobby_id) VALUES (?, ?)";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
-            for (int hobbyId: editedHobbies){
+            for (Hobby hobby: editedHobbies){
                 statement.setInt(1,userId);
-                statement.setInt(2,hobbyId);
+                statement.setInt(2,hobby.getHobbyId());
                 statement.executeUpdate();
             }
         }
@@ -263,16 +280,17 @@ public class Database {
         }
     }// clear user's hobbies list then update with new list
     //jobs & user_jobs
-    public List<String> getJobs(){
-        List<String> jobs = new ArrayList<>();
+    public List<Job> getJobs(){
+        List<Job> jobs = new ArrayList<>();
         String query =
-                "SELECT job FROM jobs";
+                "SELECT id, job FROM jobs";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()){
-                String job = resultSet.getString("job");
-                jobs.add(job);
+                int jobId = resultSet.getInt("id");
+                String jobName = resultSet.getString("job");
+                jobs.add(new Job(jobId,jobName));
             }
         }
         catch (SQLException e){
@@ -280,6 +298,22 @@ public class Database {
         }
         return jobs;
     }// view ALL available jobs
+    public String getJob(int jobId){
+        String query =
+                "SELECT job FROM jobs WHERE id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,jobId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()){
+                return resultSet.getString("job");
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return "Undefined Job";
+    }
     public void insertJob(String job){
         String query =
                 "INSERT INTO jobs (job) VALUES (?)";
@@ -295,7 +329,10 @@ public class Database {
     public List<Job> viewUserJobs(int userId){
         List<Job> userJobs = new ArrayList<>();
         String query =
-                "SELECT (uj.job_id, j.job, uj.start_date, uj.end_date) FROM user_jobs uj JOIN jobs j ON uj.job_id WHERE uj.user_id = ?";
+                "SELECT uj.job_id, j.job, uj.start_date, uj.end_date " +
+                "FROM user_jobs uj " +
+                "JOIN jobs j ON uj.job_id = j.id " +
+                "WHERE uj.user_id = ?";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1,userId);
