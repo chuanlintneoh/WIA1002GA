@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.*;
 public class Database {
     private Connection connection;
     private Statement statement;
@@ -19,6 +20,8 @@ public class Database {
             e.printStackTrace();
         }
     }
+    // executeQuery -> retrieve data
+    // executeUpdate -> modify database
     public void registerUser(User user){
         try {
             String query =
@@ -85,6 +88,243 @@ public class Database {
             statement.setString(1,data);
             statement.setInt(2,userId);
             statement.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+    //status & user_friends
+    public String getStatus(int statusId){
+        String query =
+                "SELECT status FROM status WHERE id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,statusId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()){
+                return resultSet.getString("status");
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return "Undefined Status";
+    }// view available status
+    public List<Friend> viewFriends(int userId){
+        List<Friend> friendsRequests = new ArrayList<>();
+        String query =
+                "SELECT friend_id, status FROM user_friends WHERE user_id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,userId);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()){
+                int friendId = resultSet.getInt("friend_id");
+                int statusId = resultSet.getInt("status");
+                String status = getStatus(statusId);
+                Friend friend = new Friend(friendId,status);
+                friendsRequests.add(friend);
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return friendsRequests;
+    }// view current friends, friend requests (received,sent)
+    public void insertStatus(int userId,int friendId,int statusId){// add 2 rows in database
+        //statusId = 1,2
+        String query =
+                "INSERT INTO user_friends (user_id,friend_id,status) VALUES (?,?,?)";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,userId);
+            statement.setInt(2,friendId);
+            statement.setInt(3,statusId);
+            statement.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }// send request
+    public void updateStatus(int userId, int friendId,int statusId){// update 2 rows in database
+        //statusId = 3
+        String query =
+                "UPDATE user_friends SET status_id = ? WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,statusId);
+            statement.setInt(2,userId);
+            statement.setInt(3,friendId);
+            statement.setInt(4,friendId);
+            statement.setInt(5,userId);
+            statement.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }// accept request
+    public void removeStatus(int userId,int friendId){// remove 2 rows in database
+        String query =
+                "DELETE FROM user_friends WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,userId);
+            statement.setInt(2,friendId);
+            statement.setInt(3,friendId);
+            statement.setInt(4,userId);
+            statement.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }// delete request, unfriend
+    //hobbies & user_hobbies
+    public List<String> getHobbies(){
+        List<String> hobbies = new ArrayList<>();
+        String query =
+                "SELECT hobby FROM hobbies";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()){
+                String hobby = resultSet.getString("hobby");
+                hobbies.add(hobby);
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return hobbies;
+    }// view ALL available hobbies
+    public void insertHobby(String hobby){
+        String query =
+                "INSERT INTO hobbies (hobby) VALUES (?)";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1,hobby);
+            statement.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }// insert a new hobby into database
+    public List<String> viewUserHobbies(int userId){
+        List<String> userHobbies = new ArrayList<>();
+        String query =
+                "SELECT h.hobby FROM user_hobbies uh JOIN hobbies h ON uh.hobby_id = h.id WHERE uh.user_id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,userId);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()){
+                String hobby = resultSet.getString("hobby");
+                userHobbies.add(hobby);
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return userHobbies;
+    }// return user's hobbies list
+    public void clearUserHobbies(int userId){
+        String query =
+                "DELETE FROM user_hobbies WHERE user_id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,userId);
+            statement.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }// clear user's hobbies list
+    public void editUserHobbies(int userId, List<Integer> editedHobbies){
+        clearUserHobbies(userId);
+        String query =
+                "INSERT INTO user_hobbies (user_id, hobby_id) VALUES (?, ?)";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            for (int hobbyId: editedHobbies){
+                statement.setInt(1,userId);
+                statement.setInt(2,hobbyId);
+                statement.executeUpdate();
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }// clear user's hobbies list then update with new list
+    //jobs & user_jobs
+    public List<String> getJobs(){
+        List<String> jobs = new ArrayList<>();
+        String query =
+                "SELECT job FROM jobs";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()){
+                String job = resultSet.getString("job");
+                jobs.add(job);
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return jobs;
+    }
+    public void insertJob(String job){
+        String query =
+                "INSERT INTO jobs (job) VALUES (?)";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1,job);
+            statement.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+    public List<String> viewUserJobs(int userId){
+        List<String> userJobs = new ArrayList<>();
+        String query =
+                "SELECT j.job FROM user_jobs uj JOIN jobs j ON uj.job_id WHERE uj.user_id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,userId);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()){
+                String job = resultSet.getString("job");
+                userJobs.add(job);
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return userJobs;
+    }
+    public void clearUserJobs(int userId){
+        String query =
+                "DELETE FROM user_jobs WHERE user_id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,userId);
+            statement.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+    public void editUserJobs(int userId, List<Integer> editedJobs){
+        clearUserHobbies(userId);
+        String query =
+                "INSERT INTO user_jobs (user_id, job_id, start_date, end_date) VALUES (?, ?, ?, ?)";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            for (int jobId: editedJobs){
+                statement.setInt(1,userId);
+                statement.setInt(2,jobId);
+                statement.executeUpdate();
+            }
         }
         catch (SQLException e){
             e.printStackTrace();
