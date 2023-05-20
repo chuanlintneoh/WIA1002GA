@@ -271,7 +271,7 @@ public class Database {
             e.printStackTrace();
         }
         return jobs;
-    }
+    }// view ALL available jobs
     public void insertJob(String job){
         String query =
                 "INSERT INTO jobs (job) VALUES (?)";
@@ -283,17 +283,21 @@ public class Database {
         catch (SQLException e){
             e.printStackTrace();
         }
-    }
-    public List<String> viewUserJobs(int userId){
-        List<String> userJobs = new ArrayList<>();
+    }// insert a new job into database
+    public List<Job> viewUserJobs(int userId){
+        List<Job> userJobs = new ArrayList<>();
         String query =
-                "SELECT j.job FROM user_jobs uj JOIN jobs j ON uj.job_id WHERE uj.user_id = ?";
+                "SELECT (uj.job_id, j.job, uj.start_date, uj.end_date) FROM user_jobs uj JOIN jobs j ON uj.job_id WHERE uj.user_id = ?";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1,userId);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()){
-                String job = resultSet.getString("job");
+                int jobId = resultSet.getInt("job_id");
+                String jobName = resultSet.getString("job");
+                String startDate = resultSet.getString("start_date");
+                String endDate = resultSet.getString("end_date");
+                Job job = new Job(jobId,jobName,startDate,endDate);
                 userJobs.add(job);
             }
         }
@@ -301,7 +305,7 @@ public class Database {
             e.printStackTrace();
         }
         return userJobs;
-    }
+    }// return user's jobs list
     public void clearUserJobs(int userId){
         String query =
                 "DELETE FROM user_jobs WHERE user_id = ?";
@@ -313,23 +317,25 @@ public class Database {
         catch (SQLException e){
             e.printStackTrace();
         }
-    }
-    public void editUserJobs(int userId, List<Integer> editedJobs){
-        clearUserHobbies(userId);
+    }// clear user's jobs list
+    public void editUserJobs(int userId, List<Job> editedJobs){
+        clearUserJobs(userId);
         String query =
                 "INSERT INTO user_jobs (user_id, job_id, start_date, end_date) VALUES (?, ?, ?, ?)";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
-            for (int jobId: editedJobs){
+            for (Job job: editedJobs){
                 statement.setInt(1,userId);
-                statement.setInt(2,jobId);
+                statement.setInt(2,job.getJobId());
+                statement.setString(3, job.getStartDate());
+                statement.setString(4, job.getEndDate());
                 statement.executeUpdate();
             }
         }
         catch (SQLException e){
             e.printStackTrace();
         }
-    }
+    }// clear user's jobs list then update with new list
     public void close(){
         try {
             statement.close();
