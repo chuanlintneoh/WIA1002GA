@@ -381,6 +381,130 @@ public class Database {
             e.printStackTrace();
         }
     }// clear user's jobs list then update with new list
+    //Search users
+    public List<Friend> searchUser(int userId, String keyword){
+        List<Friend> searchResult = new ArrayList<>();
+        String query =
+                "SELECT u.user_id, u.name, u.username, s.status " +
+                "FROM users u " +
+                "LEFT JOIN user_friends uf ON u.user_id = uf.friend_id AND uf.user_id = ? " +
+                "LEFT JOIN status s ON uf.status = s.id " +
+                "WHERE u.name LIKE ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,userId);
+            statement.setString(2,"%"+keyword+"%");
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()){
+                int user_id = resultSet.getInt("user_id");
+                if(user_id != userId){// excepting user himself in the search list
+                    String name = resultSet.getString("name");
+                    String username = resultSet.getString("username");
+                    String status = resultSet.getString("status");
+                    searchResult.add(new Friend(user_id,status,name,username));
+                }
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return searchResult;
+    }
+    //Find mutual friends
+    public List<Friend> findMutualFriends(int userId){
+        List<Friend> mutualFriends = new ArrayList<>();
+        String query =
+                "SELECT u.user_id, u.name, u.username, s.status " +
+                "FROM user_friends uf1 " +
+                "JOIN user_friends uf2 ON uf1.friend_id = uf2.user_id " +
+                "JOIN users u ON uf2.friend_id = u.user_id " +
+                "JOIN status s ON uf2.status = s.id " +
+                "WHERE uf1.user_id = ? AND uf1.status = 3 AND uf2.status = 3";
+        //uf1 = user's friends, uf2 = user's mutual friends
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,userId);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()){
+                int user_id = resultSet.getInt("user_id");
+                if (user_id != userId){// excepting user himself as a mutual friend
+                    String name = resultSet.getString("name");
+                    String username = resultSet.getString("username");
+                    String status = "Mutual friend";
+                    mutualFriends.add(new Friend(user_id,status,name,username));
+                }
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return mutualFriends;
+    }
+    //Admin special features
+    public List<User> viewAllUsers(){
+        List<User> allUsers = new ArrayList<>();
+        String query =
+                "SELECT user_id, name, username, email_address, contact_no FROM users";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()){
+                int userId = resultSet.getInt("user_id");
+                String name = resultSet.getString("name");
+                String username = resultSet.getString("username");
+                String email = resultSet.getString("email_address");
+                String contactNo = resultSet.getString("contact_no");
+                allUsers.add(new User(userId,name,username,email,contactNo));
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return allUsers;
+    }
+    public void deleteUser(int userId){
+        String deleteUserQuery =
+                "DELETE FROM users WHERE user_id = ?";
+        String deleteFriendsQuery =
+                "DELETE FROM user_friends WHERE user_id = ? OR friend_id = ?";
+        String deleteHobbiesQuery =
+                "DELETE FROM user_hobbies WHERE user_id = ?";
+        String deleteJobsQuery =
+                "DELETE FROM user_jobs WHERE user_id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(deleteUserQuery);
+            statement.setInt(1,userId);
+            statement.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        try {
+            PreparedStatement statement = connection.prepareStatement(deleteFriendsQuery);
+            statement.setInt(1,userId);
+            statement.setInt(2,userId);
+            statement.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        try {
+            PreparedStatement statement = connection.prepareStatement(deleteHobbiesQuery);
+            statement.setInt(1,userId);
+            statement.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        try {
+            PreparedStatement statement = connection.prepareStatement(deleteJobsQuery);
+            statement.setInt(1,userId);
+            statement.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
     public void close(){
         try {
             statement.close();

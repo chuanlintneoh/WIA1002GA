@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.awt.Image;
 public class User {
+    private int userId;
     private final String username;
     private String password;
     private Image profilePic;
@@ -10,9 +11,6 @@ public class User {
     private String birthDate;
     private String address;
     private char gender;
-    private ArrayList<User> friends;
-    private ArrayList<String> hobbies;
-    private String job;
     public User(String name,String username,String password,String emailAddress, String contactNo, String birthDate,char gender){
         this.username = username;
         this.password = password;
@@ -23,15 +21,17 @@ public class User {
         this.birthDate = birthDate;
         this.address = null;
         this.gender = gender;
-        this.friends = new ArrayList<>();
-        this.hobbies = new ArrayList<>();
-        this.job = null;
         Database database = new Database();
         database.registerUser(this);
         database.close();
     }
-    public User(String username,String email,String phone,String password){
-        this(null,username,password,email,phone,null,'-');
+    public User(int userId, String name, String username, String email, String contactNo){
+        this.userId = userId;
+        this.name = name;
+        this.username = username;
+        this.emailAddress = email;
+        this.contactNo = contactNo;
+
     }
     public String getUsername(){
         return username;
@@ -84,10 +84,8 @@ public class User {
     public void setGender(char gender) {
         this.gender = gender;
     }
-    public String getJob() {
-        return job;
-    }
-    public void setJob(String job) {
-        this.job = job;
+    @Override
+    public String toString(){
+        return String.format("User ID: %d, Name: %s, Username: %s, Email Address: %s, Contact No.: %s",userId,name,username,emailAddress,contactNo);
     }
 }
