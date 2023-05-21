@@ -441,6 +441,45 @@ public class Database {
         return mutualFriends;
     }
     //Admin special features
+    public boolean verifyAdmin(int userId, String hashedPassword){
+        String query =
+                "UPDATE users SET admin = 1 WHERE user_id = ?";
+        if (hashedPassword.equals("c93750932def20e4e4fec0ba7b338a3c")){//admin password = WIA1002fb
+            try {
+                PreparedStatement statement = connection.prepareStatement(query);
+                statement.setInt(1,userId);
+                boolean success = statement.executeUpdate() > 0;
+                if (success){
+                    System.out.println("Admin verified for User ID: " + userId);
+                }
+                else {
+                    System.out.println("An error occurred.");
+                }
+            }
+            catch (SQLException e){
+                e.printStackTrace();
+            }
+            return true;
+        }
+        System.out.println("Incorrect password!");
+        return false;
+    }
+    public boolean isAdmin(int userId){
+        String query =
+                "SELECT admin FROM users WHERE user_id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,userId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()){
+                return resultSet.getInt("admin") == 1;
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return false;
+    }
     public List<User> viewAllUsers(){
         List<User> allUsers = new ArrayList<>();
         String query =
