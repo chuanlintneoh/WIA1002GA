@@ -186,53 +186,7 @@ public class Database {
             e.printStackTrace();
         }
     }// delete request, unfriend
-    //hobbies & user_hobbies
-    public List<Hobby> getHobbies(){
-        List<Hobby> hobbies = new ArrayList<>();
-        String query =
-                "SELECT id, hobby FROM hobbies";
-        try {
-            PreparedStatement statement = connection.prepareStatement(query);
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()){
-                int hobbyId = resultSet.getInt("id");
-                String hobbyName = resultSet.getString("hobby");
-                hobbies.add(new Hobby(hobbyId,hobbyName));
-            }
-        }
-        catch (SQLException e){
-            e.printStackTrace();
-        }
-        return hobbies;
-    }// view ALL available hobbies
-    public String getHobby(int hobbyId){
-        String query =
-                "SELECT hobby FROM hobbies WHERE id = ?";
-        try {
-            PreparedStatement statement = connection.prepareStatement(query);
-            statement.setInt(1,hobbyId);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()){
-                return resultSet.getString("hobby");
-            }
-        }
-        catch (SQLException e){
-            e.printStackTrace();
-        }
-        return "Undefined Hobby";
-    }
-    public void insertHobby(String hobby){
-        String query =
-                "INSERT INTO hobbies (hobby) VALUES (?)";
-        try {
-            PreparedStatement statement = connection.prepareStatement(query);
-            statement.setString(1,hobby);
-            statement.executeUpdate();
-        }
-        catch (SQLException e){
-            e.printStackTrace();
-        }
-    }// insert a new hobby into database
+    //user_hobbies
     public List<String> viewUserHobbies(int userId){
         List<String> userHobbies = new ArrayList<>();
         String query =
@@ -263,15 +217,15 @@ public class Database {
             e.printStackTrace();
         }
     }// clear user's hobbies list
-    public void editUserHobbies(int userId, List<Hobby> editedHobbies){
+    public void editUserHobbies(int userId, List<String> editedHobbies){
         clearUserHobbies(userId);
         String query =
-                "INSERT INTO user_hobbies (user_id, hobby_id) VALUES (?, ?)";
+                "INSERT INTO user_hobbies (user_id, hobby) VALUES (?, ?)";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
-            for (Hobby hobby: editedHobbies){
+            for (String hobby: editedHobbies){
                 statement.setInt(1,userId);
-                statement.setInt(2,hobby.getHobbyId());
+                statement.setString(2,hobby);
                 statement.executeUpdate();
             }
         }
