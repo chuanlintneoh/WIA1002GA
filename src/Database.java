@@ -190,7 +190,7 @@ public class Database {
     public List<String> viewUserHobbies(int userId){
         List<String> userHobbies = new ArrayList<>();
         String query =
-                "SELECT h.hobby FROM user_hobbies uh JOIN hobbies h ON uh.hobby_id = h.id WHERE uh.user_id = ?";
+                "SELECT hobby FROM user_hobbies WHERE user_id = ?";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1,userId);
