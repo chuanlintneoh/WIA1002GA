@@ -27,9 +27,8 @@ public class AddHobbyDialog extends JDialog implements ActionListener {
         lblOther = new JLabel("Other hobbies:");
 
         // Create hobby text field
-        hobbyTextField = new JTextField();
+        hobbyTextField = new JTextField(20);
 
-        Database database = new Database();
         java.util.List<String> oriHobbies = database.viewUserHobbies(userID);
         hobbyListModel = new DefaultListModel<>();
         hobbyJList = new JList<>(hobbyListModel);
@@ -81,10 +80,16 @@ public class AddHobbyDialog extends JDialog implements ActionListener {
         contentPanel.add(btnConfirm);
 
         JPanel buttonPanel = new JPanel();
-        buttonPanel.add(lblOther);
-        buttonPanel.add(hobbyTextField);
-        buttonPanel.add(btnAdd);
-        buttonPanel.add(btnRemove);
+        JPanel buttonPanel1 = new JPanel();
+        buttonPanel1.add(lblOther);
+        buttonPanel1.add(hobbyTextField);
+        JPanel buttonPanel2 = new JPanel();
+        buttonPanel2.add(btnAdd);
+        buttonPanel2.add(btnRemove);
+        buttonPanel.add(buttonPanel1);
+        buttonPanel.add(buttonPanel2);
+        buttonPanel.add(buttonPanel1,BorderLayout.NORTH);
+        buttonPanel.add(buttonPanel2,BorderLayout.CENTER);
 
         JPanel closePanel = new JPanel();
         closePanel.add(btnSave);

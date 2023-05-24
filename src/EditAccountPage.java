@@ -2,28 +2,25 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
 
 public class EditAccountPage extends JFrame implements ActionListener {
     public static void main(String[] args) {
-        new EditAccountPage();
+        new EditAccountPage("chuanlin.tn");
     }
-    private final JLabel lblName, txtName, lblUsername, lblEmail, lblContactNo, lblDOB, txtDOB, lblGender, lblHobbies, lblJobHistory, txtGender;
-    private final JTextField txtUsername, txtEmail, txtContactNo;
+    private final JLabel lblUsername, txtUsername, lblName, lblEmail, lblContactNo, lblDOB, txtDOB, lblGender, txtGender, lblJobHistory, lblHobbies, lblAddress;
+    private final JTextField txtName, txtEmail, txtContactNo, txtAddress;
     private final JButton btnEditPassword, btnSaveChanges, btnEditBday, btnEditGender,btnAddHobby, btnAddJob;
-    // Data structures for storing selections
-    private ArrayList<String> hobbies; // ArrayList to store selected hobbies
-    Database database = new Database();
-    private final int userID = database.getUserId("vinnieying");
-    public EditAccountPage() {
+    private final Database database;
+    private final int userID;
+    public EditAccountPage(String username) {
         super("Edit Account Page");
-
-        System.out.println(userID);
+        database = new Database();
+        this.userID = database.getUserId(username);
 
         // Initialize GUI components
-        lblName = new JLabel("Name:");
-        txtName = new JLabel(database.get("name", userID));
         lblUsername = new JLabel("Username:");
+        txtUsername = new JLabel(database.get("username", userID));
+        lblName = new JLabel("Name:");
         lblEmail = new JLabel("Email address:");
         lblContactNo = new JLabel("Contact No.:");
         lblDOB = new JLabel("Date Of Birth:");
@@ -32,10 +29,12 @@ public class EditAccountPage extends JFrame implements ActionListener {
         txtGender = new JLabel(database.get("gender",userID));
         lblJobHistory = new JLabel("Job History:");
         lblHobbies = new JLabel("Hobbies:");
+        lblAddress = new JLabel("Address:");
 
-        txtUsername = new JTextField(database.get("username", userID), 20);
+        txtName = new JTextField(database.get("name", userID),20);
         txtEmail = new JTextField(database.get("email_address", userID), 20);
         txtContactNo = new JTextField(database.get("contact_no", userID), 20);
+        txtAddress = new JTextField(database.get("address",userID),20);
 
         btnEditBday = new JButton("Edit Birthday");
         btnEditBday.addActionListener(this);
@@ -50,9 +49,6 @@ public class EditAccountPage extends JFrame implements ActionListener {
         btnSaveChanges = new JButton("Save Changes");
         btnSaveChanges.addActionListener(this);
 
-        // Initialize data structures for storing selections
-        hobbies = new ArrayList<>(); // ArrayList to store selected hobbies
-
         // Add components to the frame
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -60,16 +56,15 @@ public class EditAccountPage extends JFrame implements ActionListener {
 
         gbc.gridx = 0;
         gbc.gridy = 0;
-        panel.add(lblName, gbc);
-        gbc.gridx = 1;
-        panel.add(txtName, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
         panel.add(lblUsername, gbc);
         gbc.gridx = 1;
         panel.add(txtUsername, gbc);
-        txtUsername.addActionListener(this);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        panel.add(lblName, gbc);
+        gbc.gridx = 1;
+        panel.add(txtName, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 2;
@@ -116,11 +111,17 @@ public class EditAccountPage extends JFrame implements ActionListener {
 
         gbc.gridx = 0;
         gbc.gridy = 8;
+        panel.add(lblAddress, gbc);
+
+        gbc.gridx = 1;
+        panel.add(txtAddress, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 9;
         gbc.gridwidth = 1;
         panel.add(btnEditPassword, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 9;
+        gbc.gridx = 2;
         gbc.gridwidth = 1;
         panel.add(btnSaveChanges, gbc);
         btnSaveChanges.setForeground(Color.WHITE);
@@ -142,13 +143,15 @@ public class EditAccountPage extends JFrame implements ActionListener {
         }
         else if (e.getSource() == btnSaveChanges) {
             String email = txtEmail.getText();
-            String username = txtUsername.getText();
+            String name = txtName.getText();
             String contactNo = txtContactNo.getText();
+            String address = txtAddress.getText();
             database.set("email_address",email,userID);
-            database.set("username",username,userID);
+            database.set("name",name,userID);
             database.set("contact_no",contactNo,userID);
+            database.set("address",address,userID);
             // Save changes made in the EditAccountPage window
-            saveChanges();
+            JOptionPane.showMessageDialog(this, "*ALL CHANGES ARE SAVED*", "Selections", JOptionPane.INFORMATION_MESSAGE);
         }
         else if (e.getSource() == btnEditBday) {
             EditBirthdayDialog dialog = new EditBirthdayDialog(this,userID,txtDOB);
@@ -165,36 +168,6 @@ public class EditAccountPage extends JFrame implements ActionListener {
         else if(e.getSource() == btnAddHobby){
             AddHobbyDialog dialog = new AddHobbyDialog(this,userID);
             dialog.setVisible(true);
-        }
-    }
-    private void saveChanges() {
-        hobbies.clear();
-        // Display the selected hobbies and job history
-        StringBuilder sb = new StringBuilder();
-        sb.append("Selected Hobbies:\n");
-        for (String hobby : hobbies) {
-            sb.append(hobby).append("\n");
-        }
-        sb.append("*ALL CHANGES ARE SAVED*");
-        JOptionPane.showMessageDialog(this, sb.toString(), "Selections", JOptionPane.INFORMATION_MESSAGE);
-        // Update user account details with edited information
-        String newUsername = txtUsername.getText();
-        String newEmail = txtEmail.getText();
-        String newContactNo = txtContactNo.getText();
-
-        // Example of updating the user account with new information
-        // Existing code...
-
-        // Print updated details to console (you can replace this with your logic)
-        System.out.println("Updated Account Details:");
-        System.out.println("Username: " + newUsername);
-        System.out.println("Email: " + newEmail);
-        System.out.println("Contact No.: " + newContactNo);
-
-        // Example of displaying selected hobbies (replace with your logic)
-        System.out.println("Selected Hobbies:");
-        for (String hobby : hobbies) {
-            System.out.println(hobby);
         }
     }
 }
