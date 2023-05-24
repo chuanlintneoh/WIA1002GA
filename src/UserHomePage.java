@@ -17,7 +17,7 @@ public class UserHomePage extends JFrame implements ActionListener {
         super("Home Page");
         loginPage = null;
 
-        txtSearchFriend = new JTextField("Search Friend", 50);
+        txtSearchFriend = new JTextField("Search Friend", 20);
         btnSearch = new JButton("Search");
         btnFriendReq = new JButton("View Friend Request");
         btnViewAcc = new JButton("View Account");
@@ -31,15 +31,25 @@ public class UserHomePage extends JFrame implements ActionListener {
 
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(Color.blue);
-        panel.setPreferredSize(new Dimension(100,40));
+        panel.setPreferredSize(new Dimension(1500,80));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10,10,10,10);
-        gbc.weightx = 1.0 ;
-        gbc.anchor = GridBagConstraints.EAST;
+
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        panel.add(txtSearchFriend, gbc);
+
+        gbc.gridx = 4;
+        panel.add(btnSearch,gbc);
+
+        gbc.gridx = 6;
         panel.add(btnLogOut,gbc);
 
+
         btnLogOut.addActionListener(this);
+        btnSearch.addActionListener(this);
 
         add(panel, BorderLayout.NORTH);
         setVisible(true);
@@ -48,7 +58,7 @@ public class UserHomePage extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e){
 
         if(e.getSource()== btnSearch){
-
+            System.out.println("Searching user: " + txtSearchFriend.getText());
         }
 
         else if(e.getSource()== btnFriendReq){
@@ -71,4 +81,3 @@ public class UserHomePage extends JFrame implements ActionListener {
         }
     }
 }
-
