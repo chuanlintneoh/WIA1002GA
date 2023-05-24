@@ -116,12 +116,12 @@ public class EditAccountPage extends JFrame implements ActionListener {
         gbc.gridx = 1;
         panel.add(txtAddress, gbc);
 
-        gbc.gridx = 1;
-        gbc.gridy = 9;
+        gbc.gridx = 0;
+        gbc.gridy = 10;
         gbc.gridwidth = 1;
         panel.add(btnEditPassword, gbc);
 
-        gbc.gridx = 2;
+        gbc.gridy = 11;
         gbc.gridwidth = 1;
         panel.add(btnSaveChanges, gbc);
         btnSaveChanges.setForeground(Color.WHITE);
