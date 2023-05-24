@@ -12,6 +12,7 @@ public class UserHomePage extends JFrame implements ActionListener {
     private final LoginPage loginPage;
     private final JTextField txtSearchFriend;
     private final JButton btnSearch, btnFriendReq, btnViewAcc, btnEditAcc, btnLogOut;
+    private final JLabel facebook;
 
     public UserHomePage() {
         super("Home Page");
@@ -24,6 +25,13 @@ public class UserHomePage extends JFrame implements ActionListener {
         btnEditAcc = new JButton("Edit Account");
         btnLogOut = new JButton("Log Out");
 
+        ImageIcon imageicon1 = new ImageIcon(getClass().getResource("facebook.png"));
+        Image image1 = imageicon1.getImage();
+        Image scalingimage1 = image1.getScaledInstance(350,50,Image.SCALE_SMOOTH);
+        ImageIcon scaledimage1 = new ImageIcon(scalingimage1);
+
+        facebook= new JLabel(scaledimage1);
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1500, 1000);
         setLocationRelativeTo(null);
@@ -34,19 +42,25 @@ public class UserHomePage extends JFrame implements ActionListener {
         panel.setPreferredSize(new Dimension(1500,80));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10,10,10,10);
 
+        gbc.insets = new Insets(10,10,10,80);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panel.add(facebook, gbc);
+
+        gbc.insets = new Insets(10,130,10,10);
         gbc.gridx = 2;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         panel.add(txtSearchFriend, gbc);
 
         gbc.gridx = 4;
+        gbc.insets = new Insets(10,10,10,10);
         panel.add(btnSearch,gbc);
 
         gbc.gridx = 6;
+        gbc.insets = new Insets(10,500,10,10);
         panel.add(btnLogOut,gbc);
-
 
         btnLogOut.addActionListener(this);
         btnSearch.addActionListener(this);
