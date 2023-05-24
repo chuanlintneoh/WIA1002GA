@@ -81,8 +81,6 @@ public class EditBirthdayDialog extends JDialog implements ActionListener {
         }else if (e.getActionCommand().equals("Cancel")){
             JOptionPane.showMessageDialog(this, "Your birthdate is NOT changed.", "Success", JOptionPane.INFORMATION_MESSAGE);
         }
-
-
         dispose(); // Close the dialog
     }
     private int getMonthNumber(String month) {

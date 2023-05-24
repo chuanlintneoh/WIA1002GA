@@ -252,6 +252,22 @@ public class Database {
         }
         return jobs;
     }// view ALL available jobs
+    public int getJobId(String jobName){
+        String query =
+                "SELECT id FROM jobs WHERE job = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1,jobName);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()){
+                return resultSet.getInt("id");
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return 0;
+    }
     public String getJob(int jobId){
         String query =
                 "SELECT job FROM jobs WHERE id = ?";
@@ -280,8 +296,8 @@ public class Database {
             e.printStackTrace();
         }
     }// insert a new job into database
-    public List<Job> viewUserJobs(int userId){
-        List<Job> userJobs = new ArrayList<>();
+    public Stack<Job> viewUserJobs(int userId){
+        Stack<Job> userJobs = new Stack<>();
         String query =
                 "SELECT uj.job_id, j.job, uj.start_date, uj.end_date " +
                 "FROM user_jobs uj " +
@@ -297,7 +313,7 @@ public class Database {
                 String startDate = resultSet.getString("start_date");
                 String endDate = resultSet.getString("end_date");
                 Job job = new Job(jobId,jobName,startDate,endDate);
-                userJobs.add(job);
+                userJobs.push(job);
             }
         }
         catch (SQLException e){
@@ -317,15 +333,21 @@ public class Database {
             e.printStackTrace();
         }
     }// clear user's jobs list
-    public void editUserJobs(int userId, List<Job> editedJobs){
+    public void editUserJobs(int userId, Stack<Job> editedJobs){
+        Stack<Job> reversedEditedJobs = new Stack<>();
+        while (!editedJobs.isEmpty()){
+            Job job = editedJobs.pop();
+            reversedEditedJobs.push(job);
+        }
         clearUserJobs(userId);
         String query =
                 "INSERT INTO user_jobs (user_id, job_id, start_date, end_date) VALUES (?, ?, ?, ?)";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
-            for (Job job: editedJobs){
-                statement.setInt(1,userId);
-                statement.setInt(2,job.getJobId());
+            while (!reversedEditedJobs.isEmpty()){
+                Job job = reversedEditedJobs.pop();
+                statement.setInt(1, userId);
+                statement.setInt(2, job.getJobId());
                 statement.setString(3, job.getStartDate());
                 statement.setString(4, job.getEndDate());
                 statement.executeUpdate();
@@ -335,6 +357,33 @@ public class Database {
             e.printStackTrace();
         }
     }// clear user's jobs list then update with new list
+    public void pushUserJob(int userId, Job o){
+        String query =
+                "INSERT INTO user_jobs (user_id, job_id, start_date, end_date) VALUES (?, ?, ?, ?)";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, userId);
+            statement.setInt(2, o.getJobId());
+            statement.setString(3,o.getStartDate());
+            statement.setString(4,o.getEndDate());
+            statement.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+    public void popUserJob(int userId){
+        Stack<Job> userJobs = viewUserJobs(userId);
+        if (!userJobs.isEmpty()){
+            userJobs.pop();
+            if (!userJobs.isEmpty()){
+                editUserJobs(userId,userJobs);
+            }
+            else {
+                clearUserJobs(userId);
+            }
+        }
+    }
     //Search users
     public List<Friend> searchUser(int userId, String keyword){
         List<Friend> searchResult = new ArrayList<>();

@@ -1,4 +1,4 @@
-public class Job {
+public class Job implements Comparable<Job>{
     private final int jobId;
     private final String jobName;
     private final String startDate;
@@ -38,5 +38,12 @@ public class Job {
     @Override
     public String toString(){
         return String.format("Job ID: %d, Job Name: %s, Start Date: %s, End Date: %s",jobId,jobName,startDate,endDate);
+    }
+    @Override
+    public int compareTo(Job o) {
+        if (this.startDate.compareTo(o.startDate) > 0){
+            return 1;
+        }
+        return 0;
     }
 }

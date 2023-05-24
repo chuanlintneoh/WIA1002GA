@@ -7,18 +7,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AddHobbyDialog extends JDialog implements ActionListener {
-    private JLabel lblSelect,lblOther,lblYourHobby;
-    private JCheckBox[] checkBoxes;
-    private JButton btnSave,btnCancel,btnAdd,btnRemove,btnConfirm;
-    private String[] hobbies = {"Reading", "Gardening", "Cooking", "Painting", "Photography"};
+    private final JLabel lblSelect,lblOther,lblYourHobby;
+    private final JCheckBox[] checkBoxes;
+    private final JButton btnSave,btnCancel,btnAdd,btnRemove,btnConfirm;
+    private final String[] hobbies = {"Reading", "Gardening", "Cooking", "Painting", "Photography"};
     private JScrollPane hobbyScrollPane;
-    private JList<String> hobbyJList;
-    private DefaultListModel<String> hobbyListModel;
-    private JTextField hobbyTextField;
+    private final JList<String> hobbyJList;
+    private final DefaultListModel<String> hobbyListModel;
+    private final JTextField hobbyTextField;
     private final int userID;
+    private final Database database;
     public AddHobbyDialog(Frame parent, int userID) {
         super(parent,"Hobbies",true);
         this.userID = userID;
+        database = new Database();
 
         lblYourHobby = new JLabel("Your Hobbies:");
         lblSelect = new JLabel("Select your hobbies:");
@@ -113,7 +115,7 @@ public class AddHobbyDialog extends JDialog implements ActionListener {
                 hobbyListModel.remove(selectedIndices[i]);
             }
         }if(e.getSource() == btnConfirm){
-            java.util.List<String> selectedHobbies = new ArrayList<>();
+            List<String> selectedHobbies = new ArrayList<>();
             // Check if the selected hobbies are not already in the hobbyListModel
             for (JCheckBox checkBox : checkBoxes) {
                 if (checkBox.isSelected()) {
@@ -137,12 +139,11 @@ public class AddHobbyDialog extends JDialog implements ActionListener {
             dispose();
         }
         if (e.getSource() == btnSave) {
-            Database s=new Database();
             if (hobbyListModel.isEmpty()) {
                 int choice = JOptionPane.showOptionDialog(this, "Nothing is saved as your hobby. \nAre you sure you want to quit?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
                 if (choice == JOptionPane.YES_OPTION) {
                     java.util.List<String> hobbies= new ArrayList<>();
-                    s.editUserHobbies(userID,hobbies);      //send null set
+                    database.editUserHobbies(userID,hobbies);      //send null set
                     dispose();
                 } else {
                     return;
@@ -152,7 +153,7 @@ public class AddHobbyDialog extends JDialog implements ActionListener {
                 for(int i=0;i<hobbyListModel.getSize();i++){
                     hobbies.add(hobbyListModel.getElementAt(i));
                 }
-                s.editUserHobbies(userID,hobbies);
+                database.editUserHobbies(userID,hobbies);
                 JOptionPane.showMessageDialog(this, "Your hobbies are SUCCESSFULLY saved!","Success",JOptionPane.INFORMATION_MESSAGE);
                 dispose();
             }
