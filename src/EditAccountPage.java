@@ -5,15 +5,17 @@ import java.awt.event.ActionListener;
 
 public class EditAccountPage extends JFrame implements ActionListener {
     public static void main(String[] args) {
-        new EditAccountPage("username");
+        new EditAccountPage("vinnieying");
     }
     private final JLabel lblUsername, txtUsername, lblName, lblEmail, lblContactNo, lblDOB, txtDOB, lblGender, txtGender, lblJobHistory, lblHobbies, lblAddress;
     private final JTextField txtName, txtEmail, txtContactNo, txtAddress;
     private final JButton btnEditPassword, btnEditBday, btnEditGender, btnAddJob, btnAddHobby, btnSaveChanges, btnAdmin;
     private final Database database;
     private final int userID;
+    private final String username;
     public EditAccountPage(String username) {
         super("Edit Account Page");
+        this.username = username;
         database = new Database();
         this.userID = database.getUserId(username);
 
@@ -60,6 +62,8 @@ public class EditAccountPage extends JFrame implements ActionListener {
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.NONE;
 
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -132,8 +136,10 @@ public class EditAccountPage extends JFrame implements ActionListener {
         gbc.gridy = 10;
         gbc.gridwidth = 1;
         panel.add(btnAdmin, gbc);
-        btnAdmin.setForeground(Color.WHITE);
-        btnAdmin.setBackground(Color.CYAN);
+        btnAdmin.setForeground(Color.white);
+        btnAdmin.setBackground(new Color(200,0,127));
+        btnAdmin.addActionListener(this);
+
 
         gbc.gridx = 1;
         gbc.gridy = 11;
@@ -167,6 +173,8 @@ public class EditAccountPage extends JFrame implements ActionListener {
             database.set("address",address,userID);
             // Save changes made in the EditAccountPage window
             JOptionPane.showMessageDialog(this, "*ALL CHANGES ARE SAVED*", "Selections", JOptionPane.INFORMATION_MESSAGE);
+            new ViewAccountPage(username);
+            dispose();
         }
         else if (e.getSource() == btnEditBday) {
             EditBirthdayDialog dialog = new EditBirthdayDialog(this,userID,txtDOB);

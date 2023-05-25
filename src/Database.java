@@ -1,3 +1,4 @@
+import java.io.ByteArrayInputStream;
 import java.sql.*;
 import java.util.*;
 public class Database {
@@ -86,6 +87,53 @@ public class Database {
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1,data);
+            statement.setInt(2,userId);
+            statement.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+    public byte[] getProfilePicture(int userId){
+        String query =
+                "SELECT profile_picture FROM users WHERE user_id = ?";
+        byte[] picture = null;
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,userId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()){
+                Blob profilePictureBlob = resultSet.getBlob("profile_picture");
+                if (profilePictureBlob != null){
+                    picture = profilePictureBlob.getBytes(1,(int)profilePictureBlob.length());
+                }
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return picture;
+    }
+    public void deleteProfilePicture(int userId){
+        String query =
+                "UPDATE users SET profile_picture = NULL WHERE user_id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,userId);
+            statement.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+    public void setProfilePicture(byte[] picture,int userId){
+        deleteProfilePicture(userId);
+        String query =
+                "UPDATE users SET profile_picture = ? WHERE user_id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(picture);
+            statement.setBinaryStream(1,inputStream);
             statement.setInt(2,userId);
             statement.executeUpdate();
         }
