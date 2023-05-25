@@ -5,11 +5,11 @@ import java.awt.event.ActionListener;
 
 public class EditAccountPage extends JFrame implements ActionListener {
     public static void main(String[] args) {
-        new EditAccountPage("chuanlin.tn");
+        new EditAccountPage("username");
     }
     private final JLabel lblUsername, txtUsername, lblName, lblEmail, lblContactNo, lblDOB, txtDOB, lblGender, txtGender, lblJobHistory, lblHobbies, lblAddress;
     private final JTextField txtName, txtEmail, txtContactNo, txtAddress;
-    private final JButton btnEditPassword, btnSaveChanges, btnEditBday, btnEditGender,btnAddHobby, btnAddJob;
+    private final JButton btnEditPassword, btnEditBday, btnEditGender, btnAddJob, btnAddHobby, btnSaveChanges, btnAdmin;
     private final Database database;
     private final int userID;
     public EditAccountPage(String username) {
@@ -46,6 +46,13 @@ public class EditAccountPage extends JFrame implements ActionListener {
         btnAddHobby.addActionListener(this);
         btnEditPassword = new JButton("Edit Password");
         btnEditPassword.addActionListener(this);
+        if (database.isAdmin(userID)){
+            btnAdmin = new JButton("Administrator Control");
+        }
+        else {
+            btnAdmin = new JButton("Verify as Admin");
+        }
+        btnAdmin.addActionListener(this);
         btnSaveChanges = new JButton("Save Changes");
         btnSaveChanges.addActionListener(this);
 
@@ -116,11 +123,19 @@ public class EditAccountPage extends JFrame implements ActionListener {
         gbc.gridx = 1;
         panel.add(txtAddress, gbc);
 
-        gbc.gridx = 0;
+        gbc.gridx = 1;
         gbc.gridy = 10;
         gbc.gridwidth = 1;
         panel.add(btnEditPassword, gbc);
 
+        gbc.gridx = 2;
+        gbc.gridy = 10;
+        gbc.gridwidth = 1;
+        panel.add(btnAdmin, gbc);
+        btnAdmin.setForeground(Color.WHITE);
+        btnAdmin.setBackground(Color.CYAN);
+
+        gbc.gridx = 1;
         gbc.gridy = 11;
         gbc.gridwidth = 1;
         panel.add(btnSaveChanges, gbc);
@@ -168,6 +183,18 @@ public class EditAccountPage extends JFrame implements ActionListener {
         else if(e.getSource() == btnAddHobby){
             AddHobbyDialog dialog = new AddHobbyDialog(this,userID);
             dialog.setVisible(true);
+        }
+        else if (e.getSource() == btnAdmin){
+            if (database.isAdmin(userID)){
+                //Administrator Page
+            }
+            else {
+                AdminVerificationDialog dialog = new AdminVerificationDialog(this,userID);
+                dialog.setVisible(true);
+                if (database.isAdmin(userID)){
+                    btnAdmin.setText("Administrator Control");
+                }
+            }
         }
     }
 }
