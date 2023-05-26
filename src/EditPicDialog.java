@@ -7,7 +7,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 public class EditPicDialog extends JDialog implements ActionListener{
     private final int userID;
     private final JButton btnUpload, btnDelete, btnClose;

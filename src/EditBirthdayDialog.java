@@ -65,8 +65,6 @@ public class EditBirthdayDialog extends JDialog implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("Save")) {
-
-
             int selectedDay = (int) birthDay.getSelectedItem();
             String selectedMonth = (String) birthMonth.getSelectedItem();
             int selectedYear = (int) birthYear.getSelectedItem();
@@ -79,7 +77,8 @@ public class EditBirthdayDialog extends JDialog implements ActionListener {
             txtDOB.setText(formattedDate);
 
             database.set("birthdate",formattedDate, userID);
-        }else if (e.getActionCommand().equals("Cancel")){
+        }
+        else if (e.getActionCommand().equals("Cancel")){
             JOptionPane.showMessageDialog(this, "Your birthdate is NOT changed.", "Success", JOptionPane.INFORMATION_MESSAGE);
         }
         dispose(); // Close the dialog
