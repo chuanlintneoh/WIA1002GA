@@ -204,11 +204,11 @@ public class EditAccountPage extends JFrame implements ActionListener {
             dispose();
         }
         else if (e.getSource() == btnEditBday) {
-            EditBirthdayDialog dialog = new EditBirthdayDialog(this,userID,txtDOB);
+            EditBirthdayDialog dialog = new EditBirthdayDialog(this,userID,btnEditBday);
             dialog.setVisible(true);
         }
         else if(e.getSource() == btnEditGender){
-            EditGenderDialog dialog = new EditGenderDialog(this,userID,txtGender);
+            EditGenderDialog dialog = new EditGenderDialog(this,userID,btnEditGender);
             dialog.setVisible(true);
         }
         else if(e.getSource() == btnAddJob){

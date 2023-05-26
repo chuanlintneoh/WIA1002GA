@@ -3,17 +3,18 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
-
 public class EditBirthdayDialog extends JDialog implements ActionListener {
     private final JComboBox<Integer> birthDay;
     private final JComboBox<String> birthMonth;
     private final JComboBox<Integer> birthYear;
+    private final Database database;
     private final int userID;
-    private final JLabel txtDOB;
-    public EditBirthdayDialog(Frame parent, int userID, JLabel txtDOB) {
+    private final JButton btnDOB;
+    public EditBirthdayDialog(Frame parent, int userID, JButton btnDOB) {
         super(parent, "Edit Birthday", true);
+        database = new Database();
         this.userID = userID;
-        this.txtDOB = txtDOB;
+        this.btnDOB = btnDOB;
 
         // Initialize components
         birthDay = new JComboBox<>();
@@ -64,7 +65,7 @@ public class EditBirthdayDialog extends JDialog implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("Save")) {
-            Database database = new Database();
+
 
             int selectedDay = (int) birthDay.getSelectedItem();
             String selectedMonth = (String) birthMonth.getSelectedItem();
@@ -75,7 +76,7 @@ public class EditBirthdayDialog extends JDialog implements ActionListener {
             JOptionPane.showMessageDialog(this, "Your birthdate is changed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
 
             // Update the birth date in the main frame
-            txtDOB.setText(formattedDate);
+            btnDOB.setText(formattedDate);
 
             database.set("birthdate",formattedDate, userID);
         }else if (e.getActionCommand().equals("Cancel")){

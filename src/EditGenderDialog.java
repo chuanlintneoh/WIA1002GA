@@ -2,16 +2,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 public class EditGenderDialog extends JDialog implements ActionListener {
-    private JLabel txtGender;
     private final JRadioButton radioMale, radioFemale, radioNotSet;
-    private final JButton btnSave, btnCancel;
+    private final JButton btnGender, btnSave, btnCancel;
     private final int userID;
-    public EditGenderDialog(Frame parent, int userID, JLabel txtGender) {
+    public EditGenderDialog(Frame parent, int userID, JButton btnGender) {
         super(parent, "Edit Gender", true);
         this.userID = userID;
-        this.txtGender = txtGender;
+        this.btnGender = btnGender;
 
         radioMale = new JRadioButton("Male");
         radioFemale = new JRadioButton("Female");
@@ -64,7 +62,7 @@ public class EditGenderDialog extends JDialog implements ActionListener {
             }
             Database database = new Database();
             database.set("gender",gender, userID);
-            txtGender.setText(gender);
+            btnGender.setText(gender);
             JOptionPane.showMessageDialog(this, "Your gender is changed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
             dispose();
         } else if (e.getActionCommand().equals("Cancel")) {
