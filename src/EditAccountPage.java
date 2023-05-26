@@ -244,6 +244,7 @@ public class EditAccountPage extends JFrame implements ActionListener {
             }
         }
         else if (e.getSource() == btnCancel){
+            new ViewAccountPage(username);
             dispose();
         }
     }
