@@ -46,17 +46,17 @@ public class EditAccountPage extends JFrame implements ActionListener {
 
         btnEditPic = new JButton("Edit Profile Picture");
         btnEditPic.addActionListener(this);
-        btnEditBday = new JButton(database.get("birthdate",userID));
-//        btnEditBday.setBorderPainted(false);
-//        btnEditBday.setContentAreaFilled(false);
-//        btnEditBday.setFont(btnEditBday.getFont().deriveFont(Font.PLAIN));
-//        btnEditBday.setForeground(Color.BLUE);
+        btnEditBday = new JButton("<html><u>Edit Birthday</u></html>");
+        btnEditBday.setBorderPainted(false);
+        btnEditBday.setContentAreaFilled(false);
+        btnEditBday.setFont(btnEditBday.getFont().deriveFont(Font.PLAIN));
+        btnEditBday.setForeground(Color.BLUE);
         btnEditBday.addActionListener(this);
-        btnEditGender = new JButton(database.get("gender",userID));
-//        btnEditGender.setBorderPainted(false);
-//        btnEditGender.setContentAreaFilled(false);
-//        btnEditGender.setForeground(Color.BLUE);
-//        btnEditGender.setFont(btnEditGender.getFont().deriveFont(Font.PLAIN));
+        btnEditGender = new JButton("<html><u>Edit Gender</u></html>");
+        btnEditGender.setBorderPainted(false);
+        btnEditGender.setContentAreaFilled(false);
+        btnEditGender.setForeground(Color.BLUE);
+        btnEditGender.setFont(btnEditGender.getFont().deriveFont(Font.PLAIN));
         btnEditGender.addActionListener(this);
         btnAddJob = new JButton("Add/Edit Job");
         btnAddJob.addActionListener(this);
@@ -119,8 +119,8 @@ public class EditAccountPage extends JFrame implements ActionListener {
         gbc.gridy = 5;
         panel.add(lblDOB, gbc);
         gbc.gridx = 1;
-//        panel.add(txtDOB, gbc);
-//        gbc.anchor = GridBagConstraints.EAST;
+        panel.add(txtDOB, gbc);
+        gbc.anchor = GridBagConstraints.EAST;
         panel.add(btnEditBday, gbc);
 
         gbc.gridx = 0;
@@ -128,8 +128,8 @@ public class EditAccountPage extends JFrame implements ActionListener {
         gbc.anchor = GridBagConstraints.WEST;
         panel.add(lblGender, gbc);
         gbc.gridx = 1;
-//        panel.add(txtGender,gbc);
-//        gbc.anchor = GridBagConstraints.EAST;
+        panel.add(txtGender,gbc);
+        gbc.anchor = GridBagConstraints.EAST;
         panel.add(btnEditGender,gbc);
 
         gbc.gridx = 0;
@@ -204,11 +204,11 @@ public class EditAccountPage extends JFrame implements ActionListener {
             dispose();
         }
         else if (e.getSource() == btnEditBday) {
-            EditBirthdayDialog dialog = new EditBirthdayDialog(this,userID,btnEditBday);
+            EditBirthdayDialog dialog = new EditBirthdayDialog(this,userID,txtDOB);
             dialog.setVisible(true);
         }
         else if(e.getSource() == btnEditGender){
-            EditGenderDialog dialog = new EditGenderDialog(this,userID,btnEditGender);
+            EditGenderDialog dialog = new EditGenderDialog(this,userID,txtGender);
             dialog.setVisible(true);
         }
         else if(e.getSource() == btnAddJob){
