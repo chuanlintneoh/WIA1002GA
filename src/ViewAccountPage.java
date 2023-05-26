@@ -4,12 +4,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Stack;
-
+import javax.swing.border.*;
+import java.time.*;
 public class ViewAccountPage extends JFrame implements ActionListener{
     public static void main(String[] args) {
-        new ViewAccountPage("vinnieying");
+        new ViewAccountPage("chuanlin.tn");
     }
-    private final JLabel lblName, txtName, lblUsername, txtUsername,lblEmail, txtEmail, lblContactNo, txtContactNo, lblDOB, txtDOB, lblGender, txtGender, lblHobbies, txtHobbies, lblJobHistory, lblAddress;
+    private final JLabel lblName, txtName, lblUsername, txtUsername,lblEmail, txtEmail, lblContactNo, txtContactNo, lblDOB, txtDOB, lblGender, txtGender, lblHobbies, txtHobbies, lblJobHistory, lblAddress, txtAge, lblProfilePicture;
     private final JTextArea txtJobHistory,txtAddress;
     private final JButton btnEditAcc;
     private final Database database;
@@ -31,6 +32,14 @@ public class ViewAccountPage extends JFrame implements ActionListener{
         lblContactNo = new JLabel("Contact No.:");
         txtContactNo = new JLabel(database.get("contact_no", userID));
         lblAddress = new JLabel("Address:");
+        lblProfilePicture = new JLabel(new ImageIcon("src/default_profile_pic.jpg"));
+        Border border = LineBorder.createBlackLineBorder();
+        lblProfilePicture.setBorder(border);
+        byte[] profilePictureData = database.getProfilePicture(userID);
+        if (profilePictureData != null){
+            ImageIcon profilePicture = new ImageIcon(profilePictureData);
+            lblProfilePicture.setIcon(profilePicture);
+        }
 
         txtAddress = new JTextArea(database.get("address",userID));
         txtAddress.setEditable(false);
@@ -40,16 +49,29 @@ public class ViewAccountPage extends JFrame implements ActionListener{
 
         lblDOB = new JLabel("Date Of Birth:");
         txtDOB = new JLabel(database.get("birthdate", userID));
+        LocalDate birthDate = LocalDate.parse(database.get("birthdate",userID));
+        int age = calculateAge(birthDate);
+        txtAge = new JLabel("Age:    " + String.valueOf(age) + "          ");
         lblGender = new JLabel("Gender:");
         txtGender = new JLabel(database.get("gender",userID));
 
         lblJobHistory = new JLabel("Job History:");
-        Stack<Job> jobs=database.viewUserJobs(userID);
+        Stack<Job> jobs = database.viewUserJobs(userID);
         StringBuilder jobList = new StringBuilder();
-        for (int i = 0; i <jobs.size(); i++) {
-            jobList.append(jobs.get(i).getJobName()+" (");
-            jobList.append(jobs.get(i).getStartDate().substring(0,4)+" - ");
-            jobList.append(jobs.get(i).getEndDate().substring(0,4)+")");
+        for (int i = 0; i < jobs.size(); i++) {
+            jobList.append(jobs.get(i).getJobName()).append(" (");
+            if (jobs.get(i).getStartDate() != null) {
+                jobList.append(jobs.get(i).getStartDate().substring(0, 4));
+            } else {
+                jobList.append("not set");
+            }
+            jobList.append(" - ");
+            if (jobs.get(i).getEndDate() != null) {
+                jobList.append(jobs.get(i).getEndDate().substring(0, 4));
+            } else {
+                jobList.append("not set");
+            }
+            jobList.append(")");
             if (i != jobs.size() - 1) {
                 jobList.append("\n");
             }
@@ -118,9 +140,12 @@ public class ViewAccountPage extends JFrame implements ActionListener{
         panel.add(lblGender, gbc);
         gbc.gridx = 1;
         panel.add(txtGender,gbc);
+        gbc.anchor = GridBagConstraints.EAST;
+        panel.add(txtAge, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 6;
+        gbc.anchor = GridBagConstraints.WEST;
         panel.add(lblAddress, gbc);
         gbc.gridx = 1;
         panel.add(txtAddress, gbc);
@@ -141,6 +166,12 @@ public class ViewAccountPage extends JFrame implements ActionListener{
         gbc.gridy = 9;
         panel.add(btnEditAcc,gbc);
 
+        lblProfilePicture.setPreferredSize(new Dimension(150,200));
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        gbc.gridheight = 6;
+        panel.add(lblProfilePicture, gbc);
+
         // Set frame properties
         add(panel);
         pack();
@@ -148,6 +179,11 @@ public class ViewAccountPage extends JFrame implements ActionListener{
         setSize(550, 600);
         setLocationRelativeTo(null);
         setVisible(true);
+    }
+    private int calculateAge(LocalDate birthDate) {
+        LocalDate currentDate = LocalDate.now();
+        Period period = Period.between(birthDate, currentDate);
+        return period.getYears();
     }
     @Override
     public void actionPerformed(ActionEvent e) {
