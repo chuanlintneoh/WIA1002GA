@@ -157,12 +157,15 @@ public class EditAccountPage extends JFrame implements ActionListener {
         btnAdmin.setForeground(Color.white);
         btnAdmin.setBackground(new Color(200,0,127));
 
+        JPanel closePanel = new JPanel();
         gbc.gridx = 1;
         gbc.gridy = 11;
         gbc.gridwidth = 1;
-        panel.add(btnSaveChanges, gbc);
+        closePanel.add(btnSaveChanges);
         btnSaveChanges.setForeground(Color.WHITE);
         btnSaveChanges.setBackground(new Color(46, 138, 87));
+        closePanel.add(btnCancel);
+        panel.add(closePanel, gbc);
 
         lblProfilePicture.setPreferredSize(new Dimension(150,200));
         gbc.anchor = GridBagConstraints.NORTH;
