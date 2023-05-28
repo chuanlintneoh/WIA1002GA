@@ -11,7 +11,7 @@ public class UserHomePage extends JFrame implements ActionListener {
     }
     private final LoginPage loginPage;
     private final JTextField txtSearchFriend;
-    private final JButton btnSearch, btnFriendReq, btnViewAcc, btnEditAcc, btnLogOut;
+    private final JButton btnSearch, btnFriendReq, btnUser, btnFriends, btnPages, btnHistory;
     private final JLabel facebook;
 
     public UserHomePage() {
@@ -21,9 +21,54 @@ public class UserHomePage extends JFrame implements ActionListener {
         txtSearchFriend = new JTextField("Search Friend", 20);
         btnSearch = new JButton("Search");
         btnFriendReq = new JButton("View Friend Request");
-        btnViewAcc = new JButton("View Account");
-        btnEditAcc = new JButton("Edit Account");
-        btnLogOut = new JButton("Log Out");
+        btnUser = new JButton("user name");
+        btnFriends = new JButton("Friends");
+        btnPages = new JButton("Pages");
+        btnHistory = new JButton("History");
+
+        JPopupMenu userDropDown = new JPopupMenu();
+        JMenuItem btnViewAcc = new JMenuItem("View Account");
+        JMenuItem btnEditAcc = new JMenuItem("Edit Account");
+        JMenuItem btnLogOut = new JMenuItem("Log Out");
+
+
+        userDropDown.add(btnViewAcc);
+        userDropDown.add(btnEditAcc);
+        userDropDown.add(btnLogOut);
+
+        ActionListener menuItemListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JMenuItem source = (JMenuItem) e.getSource();
+                String optionText = source.getText();
+
+                if(optionText.equals("View Account")){
+
+                }
+
+                else if(optionText.equals("Edit Account")){
+
+                }
+
+                else if(optionText.equals("Log Out")){
+                    LoginPage loginPage = new LoginPage();
+                    loginPage.setVisible(true);
+                    dispose();
+                }
+            }
+        };
+
+        btnViewAcc.addActionListener(menuItemListener);
+        btnEditAcc.addActionListener(menuItemListener);
+        btnLogOut.addActionListener(menuItemListener);
+
+        btnUser.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                userDropDown.show(btnUser,0,userDropDown.getHeight());
+            }
+        });
+
 
         ImageIcon imageicon1 = new ImageIcon(getClass().getResource("facebook.png"));
         Image image1 = imageicon1.getImage();
@@ -48,24 +93,42 @@ public class UserHomePage extends JFrame implements ActionListener {
         gbc.gridy = 0;
         panel.add(facebook, gbc);
 
-        gbc.insets = new Insets(10,130,10,10);
+        gbc.insets = new Insets(10,100,10,10);
         gbc.gridx = 2;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         panel.add(txtSearchFriend, gbc);
 
         gbc.gridx = 4;
-        gbc.insets = new Insets(10,10,10,10);
+        gbc.insets = new Insets(10,10,10,200);
         panel.add(btnSearch,gbc);
 
         gbc.gridx = 6;
-        gbc.insets = new Insets(10,500,10,10);
-        panel.add(btnLogOut,gbc);
+        gbc.insets = new Insets(10,200,10,100);
+        panel.add(btnUser,gbc);
+
+        JPanel panelLeft = new JPanel(new GridBagLayout());
+        panelLeft.setBackground(white);
+        panelLeft.setPreferredSize(new Dimension(250,1000));
+
+        gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.insets = new Insets(10,10,10,10);
+        panelLeft.add(btnFriends,gbc);
+
+        gbc.gridy = 1;
+        panelLeft.add(btnPages,gbc);
+
+        gbc.gridy=2;
+        gbc.insets = new Insets(10,10,500,10);
+        panelLeft.add(btnHistory,gbc);
 
         btnLogOut.addActionListener(this);
         btnSearch.addActionListener(this);
+        btnUser.addActionListener(this);
 
         add(panel, BorderLayout.NORTH);
+        add(panelLeft, BorderLayout.WEST);
         setVisible(true);
     }
     @Override
@@ -79,19 +142,31 @@ public class UserHomePage extends JFrame implements ActionListener {
 
         }
 
-        else if(e.getSource()== btnViewAcc){
+        else if(e.getSource()== btnFriends){
+
+        }
+
+        else if(e.getSource()== btnPages){
+
+        }
+
+        else if(e.getSource()== btnHistory){
+
+        }
+
+/*        else if(e.getSource()== btnViewAcc){
 
         }
 
         else if(e.getSource()== btnEditAcc){
 
-        }
+        } */
 
-        else if(e.getSource()== btnLogOut){
+ /*       else if(e.getSource()== btnLogOut){
             if(loginPage == null){
                 new LoginPage();
                 dispose();
             }
-        }
+        }*/
     }
 }
