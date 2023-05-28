@@ -12,7 +12,7 @@ public class UserHomePage extends JFrame implements ActionListener {
     private final LoginPage loginPage;
     private final JTextField txtSearchFriend;
     private final JButton btnSearch, btnFriendReq, btnUser, btnFriends, btnPages, btnHistory;
-    private final JLabel facebook;
+    private final JLabel forestbook;
 
     public UserHomePage() {
         super("Home Page");
@@ -25,15 +25,18 @@ public class UserHomePage extends JFrame implements ActionListener {
         btnFriends = new JButton("Friends");
         btnPages = new JButton("Pages");
         btnHistory = new JButton("History");
+        forestbook = new JLabel("forestbook");
 
         JPopupMenu userDropDown = new JPopupMenu();
         JMenuItem btnViewAcc = new JMenuItem("View Account");
         JMenuItem btnEditAcc = new JMenuItem("Edit Account");
         JMenuItem btnLogOut = new JMenuItem("Log Out");
 
-
+        btnViewAcc.setPreferredSize(new Dimension(120, 30));
         userDropDown.add(btnViewAcc);
+        btnEditAcc.setPreferredSize(new Dimension(120, 30));
         userDropDown.add(btnEditAcc);
+        btnLogOut.setPreferredSize(new Dimension(120, 30));
         userDropDown.add(btnLogOut);
 
         ActionListener menuItemListener = new ActionListener() {
@@ -70,12 +73,13 @@ public class UserHomePage extends JFrame implements ActionListener {
         });
 
 
-        ImageIcon imageicon1 = new ImageIcon(getClass().getResource("facebook.png"));
+/*        ImageIcon imageicon1 = new ImageIcon(getClass().getResource("facebook.png"));
         Image image1 = imageicon1.getImage();
         Image scalingimage1 = image1.getScaledInstance(350,50,Image.SCALE_SMOOTH);
         ImageIcon scaledimage1 = new ImageIcon(scalingimage1);
 
         facebook= new JLabel(scaledimage1);
+*/
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1500, 1000);
@@ -88,10 +92,14 @@ public class UserHomePage extends JFrame implements ActionListener {
 
         GridBagConstraints gbc = new GridBagConstraints();
 
-        gbc.insets = new Insets(10,10,10,80);
+
+
+        gbc.insets = new Insets(10,20,10,300);
         gbc.gridx = 0;
         gbc.gridy = 0;
-        panel.add(facebook, gbc);
+        forestbook.setFont(new Font("Arial",Font.BOLD,32));
+        forestbook.setForeground(WHITE);
+        panel.add(forestbook, gbc);
 
         gbc.insets = new Insets(10,100,10,10);
         gbc.gridx = 2;
@@ -105,6 +113,7 @@ public class UserHomePage extends JFrame implements ActionListener {
 
         gbc.gridx = 6;
         gbc.insets = new Insets(10,200,10,100);
+        btnUser.setPreferredSize(new Dimension(100, 30));
         panel.add(btnUser,gbc);
 
         JPanel panelLeft = new JPanel(new GridBagLayout());
@@ -113,14 +122,17 @@ public class UserHomePage extends JFrame implements ActionListener {
 
         gbc.gridy = 0;
         gbc.gridx = 0;
-        gbc.insets = new Insets(10,10,10,10);
+        gbc.insets = new Insets(0,10,0,10);
+        btnFriends.setPreferredSize(new Dimension(200, 60));
         panelLeft.add(btnFriends,gbc);
 
         gbc.gridy = 1;
+        btnPages.setPreferredSize(new Dimension(200, 60));
         panelLeft.add(btnPages,gbc);
 
         gbc.gridy=2;
-        gbc.insets = new Insets(10,10,500,10);
+        gbc.insets = new Insets(0,10,500,10);
+        btnHistory.setPreferredSize(new Dimension(200, 60));
         panelLeft.add(btnHistory,gbc);
 
         btnLogOut.addActionListener(this);
