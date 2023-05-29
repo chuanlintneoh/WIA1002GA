@@ -20,7 +20,13 @@ public class LoginPage extends JFrame implements ActionListener {
 //        lblRememberMe = new JLabel("Remember Me?");
 //        chkRememberMe = new JCheckBox();
         btnLogin = new JButton("Log In");
-        btnRegister = new JButton("Don't have an account");
+        btnLogin.setBackground(new Color(46,138,87));
+        btnLogin.setForeground(Color.WHITE);
+        btnRegister = new JButton("<html><u>Don't have an account</u></html>");
+        btnRegister.setBorderPainted(false);
+        btnRegister.setContentAreaFilled(false);
+        btnRegister.setFont(btnLogin.getFont().deriveFont(Font.PLAIN));
+        btnRegister.setForeground(Color.BLUE);
 //        btnForgotPassword = new JButton("Forgot password");
         // Add components to the frame
         JPanel panel = new JPanel(new GridBagLayout());

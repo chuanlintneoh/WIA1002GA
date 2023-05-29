@@ -2,25 +2,34 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import javax.swing.border.*;
 import java.time.*;
 public class ViewAccountPage extends JFrame implements ActionListener{
     public static void main(String[] args) {
-        new ViewAccountPage("chuanlin.tn");
+        new ViewAccountPage("vinnieying",5);//view friend account
+//        new ViewAccountPage("vinnieying",0);//view self account
     }
     private final JLabel lblName, txtName, lblUsername, txtUsername,lblEmail, txtEmail, lblContactNo, txtContactNo, lblDOB, txtDOB, lblGender, txtGender, lblHobbies, txtHobbies, lblJobHistory, lblAddress, txtAge, lblProfilePicture;
     private final JTextArea txtJobHistory,txtAddress;
-    private final JButton btnEditAcc;
+    private JButton btnEditAcc, btnStatus;
     private final Database database;
-    private final int userID;
-    private final String username;
-    public ViewAccountPage(String username) {
+    private final int userID;// viewing account's ID
+    private final String username;// current user's username
+
+    public ViewAccountPage(String username,int friendID) {
         super("View Account Page");
         this.username = username;
         database = new Database();
-        this.userID = database.getUserId(username);
+
+        if (friendID == 0) {// viewing own account
+            this.userID = database.getUserId(username);
+        }
+        else {// viewing friend's account
+            this.userID = friendID;
+        }
 
         // Initialize GUI components
         lblUsername = new JLabel("Username:");
@@ -134,18 +143,18 @@ public class ViewAccountPage extends JFrame implements ActionListener{
         panel.add(lblDOB, gbc);
         gbc.gridx = 1;
         panel.add(txtDOB, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 5;
-        panel.add(lblGender, gbc);
-        gbc.gridx = 1;
-        panel.add(txtGender,gbc);
         gbc.anchor = GridBagConstraints.EAST;
         panel.add(txtAge, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 6;
+        gbc.gridy = 5;
         gbc.anchor = GridBagConstraints.WEST;
+        panel.add(lblGender, gbc);
+        gbc.gridx = 1;
+        panel.add(txtGender,gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 6;
         panel.add(lblAddress, gbc);
         gbc.gridx = 1;
         panel.add(txtAddress, gbc);
@@ -162,11 +171,43 @@ public class ViewAccountPage extends JFrame implements ActionListener{
         gbc.gridx = 1;
         panel.add(txtHobbies,gbc);
 
+        gbc.anchor = GridBagConstraints.CENTER;
         gbc.gridx = 2;
         gbc.gridy = 9;
-        panel.add(btnEditAcc,gbc);
+        if (friendID != 0){
+            ArrayList<Friend> friendList = (ArrayList<Friend>) database.viewFriendsRequests(database.getUserId(username));
+            boolean friendFound = false;
+            for (Friend friend : friendList){
+                if(friend.getUserId() == friendID){
+                    btnStatus = new JButton(friend.getStatus());
+                    if(btnStatus.getText().equals("friend request sent")){
+                        btnStatus.setBackground(new Color(0,0,102));
+                        btnStatus.setForeground(Color.WHITE);
+                    } else if (btnStatus.getText().equals("receive request")) {
+                        btnStatus.setBackground(new Color(255,255,153));
+                    }else if(btnStatus.getText().equals("friends")){
+                        btnStatus.setBackground(new Color(0,204,0));
+                        btnStatus.setForeground(Color.WHITE);
+                    }
+                    btnStatus.addActionListener(this);
+                    panel.add(btnStatus,gbc);
+                    friendFound = true;
+                    break;
+                }
+            }if (!friendFound) {
+                btnStatus = new JButton("Add Friend");
+                btnStatus.setForeground(Color.WHITE);
+                btnStatus.setBackground(new Color(0,102,204));
+                btnStatus.addActionListener(this);
+                panel.add(btnStatus, gbc);
+            }
+        }
+        else {
+            panel.add(btnEditAcc,gbc);
+        }
 
-        lblProfilePicture.setPreferredSize(new Dimension(150,200));
+        lblProfilePicture.setPreferredSize(new Dimension(150,180));
+        gbc.anchor = GridBagConstraints.NORTH;
         gbc.gridx = 2;
         gbc.gridy = 0;
         gbc.gridheight = 6;
@@ -190,6 +231,54 @@ public class ViewAccountPage extends JFrame implements ActionListener{
         if (e.getSource() == btnEditAcc) {
             new EditAccountPage(username);
             dispose();
+        }
+        else if (e.getSource() == btnStatus){
+            if (btnStatus.getText().equals("Add Friend")){
+                database.insertStatus(database.getUserId(username), userID, 1);// send request
+                database.insertStatus(userID, database.getUserId(username), 2);// receive request
+                JOptionPane.showMessageDialog(this, "Your friend request is sent!.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                btnStatus.setText("Friend request sent");
+                btnStatus.setBackground(new Color(0,0,102));
+                btnStatus.setForeground(Color.white);
+            }
+            else if (btnStatus.getText().equals("Friend request sent")) {
+                int response = JOptionPane.showConfirmDialog(this, "Are you sure you want to cancel your friend request?", "Confirm", JOptionPane.YES_NO_OPTION);
+                if (response == JOptionPane.YES_OPTION) {
+                    database.removeStatus(database.getUserId(username),userID);// delete request
+                    JOptionPane.showMessageDialog(this, "Friend request cancelled.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    btnStatus.setText("Add Friend");
+                    btnStatus.setBackground(new Color(0,102,204));
+                    btnStatus.setForeground(Color.white);
+                }
+            }
+            else if (btnStatus.getText().equals("Received friend request")){
+                Object[] options = {"Confirm", "Delete"};
+                int response = JOptionPane.showOptionDialog(this, "Confirm friend request?", "Confirm",
+                        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+                if (response == 0){//confirm
+                    database.updateStatus(database.getUserId(username),userID,3);// Update status to friends
+                    JOptionPane.showMessageDialog(this, "You two are now friends!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    btnStatus.setText("Friend");
+                    btnStatus.setBackground(new Color(0,204,0));
+                    btnStatus.setForeground(Color.WHITE);
+                }
+                else if (response == 1){//delete
+                    database.removeStatus(database.getUserId(username),userID);
+                    JOptionPane.showMessageDialog(this, "You deleted the friend request...", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    btnStatus.setText("Add Friend");
+                    btnStatus.setBackground(new Color(0,102,204));
+                    btnStatus.setForeground(Color.WHITE);
+                }
+            }
+            else if (btnStatus.getText().equals("Friend")){
+                int response = JOptionPane.showConfirmDialog(this, "UNFRIEND?", "Confirm", JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null);
+                if(response == JOptionPane.YES_OPTION) {
+                    database.removeStatus(database.getUserId(username),userID);
+                    btnStatus.setText("Add Friend");
+                    btnStatus.setBackground(new Color(0,102,204));
+                    btnStatus.setForeground(Color.white);
+                }
+            }
         }
     }
 }

@@ -73,6 +73,12 @@ public class SetDateDialog extends JDialog implements ActionListener {
             int year = (int) dateYear.getSelectedItem();
             String monthString = (String) dateMonth.getSelectedItem();
             int month = Arrays.asList(new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sept","Oct","Nov","Dec"}).indexOf(monthString);
+
+            if (!isValidDate(day, month + 1, year)) {
+                JOptionPane.showMessageDialog(this, "Invalid date selected!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             selectedDate = String.format("%04d-%02d-%02d", year, month + 1, day);
             isDateSelected = true;
             btn.setText(selectedDate);
@@ -81,5 +87,13 @@ public class SetDateDialog extends JDialog implements ActionListener {
             isDateSelected = false;
         }
         dispose();
+    }
+    private boolean isValidDate(int day, int month, int year) {
+
+        int[] daysInMonth = {31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+        return day >= 1 && day <= daysInMonth[month - 1];
+    }
+    private boolean isLeapYear(int year) {
+        return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
     }
 }

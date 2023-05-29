@@ -9,12 +9,12 @@ public class EditBirthdayDialog extends JDialog implements ActionListener {
     private final JComboBox<Integer> birthYear;
     private final Database database;
     private final int userID;
-    private final JLabel txtDOB;
-    public EditBirthdayDialog(Frame parent, int userID, JLabel txtDOB) {
+    private final JButton btnDOB;
+    public EditBirthdayDialog(Frame parent, int userID, JButton btnDOB) {
         super(parent, "Edit Birthday", true);
         database = new Database();
         this.userID = userID;
-        this.txtDOB = txtDOB;
+        this.btnDOB = btnDOB;
 
         // Initialize components
         birthDay = new JComboBox<>();
@@ -69,19 +69,46 @@ public class EditBirthdayDialog extends JDialog implements ActionListener {
             String selectedMonth = (String) birthMonth.getSelectedItem();
             int selectedYear = (int) birthYear.getSelectedItem();
 
-            // Format the birth date as desired (e.g., "YYYY-MM-DD")
+            if (!isValidDate(selectedDay, selectedMonth, selectedYear)) {
+                JOptionPane.showMessageDialog(this, "Invalid date selected!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             String formattedDate = String.format("%04d-%02d-%02d", selectedYear, getMonthNumber(selectedMonth), selectedDay);
-            JOptionPane.showMessageDialog(this, "Your birthdate is changed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Your birthdate has been changed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
 
-            // Update the birth date in the main frame
-            txtDOB.setText(formattedDate);
+            btnDOB.setText(formattedDate);
+            database.set("birthdate", formattedDate, userID);
+        } else if (e.getActionCommand().equals("Cancel")) {
+            JOptionPane.showMessageDialog(this, "Your birthdate has not been changed.", "Success", JOptionPane.INFORMATION_MESSAGE);
+        }
+        dispose();
+    }
 
-            database.set("birthdate",formattedDate, userID);
+    public boolean isValidDate(int day, String month, int year) {
+        int monthNumber = getMonthNumber(month);
+
+        if (monthNumber == 2) {
+            if (isLeapYear(year)) {
+                return day <= 29;
+            } else {
+                return day <= 28;
+            }
+        } else if (monthNumber == 4 || monthNumber == 6 || monthNumber == 9 || monthNumber == 11) {
+            return day <= 30;
+        } else {
+            return true;
         }
-        else if (e.getActionCommand().equals("Cancel")){
-            JOptionPane.showMessageDialog(this, "Your birthdate is NOT changed.", "Success", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public boolean isLeapYear(int year) {
+        if (year % 4 != 0) {
+            return false;
+        } else if (year % 100 != 0) {
+            return true;
+        } else {
+            return year % 400 == 0;
         }
-        dispose(); // Close the dialog
     }
     private int getMonthNumber(String month) {
         String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"};

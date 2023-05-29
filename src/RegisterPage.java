@@ -31,7 +31,7 @@ public class RegisterPage extends JFrame implements ActionListener {
         txtEmail = new JTextField(20);
         lblContactNo = new JLabel("Contact No.:");
         txtContactNo = new JTextField(20);
-        lblDOB = new JLabel("Date Of Birth");
+        lblDOB = new JLabel("Date Of Birth:");
         Integer[] days = new Integer[31];
         for (int i = 1; i <= days.length; i++){
             days[i-1] = i;
@@ -44,7 +44,7 @@ public class RegisterPage extends JFrame implements ActionListener {
             years[i-1] = currentYear-100+i;
         }
         birthYear = new JComboBox<>(years);
-        lblGender = new JLabel("Gender");
+        lblGender = new JLabel("Gender:");
         radioMale = new JRadioButton("Male");
         radioFemale = new JRadioButton("Female");
         radioNotSet = new JRadioButton("Prefer not to tell");
@@ -52,11 +52,22 @@ public class RegisterPage extends JFrame implements ActionListener {
         genderGroup.add(radioMale);
         genderGroup.add(radioFemale);
         genderGroup.add(radioNotSet);
+
         btnRegister = new JButton("Register");
-        btnLogin = new JButton("Already have an account");
+        btnRegister.setBackground(new Color(46,138,87));
+        btnRegister.setForeground(Color.WHITE);
+        btnRegister.addActionListener(this);
+        btnLogin = new JButton("<html><u>Already have an Account</u></html>");
+        btnLogin.setBorderPainted(false);
+        btnLogin.setContentAreaFilled(false);
+        btnLogin.setFont(btnLogin.getFont().deriveFont(Font.PLAIN));
+        btnLogin.setForeground(Color.BLUE);
+        btnLogin.addActionListener(this);
+
         // Add components to the frame
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -93,6 +104,7 @@ public class RegisterPage extends JFrame implements ActionListener {
         panel.add(lblDOB, gbc);
         gbc.gridx = 0;
         gbc.gridy = 7;
+        gbc.anchor = GridBagConstraints.CENTER;
         panel.add(birthDay, gbc);
         gbc.gridx = 1;
         panel.add(birthMonth, gbc);
@@ -100,9 +112,11 @@ public class RegisterPage extends JFrame implements ActionListener {
         panel.add(birthYear, gbc);
         gbc.gridx = 0;
         gbc.gridy = 8;
+        gbc.anchor = GridBagConstraints.WEST;
         panel.add(lblGender, gbc);
         gbc.gridx = 0;
         gbc.gridy = 9;
+        gbc.anchor = GridBagConstraints.CENTER;
         panel.add(radioMale, gbc);
         gbc.gridx = 1;
         panel.add(radioFemale, gbc);
@@ -116,9 +130,7 @@ public class RegisterPage extends JFrame implements ActionListener {
         gbc.gridy = 11;
         gbc.gridwidth = 4;
         panel.add(btnLogin, gbc);
-        // Add action listeners to buttons
-        btnRegister.addActionListener(this);
-        btnLogin.addActionListener(this);
+
         // Set frame properties
         add(panel);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -139,6 +151,12 @@ public class RegisterPage extends JFrame implements ActionListener {
             int year = (int) birthYear.getSelectedItem();
             String monthString = (String) birthMonth.getSelectedItem();
             int month = Arrays.asList(new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sept","Oct","Nov","Dec"}).indexOf(monthString);
+
+            if (!isValidDate(day, month + 1, year)) {
+                JOptionPane.showMessageDialog(this, "Invalid date of birth selected!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             String birthDate = String.format("%04d-%02d-%02d", year, month + 1, day);
             char gender;
             if (radioMale.isSelected()) {
@@ -168,5 +186,15 @@ public class RegisterPage extends JFrame implements ActionListener {
             }
             RegisterPage.this.setVisible(false);
         }
+    }
+
+    private boolean isValidDate(int day, int month, int year) {
+
+        int[] daysInMonth = {31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+        return day >= 1 && day <= daysInMonth[month - 1];
+    }
+
+    private boolean isLeapYear(int year) {
+        return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
     }
 }

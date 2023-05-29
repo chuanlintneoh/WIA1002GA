@@ -51,4 +51,3 @@ public class AdminVerificationDialog extends JDialog implements ActionListener {
         }
     }
 }
-

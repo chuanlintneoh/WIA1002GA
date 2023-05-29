@@ -5,7 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 public class EditAccountPage extends JFrame implements ActionListener {
-    private final JLabel lblUsername, txtUsername, lblName, lblEmail, lblContactNo, lblDOB, txtDOB, lblGender, txtGender, lblJobHistory, lblHobbies, lblAddress, lblProfilePicture;
+    private final JLabel lblUsername, txtUsername, lblName, lblEmail, lblContactNo, lblDOB, lblGender, lblJobHistory, lblHobbies, lblAddress, lblProfilePicture;
     private final JTextField txtName, txtEmail, txtContactNo, txtAddress;
     private final JButton btnEditPic, btnEditPassword, btnEditBday, btnEditGender, btnAddJob, btnAddHobby, btnSaveChanges, btnCancel, btnAdmin;
     private final Database database;
@@ -24,9 +24,7 @@ public class EditAccountPage extends JFrame implements ActionListener {
         lblEmail = new JLabel("Email address:");
         lblContactNo = new JLabel("Contact No.:");
         lblDOB = new JLabel("Date Of Birth:");
-        txtDOB = new JLabel(database.get("birthdate", userID));
         lblGender = new JLabel("Gender:");
-        txtGender = new JLabel(database.get("gender",userID));
         lblJobHistory = new JLabel("Job History:");
         lblHobbies = new JLabel("Hobbies:");
         lblAddress = new JLabel("Address:");
@@ -46,18 +44,21 @@ public class EditAccountPage extends JFrame implements ActionListener {
 
         btnEditPic = new JButton("Edit Profile Picture");
         btnEditPic.addActionListener(this);
-        btnEditBday = new JButton("<html><u>Edit Birthday</u></html>");
+        btnEditBday = new JButton(String.format("<html><u>%s</u></html>",database.get("birthdate",userID)));
         btnEditBday.setBorderPainted(false);
         btnEditBday.setContentAreaFilled(false);
         btnEditBday.setFont(btnEditBday.getFont().deriveFont(Font.PLAIN));
         btnEditBday.setForeground(Color.BLUE);
         btnEditBday.addActionListener(this);
-        btnEditGender = new JButton("<html><u>Edit Gender</u></html>");
+        int leftPadding=5;
+        btnEditBday.setBorder(BorderFactory.createEmptyBorder(0, leftPadding, 0, 0));
+        btnEditGender = new JButton(String.format("<html><u>%s</u></html>",database.get("gender", userID)));
         btnEditGender.setBorderPainted(false);
         btnEditGender.setContentAreaFilled(false);
         btnEditGender.setForeground(Color.BLUE);
         btnEditGender.setFont(btnEditGender.getFont().deriveFont(Font.PLAIN));
         btnEditGender.addActionListener(this);
+        btnEditGender.setBorder(BorderFactory.createEmptyBorder(0, leftPadding, 0, 0));
         btnAddJob = new JButton("Add/Edit Job");
         btnAddJob.addActionListener(this);
         btnAddHobby = new JButton("Add/Edit Hobby");
@@ -73,7 +74,7 @@ public class EditAccountPage extends JFrame implements ActionListener {
             btnAdmin = new JButton("Verify as Admin");
         }
         btnAdmin.addActionListener(this);
-        btnSaveChanges = new JButton("Save Changes");
+        btnSaveChanges = new JButton("Save");
         btnSaveChanges.addActionListener(this);
         btnCancel = new JButton("Cancel");
         btnCancel.addActionListener(this);
@@ -119,8 +120,7 @@ public class EditAccountPage extends JFrame implements ActionListener {
         gbc.gridy = 5;
         panel.add(lblDOB, gbc);
         gbc.gridx = 1;
-        panel.add(txtDOB, gbc);
-        gbc.anchor = GridBagConstraints.EAST;
+
         panel.add(btnEditBday, gbc);
 
         gbc.gridx = 0;
@@ -128,8 +128,6 @@ public class EditAccountPage extends JFrame implements ActionListener {
         gbc.anchor = GridBagConstraints.WEST;
         panel.add(lblGender, gbc);
         gbc.gridx = 1;
-        panel.add(txtGender,gbc);
-        gbc.anchor = GridBagConstraints.EAST;
         panel.add(btnEditGender,gbc);
 
         gbc.gridx = 0;
@@ -157,16 +155,17 @@ public class EditAccountPage extends JFrame implements ActionListener {
         btnAdmin.setBackground(new Color(200,0,127));
 
         JPanel closePanel = new JPanel();
-        gbc.gridx = 1;
+        gbc.gridx = 2;
         gbc.gridy = 10;
         gbc.gridwidth = 1;
-        closePanel.add(btnSaveChanges);
+        gbc.anchor = GridBagConstraints.WEST;
+        closePanel.add(btnSaveChanges,gbc);
         btnSaveChanges.setForeground(Color.WHITE);
         btnSaveChanges.setBackground(new Color(46, 138, 87));
         closePanel.add(btnCancel);
         panel.add(closePanel, gbc);
 
-        lblProfilePicture.setPreferredSize(new Dimension(150,200));
+        lblProfilePicture.setPreferredSize(new Dimension(150,180));
         gbc.anchor = GridBagConstraints.NORTH;
         gbc.gridx = 2;
         gbc.gridy = 0;
@@ -200,15 +199,15 @@ public class EditAccountPage extends JFrame implements ActionListener {
             database.set("address",address,userID);
             // Save changes made in the EditAccountPage window
             JOptionPane.showMessageDialog(this, "*ALL CHANGES ARE SAVED*", "Selections", JOptionPane.INFORMATION_MESSAGE);
-            new ViewAccountPage(username);
+            new ViewAccountPage(username,0);
             dispose();
         }
         else if (e.getSource() == btnEditBday) {
-            EditBirthdayDialog dialog = new EditBirthdayDialog(this,userID,txtDOB);
+            EditBirthdayDialog dialog = new EditBirthdayDialog(this,userID,btnEditBday);
             dialog.setVisible(true);
         }
         else if(e.getSource() == btnEditGender){
-            EditGenderDialog dialog = new EditGenderDialog(this,userID,txtGender);
+            EditGenderDialog dialog = new EditGenderDialog(this,userID,btnEditGender);
             dialog.setVisible(true);
         }
         else if(e.getSource() == btnAddJob){
@@ -243,7 +242,7 @@ public class EditAccountPage extends JFrame implements ActionListener {
             }
         }
         else if (e.getSource() == btnCancel){
-            new ViewAccountPage(username);
+            new ViewAccountPage(username,0);
             dispose();
         }
     }
