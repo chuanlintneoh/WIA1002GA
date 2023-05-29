@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.awt.Image;
 public class User {
     private int userId;
@@ -25,13 +24,15 @@ public class User {
         database.registerUser(this);
         database.close();
     }
-    public User(int userId, String name, String username, String email, String contactNo){
+    public User(int userId, String name, String username, String email, String contactNo, String birthDate, char gender, String address){
         this.userId = userId;
         this.name = name;
         this.username = username;
         this.emailAddress = email;
         this.contactNo = contactNo;
-
+        this.birthDate = birthDate;
+        this.gender = gender;
+        this.address = address;
     }
     public String getUsername(){
         return username;

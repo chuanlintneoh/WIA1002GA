@@ -544,7 +544,7 @@ public class Database {
     public List<User> viewAllUsers(){
         List<User> allUsers = new ArrayList<>();
         String query =
-                "SELECT user_id, name, username, email_address, contact_no FROM users";
+                "SELECT user_id, name, username, email_address, contact_no, birthdate, gender, address FROM users";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             ResultSet resultSet = statement.executeQuery();
@@ -554,7 +554,10 @@ public class Database {
                 String username = resultSet.getString("username");
                 String email = resultSet.getString("email_address");
                 String contactNo = resultSet.getString("contact_no");
-                allUsers.add(new User(userId,name,username,email,contactNo));
+                String birthdate = resultSet.getString("birthdate");
+                char gender = resultSet.getString("gender").charAt(0);
+                String address = resultSet.getString("address");
+                allUsers.add(new User(userId,name,username,email,contactNo,birthdate,gender,address));
             }
         }
         catch (SQLException e){
