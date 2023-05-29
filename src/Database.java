@@ -35,16 +35,26 @@ public class Database {
             e.printStackTrace();
         }
     }
-    public boolean authenticateUser(String username,String password){
+    public int authenticateUser(String username,String hashedPassword){
+        String query =
+                "SELECT user_id FROM users WHERE (username = ? OR email_address = ? OR contact_no = ?) AND password = ?";
         try {
-            String query =
-                    String.format("SELECT * FROM users WHERE (username='%s' OR email_address='%s' OR contact_no='%s') AND password='%s'",username,username,username,password);
-            ResultSet resultSet = statement.executeQuery(query);// Execute the query
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1,username);
+            statement.setString(2,username);
+            statement.setString(3,username);
+            statement.setString(4,hashedPassword);
+            ResultSet resultSet = statement.executeQuery();
             // If a row is returned, the user exists and the credentials are valid
-            return resultSet.next();
+            if (resultSet.next()){
+                return resultSet.getInt("user_id");
+            }
+            else {
+                return -1;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return -1;
         }
     }
     public int getUserId(String username){

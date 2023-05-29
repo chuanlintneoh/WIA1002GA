@@ -14,7 +14,7 @@ public class ViewAccountPage extends JFrame implements ActionListener{
     }
     private final JLabel lblName, txtName, lblUsername, txtUsername,lblEmail, txtEmail, lblContactNo, txtContactNo, lblDOB, txtDOB, lblGender, txtGender, lblHobbies, txtHobbies, lblJobHistory, lblAddress, txtAge, lblProfilePicture;
     private final JTextArea txtJobHistory,txtAddress;
-    private JButton btnEditAcc, btnStatus;
+    private JButton btnHome, btnEditAcc, btnStatus;
     private final Database database;
     private final int userID;// viewing account's ID
     private final String username;// current user's username
@@ -104,6 +104,8 @@ public class ViewAccountPage extends JFrame implements ActionListener{
         }
         txtHobbies = new JLabel(hobbyList.toString());
 
+        btnHome = new JButton("Home");
+        btnHome.addActionListener(this);
         btnEditAcc = new JButton("Edit Account");
         btnEditAcc.addActionListener(this);
 
@@ -206,6 +208,10 @@ public class ViewAccountPage extends JFrame implements ActionListener{
             panel.add(btnEditAcc,gbc);
         }
 
+        gbc.gridx = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        panel.add(btnHome,gbc);
+
         lblProfilePicture.setPreferredSize(new Dimension(150,180));
         gbc.anchor = GridBagConstraints.NORTH;
         gbc.gridx = 2;
@@ -228,8 +234,12 @@ public class ViewAccountPage extends JFrame implements ActionListener{
     }
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == btnEditAcc) {
+        if (e.getSource() == btnEditAcc){
             new EditAccountPage(username);
+            dispose();
+        }
+        else if (e.getSource() == btnHome){
+            new HomePage(database.getUserId(username));
             dispose();
         }
         else if (e.getSource() == btnStatus){

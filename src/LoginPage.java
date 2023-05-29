@@ -3,17 +3,17 @@ import java.awt.*;
 import java.awt.event.*;
 public class LoginPage extends JFrame implements ActionListener {
     private final RegisterPage registerPage;
-    public static void main(String[] args) {
-        new LoginPage();
-    }
     //private JLabel lblRememberMe;
     private final JTextField txtUsername;
     private final JPasswordField txtPassword;
     //private JCheckBox chkRememberMe;
     private final JButton btnLogin, btnRegister;// btnForgotPassword
+    private final Database database;
+    private int userID;
     public LoginPage(){
         super("User Login Page");
         registerPage = null;
+        database = new Database();
         // Initialize GUI components
         txtUsername = new JTextField("Username",20);
         txtPassword = new JPasswordField("Password",20);
@@ -73,9 +73,11 @@ public class LoginPage extends JFrame implements ActionListener {
                 JOptionPane.showMessageDialog(this, "All fields are required.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            Database database = new Database();
-            if (database.authenticateUser(username,password)){
+            this.userID = database.authenticateUser(username,password);
+            if (userID > 0){
                 JOptionPane.showMessageDialog(this, "Log in successful.", "Registration Success", JOptionPane.INFORMATION_MESSAGE);
+                new HomePage(userID);
+                dispose();
             }
             else {
                 JOptionPane.showMessageDialog(this, "Username and password does not match! Please log in again.", "Error", JOptionPane.ERROR_MESSAGE);

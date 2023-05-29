@@ -5,9 +5,6 @@ import java.util.Calendar;
 import java.util.Arrays;
 public class RegisterPage extends JFrame implements ActionListener {
     private final LoginPage loginPage;
-    public static void main(String[] args) {
-        new RegisterPage();
-    }
     private final JLabel lblName, lblUsername, lblPassword, lblConfirmPassword, lblEmail, lblContactNo, lblDOB, lblGender;
     private final JTextField txtName, txtUsername, txtEmail, txtContactNo;
     private final JPasswordField txtPassword, txtConfirmPassword;
@@ -151,12 +148,10 @@ public class RegisterPage extends JFrame implements ActionListener {
             int year = (int) birthYear.getSelectedItem();
             String monthString = (String) birthMonth.getSelectedItem();
             int month = Arrays.asList(new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sept","Oct","Nov","Dec"}).indexOf(monthString);
-
             if (!isValidDate(day, month + 1, year)) {
                 JOptionPane.showMessageDialog(this, "Invalid date of birth selected!", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
             String birthDate = String.format("%04d-%02d-%02d", year, month + 1, day);
             char gender;
             if (radioMale.isSelected()) {
@@ -187,13 +182,11 @@ public class RegisterPage extends JFrame implements ActionListener {
             RegisterPage.this.setVisible(false);
         }
     }
-
     private boolean isValidDate(int day, int month, int year) {
 
         int[] daysInMonth = {31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
         return day >= 1 && day <= daysInMonth[month - 1];
     }
-
     private boolean isLeapYear(int year) {
         return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
     }
