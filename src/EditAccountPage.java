@@ -52,15 +52,14 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
         btnEditBday.setFont(btnEditBday.getFont().deriveFont(Font.PLAIN));
         btnEditBday.setForeground(Color.BLUE);
         btnEditBday.addActionListener(this);
-        int leftPadding=5;
-        btnEditBday.setBorder(BorderFactory.createEmptyBorder(0, leftPadding, 0, 0));
+        btnEditBday.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
         btnEditGender = new JButton(String.format("<html><u>%s</u></html>",database.get("gender", userID)));
         btnEditGender.setBorderPainted(false);
         btnEditGender.setContentAreaFilled(false);
         btnEditGender.setForeground(Color.BLUE);
         btnEditGender.setFont(btnEditGender.getFont().deriveFont(Font.PLAIN));
         btnEditGender.addActionListener(this);
-        btnEditGender.setBorder(BorderFactory.createEmptyBorder(0, leftPadding, 0, 0));
+        btnEditGender.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
         btnAddJob = new JButton("Add/Edit Job");
         btnAddJob.addActionListener(this);
         btnAddHobby = new JButton("Add/Edit Hobby");
@@ -81,8 +80,6 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
         btnCancel = new JButton("Cancel");
         btnCancel.addActionListener(this);
         btnBack = new JButton("Back");
-//        Icon backIcon = UIManager.getIcon("Table.ascendingSortIcon");
-//        btnBack.setIcon(backIcon);
         btnBack.addActionListener(this);
 
         // Add components to the frame
@@ -160,6 +157,10 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
         btnAdmin.setForeground(Color.white);
         btnAdmin.setBackground(new Color(200,0,127));
 
+        gbc.gridx = 1;
+        gbc.gridy = 10;
+        panel.add(btnBack,gbc);
+
         JPanel closePanel = new JPanel();
         gbc.gridx = 2;
         gbc.gridy = 10;
@@ -187,6 +188,9 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
         setSize(550, 600);
         setLocationRelativeTo(null);
         setVisible(true);
+    }
+    public void showPage(){
+        new EditAccountPage(username,tracebackFunction);
     }
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -251,6 +255,10 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
         }
         else if (e.getSource() == btnCancel){
             tracebackFunction.pushPage(new ViewAccountPage(username,0,tracebackFunction));
+            dispose();
+        }
+        else if (e.getSource() == btnBack){
+            tracebackFunction.popPeek();
             dispose();
         }
     }

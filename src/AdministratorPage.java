@@ -8,7 +8,7 @@ public class AdministratorPage extends JFrame implements Page,ActionListener {
     private final Database database;
     private final JTable userTable;
     private final DefaultTableModel tableModel;
-    private final JButton deleteButton, viewButton, closeButton;
+    private final JButton deleteButton, viewButton, closeButton, btnBack;
     private final String username;
     private final TracebackFunction tracebackFunction;
     public AdministratorPage(String username, TracebackFunction tracebackFunction){
@@ -43,6 +43,8 @@ public class AdministratorPage extends JFrame implements Page,ActionListener {
         viewButton.addActionListener(this);
         closeButton = new JButton("Close");
         closeButton.addActionListener(this);
+        btnBack = new JButton("Back");
+        btnBack.addActionListener(this);
 
         // Add components to the frame
         add(scrollPane, BorderLayout.CENTER);
@@ -51,6 +53,7 @@ public class AdministratorPage extends JFrame implements Page,ActionListener {
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(deleteButton);
         buttonPanel.add(viewButton);
+        buttonPanel.add(btnBack);
         buttonPanel.add(closeButton);
         add(buttonPanel, BorderLayout.SOUTH);
 
@@ -83,7 +86,6 @@ public class AdministratorPage extends JFrame implements Page,ActionListener {
             e.printStackTrace();
         }
     }
-
     private void viewUser(int userId) {
         List<User> users = database.viewAllUsers();
         User selectedUser = null;
@@ -131,6 +133,9 @@ public class AdministratorPage extends JFrame implements Page,ActionListener {
             JOptionPane.showMessageDialog(this, "User not found.");
         }
     }
+    public void showPage(){
+        new AdministratorPage(username,tracebackFunction);
+    }
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == viewButton){
@@ -146,13 +151,17 @@ public class AdministratorPage extends JFrame implements Page,ActionListener {
             int selectedRow = userTable.getSelectedRow();
             if (selectedRow != -1) {
                 int userId = (int) userTable.getValueAt(selectedRow, 0);
-                database.deleteUser(userId);
+                deleteUser(userId);
             } else {
                 JOptionPane.showMessageDialog(AdministratorPage.this, "Please select a user to delete.");
             }
         }
         else if (e.getSource() == closeButton){
             tracebackFunction.pushPage(new EditAccountPage(username,tracebackFunction));
+            dispose();
+        }
+        else if (e.getSource() == btnBack){
+            tracebackFunction.popPeek();
             dispose();
         }
     }

@@ -9,7 +9,7 @@ import javax.swing.border.*;
 import java.time.*;
 public class ViewAccountPage extends JFrame implements Page,ActionListener{
     public static void main(String[] args) {
-        new ViewAccountPage("vinnieying",5,new TracebackFunction());//view friend account
+        new ViewAccountPage("vinnieying",1,new TracebackFunction());//view friend account
 //        new ViewAccountPage("vinnieying",0);//view self account
     }
     private final JLabel lblName, txtName, lblUsername, txtUsername,lblEmail, txtEmail, lblContactNo, txtContactNo, lblDOB, txtDOB, lblGender, txtGender, lblHobbies, txtHobbies, lblJobHistory, lblAddress, txtAge, lblProfilePicture;
@@ -17,14 +17,15 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
     private JButton btnHome, btnEditAcc, btnStatus, btnBack;
     private final Database database;
     private final int userID;// viewing account's ID
+    private final int friendID;// friend's account ID
     private final String username;// current user's username
     private final TracebackFunction tracebackFunction;
-    public ViewAccountPage(String username,int friendID, TracebackFunction tracebackFunction) {
+    public ViewAccountPage(String username, int friendID, TracebackFunction tracebackFunction) {
         super("View Account Page");
         this.username = username;
         database = new Database();
         this.tracebackFunction = tracebackFunction;
-
+        this.friendID = friendID;
         if (friendID == 0) {// viewing own account
             this.userID = database.getUserId(username);
         }
@@ -109,9 +110,7 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
         btnHome.addActionListener(this);
         btnEditAcc = new JButton("Edit Account");
         btnEditAcc.addActionListener(this);
-        btnBack = new JButton();
-        Icon backIcon = UIManager.getIcon("Table.ascendingSortIcon");
-        btnBack.setIcon(backIcon);
+        btnBack = new JButton("Back");
         btnBack.addActionListener(this);
 
         // Add components to the frame
@@ -187,12 +186,12 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
             for (Friend friend : friendList){
                 if(friend.getUserId() == friendID){
                     btnStatus = new JButton(friend.getStatus());
-                    if(btnStatus.getText().equals("friend request sent")){
+                    if(btnStatus.getText().equals("Friend request sent")){
                         btnStatus.setBackground(new Color(0,0,102));
                         btnStatus.setForeground(Color.WHITE);
-                    } else if (btnStatus.getText().equals("receive request")) {
+                    } else if (btnStatus.getText().equals("Received friend request")) {
                         btnStatus.setBackground(new Color(255,255,153));
-                    }else if(btnStatus.getText().equals("friends")){
+                    } else if(btnStatus.getText().equals("Friend")){
                         btnStatus.setBackground(new Color(0,204,0));
                         btnStatus.setForeground(Color.WHITE);
                     }
@@ -201,7 +200,8 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
                     friendFound = true;
                     break;
                 }
-            }if (!friendFound) {
+            }
+            if (!friendFound) {
                 btnStatus = new JButton("Add Friend");
                 btnStatus.setForeground(Color.WHITE);
                 btnStatus.setBackground(new Color(0,102,204));
@@ -216,6 +216,10 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
         gbc.gridx = 0;
         gbc.anchor = GridBagConstraints.EAST;
         panel.add(btnHome,gbc);
+
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        panel.add(btnBack,gbc);
 
         lblProfilePicture.setPreferredSize(new Dimension(150,180));
         gbc.anchor = GridBagConstraints.NORTH;
@@ -237,6 +241,9 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
         Period period = Period.between(birthDate, currentDate);
         return period.getYears();
     }
+    public void showPage(){
+        new ViewAccountPage(username,friendID,tracebackFunction);
+    }
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnEditAcc){
@@ -244,7 +251,11 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
             dispose();
         }
         else if (e.getSource() == btnHome){
-            tracebackFunction.pushPage(new HomePage(database.getUserId(username),tracebackFunction));
+            tracebackFunction.pushPage(new HomePage(username,tracebackFunction));
+            dispose();
+        }
+        else if (e.getSource() == btnBack){
+            tracebackFunction.popPeek();
             dispose();
         }
         else if (e.getSource() == btnStatus){

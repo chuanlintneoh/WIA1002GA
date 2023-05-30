@@ -3,7 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Calendar;
 import java.util.Arrays;
-public class RegisterPage extends JFrame implements Page,ActionListener {
+public class RegisterPage extends JFrame implements ActionListener {
     private final LoginPage loginPage;
     private final JLabel lblName, lblUsername, lblPassword, lblConfirmPassword, lblEmail, lblContactNo, lblDOB, lblGender;
     private final JTextField txtName, txtUsername, txtEmail, txtContactNo;
@@ -176,7 +176,7 @@ public class RegisterPage extends JFrame implements Page,ActionListener {
         }
         else if (e.getSource() == btnLogin){
             if (loginPage == null){
-                tracebackFunction.pushPage(new LoginPage(tracebackFunction));
+                new LoginPage(tracebackFunction);
             }
             else {
                 loginPage.setVisible(true);

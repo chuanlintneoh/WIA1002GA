@@ -10,11 +10,11 @@ public class HomePage extends JFrame implements Page,ActionListener{
     private final int userID;
     private final String username;
     private final TracebackFunction tracebackFunction;
-    public HomePage(int userID, TracebackFunction tracebackFunction) {
+    public HomePage(String username, TracebackFunction tracebackFunction) {
         super("ForestBook Home Page");
-        this.userID = userID;
+        this.username = username;
         database = new Database();
-        this.username = database.get("username",userID);
+        this.userID = database.getUserId(username);
         this.tracebackFunction = tracebackFunction;
 
         forestbook = new JLabel("ForestBook");
@@ -26,9 +26,7 @@ public class HomePage extends JFrame implements Page,ActionListener{
         btnViewAcc = new JButton("View Account");
         btnEditAcc = new JButton("Edit Account");
         btnLogOut = new JButton("Log Out");
-        btnBack = new JButton();
-        Icon backIcon = UIManager.getIcon("Table.ascendingSortIcon");
-        btnBack.setIcon(backIcon);
+        btnBack = new JButton("Back");
 
         btnViewAcc.addActionListener(this);
         btnEditAcc.addActionListener(this);
@@ -91,6 +89,9 @@ public class HomePage extends JFrame implements Page,ActionListener{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(900,700);
         setLocationRelativeTo(null);
+    }
+    public void showPage(){
+        new HomePage(username,tracebackFunction);
     }
     @Override
     public void actionPerformed(ActionEvent e){

@@ -1,7 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-public class LoginPage extends JFrame implements Page,ActionListener {
+public class LoginPage extends JFrame implements ActionListener {
     private final RegisterPage registerPage;
     //private JLabel lblRememberMe;
     private final JTextField txtUsername;
@@ -78,7 +78,7 @@ public class LoginPage extends JFrame implements Page,ActionListener {
             this.userID = database.authenticateUser(username,password);
             if (userID > 0){
                 JOptionPane.showMessageDialog(this, "Log in successful.", "Registration Success", JOptionPane.INFORMATION_MESSAGE);
-                tracebackFunction.pushPage(new HomePage(userID,tracebackFunction));
+                tracebackFunction.pushPage(new HomePage(database.get("username",userID),tracebackFunction));
                 dispose();
             }
             else {
@@ -87,7 +87,7 @@ public class LoginPage extends JFrame implements Page,ActionListener {
         }
         else if (e.getSource() == btnRegister){
             if (registerPage == null){
-                tracebackFunction.pushPage(new RegisterPage(tracebackFunction));
+                new RegisterPage(tracebackFunction);
             }
             else {
                 registerPage.setVisible(true);
