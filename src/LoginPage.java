@@ -1,7 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-public class LoginPage extends JFrame implements ActionListener {
+public class LoginPage extends JFrame implements Page,ActionListener {
     private final RegisterPage registerPage;
     //private JLabel lblRememberMe;
     private final JTextField txtUsername;
@@ -10,10 +10,12 @@ public class LoginPage extends JFrame implements ActionListener {
     private final JButton btnLogin, btnRegister;// btnForgotPassword
     private final Database database;
     private int userID;
-    public LoginPage(){
+    private final TracebackFunction tracebackFunction;
+    public LoginPage(TracebackFunction tracebackFunction){
         super("User Login Page");
-        registerPage = null;
-        database = new Database();
+        this.registerPage = null;
+        this.database = new Database();
+        this.tracebackFunction = tracebackFunction;
         // Initialize GUI components
         txtUsername = new JTextField("Username",20);
         txtPassword = new JPasswordField("Password",20);
@@ -76,7 +78,7 @@ public class LoginPage extends JFrame implements ActionListener {
             this.userID = database.authenticateUser(username,password);
             if (userID > 0){
                 JOptionPane.showMessageDialog(this, "Log in successful.", "Registration Success", JOptionPane.INFORMATION_MESSAGE);
-                new HomePage(userID);
+                tracebackFunction.pushPage(new HomePage(userID,tracebackFunction));
                 dispose();
             }
             else {
@@ -85,7 +87,7 @@ public class LoginPage extends JFrame implements ActionListener {
         }
         else if (e.getSource() == btnRegister){
             if (registerPage == null){
-                new RegisterPage();
+                tracebackFunction.pushPage(new RegisterPage(tracebackFunction));
             }
             else {
                 registerPage.setVisible(true);

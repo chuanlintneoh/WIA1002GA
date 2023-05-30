@@ -7,22 +7,23 @@ import java.util.List;
 import java.util.Stack;
 import javax.swing.border.*;
 import java.time.*;
-public class ViewAccountPage extends JFrame implements ActionListener{
+public class ViewAccountPage extends JFrame implements Page,ActionListener{
     public static void main(String[] args) {
-        new ViewAccountPage("vinnieying",5);//view friend account
+        new ViewAccountPage("vinnieying",5,new TracebackFunction());//view friend account
 //        new ViewAccountPage("vinnieying",0);//view self account
     }
     private final JLabel lblName, txtName, lblUsername, txtUsername,lblEmail, txtEmail, lblContactNo, txtContactNo, lblDOB, txtDOB, lblGender, txtGender, lblHobbies, txtHobbies, lblJobHistory, lblAddress, txtAge, lblProfilePicture;
     private final JTextArea txtJobHistory,txtAddress;
-    private JButton btnHome, btnEditAcc, btnStatus;
+    private JButton btnHome, btnEditAcc, btnStatus, btnBack;
     private final Database database;
     private final int userID;// viewing account's ID
     private final String username;// current user's username
-
-    public ViewAccountPage(String username,int friendID) {
+    private final TracebackFunction tracebackFunction;
+    public ViewAccountPage(String username,int friendID, TracebackFunction tracebackFunction) {
         super("View Account Page");
         this.username = username;
         database = new Database();
+        this.tracebackFunction = tracebackFunction;
 
         if (friendID == 0) {// viewing own account
             this.userID = database.getUserId(username);
@@ -108,6 +109,10 @@ public class ViewAccountPage extends JFrame implements ActionListener{
         btnHome.addActionListener(this);
         btnEditAcc = new JButton("Edit Account");
         btnEditAcc.addActionListener(this);
+        btnBack = new JButton();
+        Icon backIcon = UIManager.getIcon("Table.ascendingSortIcon");
+        btnBack.setIcon(backIcon);
+        btnBack.addActionListener(this);
 
         // Add components to the frame
         JPanel panel = new JPanel(new GridBagLayout());
@@ -235,11 +240,11 @@ public class ViewAccountPage extends JFrame implements ActionListener{
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnEditAcc){
-            new EditAccountPage(username);
+            tracebackFunction.pushPage(new EditAccountPage(username,tracebackFunction));
             dispose();
         }
         else if (e.getSource() == btnHome){
-            new HomePage(database.getUserId(username));
+            tracebackFunction.pushPage(new HomePage(database.getUserId(username),tracebackFunction));
             dispose();
         }
         else if (e.getSource() == btnStatus){

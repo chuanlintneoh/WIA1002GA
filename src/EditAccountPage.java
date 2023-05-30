@@ -4,18 +4,20 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-public class EditAccountPage extends JFrame implements ActionListener {
+public class EditAccountPage extends JFrame implements Page,ActionListener {
     private final JLabel lblUsername, txtUsername, lblName, lblEmail, lblContactNo, lblDOB, lblGender, lblJobHistory, lblHobbies, lblAddress, lblProfilePicture;
     private final JTextField txtName, txtEmail, txtContactNo, txtAddress;
-    private final JButton btnEditPic, btnEditPassword, btnEditBday, btnEditGender, btnAddJob, btnAddHobby, btnSaveChanges, btnCancel, btnAdmin;
+    private final JButton btnEditPic, btnEditPassword, btnEditBday, btnEditGender, btnAddJob, btnAddHobby, btnSaveChanges, btnCancel, btnAdmin, btnBack;
     private final Database database;
     private final int userID;
     private final String username;
-    public EditAccountPage(String username) {
+    private final TracebackFunction tracebackFunction;
+    public EditAccountPage(String username, TracebackFunction tracebackFunction) {
         super("Edit Account Page");
         this.username = username;
         database = new Database();
         this.userID = database.getUserId(username);
+        this.tracebackFunction = tracebackFunction;
 
         // Initialize GUI components
         lblUsername = new JLabel("Username:");
@@ -78,6 +80,10 @@ public class EditAccountPage extends JFrame implements ActionListener {
         btnSaveChanges.addActionListener(this);
         btnCancel = new JButton("Cancel");
         btnCancel.addActionListener(this);
+        btnBack = new JButton("Back");
+//        Icon backIcon = UIManager.getIcon("Table.ascendingSortIcon");
+//        btnBack.setIcon(backIcon);
+        btnBack.addActionListener(this);
 
         // Add components to the frame
         JPanel panel = new JPanel(new GridBagLayout());
@@ -199,7 +205,7 @@ public class EditAccountPage extends JFrame implements ActionListener {
             database.set("address",address,userID);
             // Save changes made in the EditAccountPage window
             JOptionPane.showMessageDialog(this, "*ALL CHANGES ARE SAVED*", "Selections", JOptionPane.INFORMATION_MESSAGE);
-            new ViewAccountPage(username,0);
+            tracebackFunction.pushPage(new ViewAccountPage(username,0,tracebackFunction));
             dispose();
         }
         else if (e.getSource() == btnEditBday) {
@@ -221,6 +227,8 @@ public class EditAccountPage extends JFrame implements ActionListener {
         else if (e.getSource() == btnAdmin){
             if (database.isAdmin(userID)){
                 //Administrator Page
+                tracebackFunction.pushPage(new AdministratorPage(username,tracebackFunction));
+                dispose();
             }
             else {
                 AdminVerificationDialog dialog = new AdminVerificationDialog(this,userID);
@@ -242,7 +250,7 @@ public class EditAccountPage extends JFrame implements ActionListener {
             }
         }
         else if (e.getSource() == btnCancel){
-            new ViewAccountPage(username,0);
+            tracebackFunction.pushPage(new ViewAccountPage(username,0,tracebackFunction));
             dispose();
         }
     }

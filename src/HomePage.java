@@ -2,19 +2,20 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import static java.awt.Color.*;
-public class HomePage extends JFrame implements ActionListener{
+public class HomePage extends JFrame implements Page,ActionListener{
     private final JTextField txtSearch;
-    private final JButton btnSearch, btnUser, btnViewAcc, btnEditAcc, btnLogOut, btnFriendReq, btnFriends;
+    private final JButton btnSearch, btnUser, btnViewAcc, btnEditAcc, btnLogOut, btnFriendReq, btnFriends, btnBack;
     private final JLabel forestbook;
     private final Database database;
     private final int userID;
     private final String username;
-//    private Stack<Object> tracebackFunction;
-    public HomePage(int userID) {
+    private final TracebackFunction tracebackFunction;
+    public HomePage(int userID, TracebackFunction tracebackFunction) {
         super("ForestBook Home Page");
         this.userID = userID;
         database = new Database();
         this.username = database.get("username",userID);
+        this.tracebackFunction = tracebackFunction;
 
         forestbook = new JLabel("ForestBook");
         txtSearch = new JTextField(40);
@@ -25,11 +26,15 @@ public class HomePage extends JFrame implements ActionListener{
         btnViewAcc = new JButton("View Account");
         btnEditAcc = new JButton("Edit Account");
         btnLogOut = new JButton("Log Out");
+        btnBack = new JButton();
+        Icon backIcon = UIManager.getIcon("Table.ascendingSortIcon");
+        btnBack.setIcon(backIcon);
 
         btnViewAcc.addActionListener(this);
         btnEditAcc.addActionListener(this);
         btnLogOut.addActionListener(this);
         btnSearch.addActionListener(this);
+        btnBack.addActionListener(this);
 
         JPopupMenu accountMenu = new JPopupMenu();
         accountMenu.add(btnViewAcc);
@@ -66,6 +71,7 @@ public class HomePage extends JFrame implements ActionListener{
         panel.add(panel2,gbc);
 
         JPanel panel3 = new JPanel();
+        panel3.add(btnBack,componentsGBC);
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.weightx = 0.2;
@@ -90,17 +96,18 @@ public class HomePage extends JFrame implements ActionListener{
     public void actionPerformed(ActionEvent e){
         if (e.getSource() == btnLogOut){
             //LoginPage
-            new LoginPage();
+            tracebackFunction.clear();
+            new LoginPage(tracebackFunction);
             dispose();
         }
         else if (e.getSource() == btnViewAcc){
             //ViewAccountPage (own account)
-            new ViewAccountPage(username,0);
+            tracebackFunction.pushPage(new ViewAccountPage(username,0,tracebackFunction));
             dispose();
         }
         else if (e.getSource() == btnEditAcc){
             //EditAccountPage
-            new EditAccountPage(username);
+            tracebackFunction.pushPage(new EditAccountPage(username,tracebackFunction));
             dispose();
         }
         else if (e.getSource() == btnSearch){
@@ -111,6 +118,10 @@ public class HomePage extends JFrame implements ActionListener{
         }
         else if (e.getSource() == btnFriends){
 
+        }
+        else if (e.getSource() == btnBack){
+            tracebackFunction.popPeek();
+            dispose();
         }
     }
 }

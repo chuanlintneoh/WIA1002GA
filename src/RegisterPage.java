@@ -3,7 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Calendar;
 import java.util.Arrays;
-public class RegisterPage extends JFrame implements ActionListener {
+public class RegisterPage extends JFrame implements Page,ActionListener {
     private final LoginPage loginPage;
     private final JLabel lblName, lblUsername, lblPassword, lblConfirmPassword, lblEmail, lblContactNo, lblDOB, lblGender;
     private final JTextField txtName, txtUsername, txtEmail, txtContactNo;
@@ -12,9 +12,11 @@ public class RegisterPage extends JFrame implements ActionListener {
     private final JComboBox<String> birthMonth;
     private final JRadioButton radioMale, radioFemale, radioNotSet;
     private final JButton btnRegister, btnLogin;
-    public RegisterPage(){
+    private final TracebackFunction tracebackFunction;
+    public RegisterPage(TracebackFunction tracebackFunction){
         super("User Registration Page");
-        loginPage = null;
+        this.loginPage = null;
+        this.tracebackFunction = tracebackFunction;
         // Initialize GUI components
         lblName = new JLabel("Name:");
         txtName = new JTextField(20);
@@ -174,7 +176,7 @@ public class RegisterPage extends JFrame implements ActionListener {
         }
         else if (e.getSource() == btnLogin){
             if (loginPage == null){
-                new LoginPage();
+                tracebackFunction.pushPage(new LoginPage(tracebackFunction));
             }
             else {
                 loginPage.setVisible(true);
@@ -183,7 +185,6 @@ public class RegisterPage extends JFrame implements ActionListener {
         }
     }
     private boolean isValidDate(int day, int month, int year) {
-
         int[] daysInMonth = {31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
         return day >= 1 && day <= daysInMonth[month - 1];
     }

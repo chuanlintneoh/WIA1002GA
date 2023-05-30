@@ -34,6 +34,9 @@ public class User {
         this.gender = gender;
         this.address = address;
     }
+    public int getUserId(){
+        return userId;
+    };
     public String getUsername(){
         return username;
     }
