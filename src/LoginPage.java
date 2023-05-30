@@ -3,11 +3,9 @@ import java.awt.*;
 import java.awt.event.*;
 public class LoginPage extends JFrame implements ActionListener {
     private final RegisterPage registerPage;
-    //private JLabel lblRememberMe;
     private final JTextField txtUsername;
     private final JPasswordField txtPassword;
-    //private JCheckBox chkRememberMe;
-    private final JButton btnLogin, btnRegister;// btnForgotPassword
+    private final JButton btnLogin, btnRegister;
     private final Database database;
     private int userID;
     private final TracebackFunction tracebackFunction;
@@ -16,11 +14,10 @@ public class LoginPage extends JFrame implements ActionListener {
         this.registerPage = null;
         this.database = new Database();
         this.tracebackFunction = tracebackFunction;
+
         // Initialize GUI components
         txtUsername = new JTextField("Username",20);
         txtPassword = new JPasswordField("Password",20);
-//        lblRememberMe = new JLabel("Remember Me?");
-//        chkRememberMe = new JCheckBox();
         btnLogin = new JButton("Log In");
         btnLogin.setBackground(new Color(46,138,87));
         btnLogin.setForeground(Color.WHITE);
@@ -29,36 +26,33 @@ public class LoginPage extends JFrame implements ActionListener {
         btnRegister.setContentAreaFilled(false);
         btnRegister.setFont(btnLogin.getFont().deriveFont(Font.PLAIN));
         btnRegister.setForeground(Color.BLUE);
-//        btnForgotPassword = new JButton("Forgot password");
-        // Add components to the frame
+
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
+
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         panel.add(txtUsername, gbc);
+
         gbc.gridy = 1;
         panel.add(txtPassword, gbc);
-//        gbc.gridy = 2;
-//        gbc.gridwidth = 1;
-//        panel.add(lblRememberMe, gbc);
-//        gbc.gridx = 1;
-//        panel.add(chkRememberMe, gbc);
+
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 2;
         panel.add(btnLogin, gbc);
-//        gbc.gridx = 0;
+
         gbc.gridy = 4;
         gbc.gridwidth = 1;
-//        panel.add(btnForgotPassword, gbc);
         gbc.gridx = 1;
         panel.add(btnRegister, gbc);
+
         // Add action listeners to buttons
         btnLogin.addActionListener(this);
         btnRegister.addActionListener(this);
-//        btnForgotPassword.addActionListener(this);
+
         // Set frame properties
         add(panel);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

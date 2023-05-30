@@ -157,7 +157,7 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
         btnAdmin.setForeground(Color.white);
         btnAdmin.setBackground(new Color(200,0,127));
 
-        gbc.gridx = 1;
+        gbc.gridx = 0;
         gbc.gridy = 10;
         panel.add(btnBack,gbc);
 
