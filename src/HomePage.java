@@ -4,7 +4,7 @@ import java.awt.event.*;
 import static java.awt.Color.*;
 public class HomePage extends JFrame implements Page,ActionListener{
     private final JTextField txtSearch;
-    private final JButton btnSearch, btnUser, btnViewAcc, btnEditAcc, btnLogOut, btnFriendReq, btnFriends, btnBack;
+    private final JButton btnSearch, btnUser, btnViewAcc, btnEditAcc, btnLogOut, btnBack;
     private final JLabel forestbook;
     private final Database database;
     private final int userID;
@@ -21,8 +21,6 @@ public class HomePage extends JFrame implements Page,ActionListener{
         txtSearch = new JTextField(40);
         btnSearch = new JButton("Search");
         btnUser = new JButton(username);
-        btnFriendReq = new JButton("Friend Requests");
-        btnFriends = new JButton("Friends");
         btnViewAcc = new JButton("View Account");
         btnEditAcc = new JButton("Edit Account");
         btnLogOut = new JButton("Log Out");
@@ -112,13 +110,10 @@ public class HomePage extends JFrame implements Page,ActionListener{
             dispose();
         }
         else if (e.getSource() == btnSearch){
+            String keyword = txtSearch.getText();
             //SearchResultsPage
-        }
-        else if (e.getSource() == btnFriendReq) {
-
-        }
-        else if (e.getSource() == btnFriends){
-
+//            tracebackFunction.pushPage(new SearchResultsPage(username,keyword,tracebackFunction));
+            dispose();
         }
         else if (e.getSource() == btnBack){
             tracebackFunction.popPeek();
