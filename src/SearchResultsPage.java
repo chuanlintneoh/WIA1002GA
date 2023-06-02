@@ -1,20 +1,23 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 import static java.awt.Color.*;
-public class HomePage extends JFrame implements Page,ActionListener{
+public class SearchResultsPage extends JFrame implements Page, ActionListener {
     private final JTextField txtSearch;
-    private final JButton btnSearch, btnUser, btnViewAcc, btnEditAcc, btnLogOut, btnBack;
+    private final JButton btnUser, btnSearch, btnViewAcc, btnEditAcc, btnLogOut, btnBack, btnStatus;
     private final JLabel forestbook;
     private final Database database;
-    private final int userID;
     private final String username;
+    private final int userID;
+    private final String keyword;
     private final TracebackFunction tracebackFunction;
-    public HomePage(String username, TracebackFunction tracebackFunction) {
-        super("ForestBook Home Page");
-        this.username = username;
-        database = new Database();
-        this.userID = database.getUserId(username);
+    public SearchResultsPage(int userId, String keyword, TracebackFunction tracebackFunction){
+        super(String.format("Search Results of \"%s\"",keyword));
+        this.database = new Database();
+        this.userID = userId;
+        this.username = database.get("username",userId);
+        this.keyword = keyword;
         this.tracebackFunction = tracebackFunction;
 
         forestbook = new JLabel("ForestBook");
@@ -25,12 +28,14 @@ public class HomePage extends JFrame implements Page,ActionListener{
         btnEditAcc = new JButton("Edit Account");
         btnLogOut = new JButton("Log Out");
         btnBack = new JButton("Back");
+        btnStatus = new JButton("Add Friend");
 
         btnViewAcc.addActionListener(this);
         btnEditAcc.addActionListener(this);
         btnLogOut.addActionListener(this);
         btnSearch.addActionListener(this);
         btnBack.addActionListener(this);
+        btnStatus.addActionListener(this);
 
         JPopupMenu accountMenu = new JPopupMenu();
         accountMenu.add(btnViewAcc);
@@ -39,12 +44,12 @@ public class HomePage extends JFrame implements Page,ActionListener{
 
         btnUser.addActionListener(e -> accountMenu.show(btnUser, 0, btnUser.getHeight()));
 
-        forestbook.setFont(new Font("Arial",Font.BOLD,32));
+        forestbook.setFont(new Font("Arial", Font.BOLD, 32));
         forestbook.setForeground(GREEN);
 
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(0,0,0,0);
+        gbc.insets = new Insets(0, 0, 0, 0);
         GridBagConstraints componentsGBC = new GridBagConstraints();
         componentsGBC.insets = new Insets(10,10,10,10);
 
@@ -54,7 +59,7 @@ public class HomePage extends JFrame implements Page,ActionListener{
         gbc.gridy = 0;
         gbc.weightx = 0.2;
         gbc.weighty = 0.2;
-        panel.add(panel1,gbc);
+        panel.add(panel1, gbc);
 
         JPanel panel2 = new JPanel();
         panel2.add(txtSearch,componentsGBC);
@@ -64,42 +69,83 @@ public class HomePage extends JFrame implements Page,ActionListener{
         gbc.gridy = 0;
         gbc.weightx = 0.8;
         gbc.weighty = 0.2;
-        panel.add(panel2,gbc);
+        panel.add(panel2, gbc);
 
-        JPanel panel3 = new JPanel();
+        JPanel searchResultsPanel = new JPanel(new GridBagLayout());
+        JScrollPane scrollPane = new JScrollPane(searchResultsPanel);
         gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.weightx = 0.2;
+        gbc.gridwidth = 2;
+        gbc.weightx = 1.0;
         gbc.weighty = 0.7;
-        panel.add(panel3,gbc);
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.BOTH;
+        panel.add(scrollPane, gbc);
+
+        ArrayList<Friend> searchResults = (ArrayList<Friend>) database.searchUser(userId,keyword);
+        for (Friend searchResult : searchResults){
+            JPanel resultPanel = new JPanel(new GridBagLayout());
+            GridBagConstraints resultGBC = new GridBagConstraints();
+
+            byte[] profilePictureData = database.getProfilePicture(searchResult.getUserId());
+            JLabel lblProfilePicture = new JLabel();
+            if (profilePictureData != null){
+                lblProfilePicture.setIcon(new ImageIcon(profilePictureData));
+            }
+            else {
+                lblProfilePicture.setIcon(new ImageIcon("src/default_profile_pic.jpg"));
+            }
+            JLabel lblUsername = new JLabel(searchResult.getUsername());
+            JLabel lblName = new JLabel(searchResult.getName());
+            JLabel lblUserId = new JLabel(String.valueOf(searchResult.getUserId()));
+            JButton btnViewAcc = new JButton("View Account");
+            btnViewAcc.addActionListener(this);
+
+            resultGBC.gridx = 1;
+            resultGBC.gridy = 0;
+            resultPanel.add(lblUsername,resultGBC);
+            resultGBC.gridy = 1;
+            resultPanel.add(lblName,resultGBC);
+            resultGBC.gridy = 2;
+            resultPanel.add(lblUserId,resultGBC);
+            resultGBC.gridx = 2;
+            resultGBC.gridy = 0;
+            resultGBC.anchor = GridBagConstraints.EAST;
+            resultPanel.add(btnViewAcc,resultGBC);
+            resultGBC.gridx = 0;
+            resultGBC.gridy = 0;
+            resultGBC.gridheight = 3;
+            resultPanel.add(lblProfilePicture,resultGBC);
+
+            gbc.weightx = 1.0;
+            gbc.weighty = 0.3;
+            gbc.insets = new Insets(10,10,10,10);
+            searchResultsPanel.add(resultPanel,gbc);
+        }
 
         JPanel panel4 = new JPanel();
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.weightx = 0.8;
-        gbc.weighty = 0.7;
-        panel.add(panel4,gbc);
-
-        JPanel panel5 = new JPanel();
-        panel5.add(btnBack,componentsGBC);
+        componentsGBC.anchor = GridBagConstraints.WEST;
+        panel4.add(btnBack,componentsGBC);
         gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
+        gbc.gridwidth = 1;
         gbc.weightx = 1.0;
         gbc.weighty = 0.1;
-        panel.add(panel5,gbc);
+        panel.add(panel4, gbc);
 
         add(panel);
         pack();
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(900,700);
+        setSize(900, 700);
         setLocationRelativeTo(null);
     }
-    public void showPage(){
-        new HomePage(username,tracebackFunction);
+    @Override
+    public void showPage() {
+        new SearchResultsPage(userID,keyword,tracebackFunction);
     }
     @Override
-    public void actionPerformed(ActionEvent e){
+    public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnLogOut){
             //LoginPage
             tracebackFunction.clear();
