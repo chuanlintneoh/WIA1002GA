@@ -13,10 +13,12 @@ public class RegisterPage extends JFrame implements ActionListener {
     private final JRadioButton radioMale, radioFemale, radioNotSet;
     private final JButton btnRegister, btnLogin;
     private final TracebackFunction tracebackFunction;
+    private final Database database;
     public RegisterPage(TracebackFunction tracebackFunction){
         super("User Registration Page");
         this.loginPage = null;
         this.tracebackFunction = tracebackFunction;
+        this.database = new Database();
         // Initialize GUI components
         lblName = new JLabel("Name:");
         txtName = new JTextField(20);
@@ -168,7 +170,11 @@ public class RegisterPage extends JFrame implements ActionListener {
                 return;
             }
             if (!password.equals(confirmPassword)) {
-                JOptionPane.showMessageDialog(this, "Passwords do not match. Please re-enter the password", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Passwords do not match! Please re-enter the password.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (!database.isUsernameAvailable(username)){
+                JOptionPane.showMessageDialog(this, "Username not available! Please re-enter the username.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             new User(name,username,password,emailAddress,contactNo,birthDate,gender);

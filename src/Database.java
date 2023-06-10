@@ -23,6 +23,24 @@ public class Database {
     }
     // executeQuery -> retrieve data
     // executeUpdate -> modify database
+    public boolean isUsernameAvailable(String username){
+        String query =
+                "SELECT COUNT(*) FROM users WHERE BINARY username = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1,username);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()){
+                int count = resultSet.getInt(1);
+                return count == 0;
+            }
+            return true;
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return false;
+    }
     public void registerUser(User user){
         try {
             String query =
