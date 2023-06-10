@@ -245,13 +245,8 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
         else if (e.getSource() == btnEditPic){
             EditPicDialog dialog = new EditPicDialog(this,userID,lblProfilePicture);
             dialog.setVisible(true);
-            byte[] profilePictureData = database.getProfilePicture(userID);
-            if (profilePictureData != null){
-                lblProfilePicture.setIcon(new ImageIcon(profilePictureData));
-            }
-            else {
-                lblProfilePicture.setIcon(new ImageIcon("src/default_profile_pic.jpg"));
-            }
+            tracebackFunction.peek();
+            dispose();
         }
         else if (e.getSource() == btnCancel){
             tracebackFunction.pushPage(new ViewAccountPage(username,0,tracebackFunction));
