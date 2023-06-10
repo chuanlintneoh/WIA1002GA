@@ -55,7 +55,7 @@ public class Database {
     }
     public int authenticateUser(String username,String hashedPassword){
         String query =
-                "SELECT user_id FROM users WHERE (username = ? OR email_address = ? OR contact_no = ?) AND password = ?";
+                "SELECT user_id FROM users WHERE (BINARY username = ? OR BINARY email_address = ? OR BINARY contact_no = ?) AND BINARY password = ?";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1,username);
@@ -77,7 +77,7 @@ public class Database {
     }
     public int getUserId(String username){
         String query =
-                "SELECT user_id FROM users WHERE username = ?";
+                "SELECT user_id FROM users WHERE BINARY username = ?";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1,username);
