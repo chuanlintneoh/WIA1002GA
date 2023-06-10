@@ -44,8 +44,8 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
 
         btnUser.addActionListener(e -> accountMenu.show(btnUser, 0, btnUser.getHeight()));
 
-        forestbook.setFont(new Font("Arial", Font.BOLD, 32));
-        forestbook.setForeground(GREEN);
+        forestbook.setFont(new Font("Curlz MT", Font.BOLD, 42));
+        forestbook.setForeground(new Color(0, 128, 0));
 
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -117,6 +117,7 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
             resultGBC.gridheight = 3;
             resultPanel.add(lblProfilePicture,resultGBC);
 
+            resultPanel.setBackground(new Color(180, 238, 156));
             gbc.weightx = 1.0;
             gbc.weighty = 0.3;
             gbc.insets = new Insets(10,10,10,10);

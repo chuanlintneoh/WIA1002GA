@@ -63,7 +63,7 @@ public class EditPicDialog extends JDialog implements ActionListener{
                     int height = image.getHeight();
                     double widthRatio = (double) maxWidth / width;
                     double heightRatio = (double) maxHeight / height;
-                    double scaleRatio = Math.min(widthRatio, heightRatio);
+                    double scaleRatio = Math.max(widthRatio, heightRatio);
                     int newWidth = (int) (width * scaleRatio);
                     int newHeight = (int) (height * scaleRatio);
                     Image resizedImage = image.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);

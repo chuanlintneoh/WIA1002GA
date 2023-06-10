@@ -26,6 +26,60 @@ public class HomePage extends JFrame implements Page,ActionListener{
         btnLogOut = new JButton("Log Out");
         btnBack = new JButton("Back");
 
+        btnViewAcc.setForeground(new Color(58,30,0));
+        btnViewAcc.setBackground(new Color(196, 164, 132));
+        btnViewAcc.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        btnViewAcc.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnViewAcc.setForeground(WHITE); // Change to the desired color
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnViewAcc.setForeground(new Color(58,30,0)); // Change back to the default color
+            }
+        });
+        btnEditAcc.setForeground(new Color(58,30,0));
+        btnEditAcc.setBackground(new Color(196, 164, 132));
+        btnEditAcc.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        btnEditAcc.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnEditAcc.setForeground(WHITE); // Change to the desired color
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnEditAcc.setForeground(new Color(58,30,0)); // Change back to the default color
+            }
+
+        });
+        btnLogOut.setForeground(new Color(70,13,13));
+        btnLogOut.setBackground(new Color(196, 164, 132));
+        btnLogOut.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        btnLogOut.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnLogOut.setForeground(WHITE); // Change to the desired color
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnLogOut.setForeground(new Color(70,13,13)); // Change back to the default color
+            }
+        });
+
+        btnUser.setBackground(new Color(180, 238, 156));
+        btnUser.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 50));
+        btnUser.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnUser.setForeground(WHITE); // Change to the desired color
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnUser.setForeground(new Color(58,30,0)); // Change back to the default color
+            }
+        });
+
         btnViewAcc.addActionListener(this);
         btnEditAcc.addActionListener(this);
         btnLogOut.addActionListener(this);
@@ -33,60 +87,41 @@ public class HomePage extends JFrame implements Page,ActionListener{
         btnBack.addActionListener(this);
 
         JPopupMenu accountMenu = new JPopupMenu();
+        accountMenu.setBackground(new Color(196,164,132));
         accountMenu.add(btnViewAcc);
         accountMenu.add(btnEditAcc);
         accountMenu.add(btnLogOut);
 
-        btnUser.addActionListener(e -> accountMenu.show(btnUser, 0, btnUser.getHeight()));
+        btnUser.addActionListener(e -> accountMenu.show(btnUser, -56, btnUser.getHeight()));
 
-        forestbook.setFont(new Font("Arial",Font.BOLD,32));
-        forestbook.setForeground(GREEN);
+        forestbook.setFont(new Font("Curlz MT", Font.BOLD, 42));
+        forestbook.setForeground(new Color(0, 128, 0));
 
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(0,0,0,0);
-        GridBagConstraints componentsGBC = new GridBagConstraints();
-        componentsGBC.insets = new Insets(10,10,10,10);
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JPanel panel1 = new JPanel();
-        panel1.add(forestbook,componentsGBC);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 0.2;
-        gbc.weighty = 0.2;
-        panel.add(panel1,gbc);
+        JPanel topPanel = new JPanel();
+        topPanel.add(forestbook);
+        topPanel.setBackground(new Color(180, 238, 156));
 
-        JPanel panel2 = new JPanel();
-        panel2.add(txtSearch,componentsGBC);
-        panel2.add(btnSearch,componentsGBC);
-        panel2.add(btnUser,componentsGBC);
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.weightx = 0.8;
-        gbc.weighty = 0.2;
-        panel.add(panel2,gbc);
+        JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        centerPanel.add(txtSearch);
+        centerPanel.add(btnSearch);
 
-        JPanel panel3 = new JPanel();
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.weightx = 0.2;
-        gbc.weighty = 0.7;
-        panel.add(panel3,gbc);
+        centerPanel.setBackground(new Color(180, 238, 156));
 
-        JPanel panel4 = new JPanel();
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.weightx = 0.8;
-        gbc.weighty = 0.7;
-        panel.add(panel4,gbc);
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.add(btnBack);
+        bottomPanel.setBackground(new Color(180, 238, 156));
 
-        JPanel panel5 = new JPanel();
-        panel5.add(btnBack,componentsGBC);
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.weightx = 1.0;
-        gbc.weighty = 0.1;
-        panel.add(panel5,gbc);
+        JPanel userPanel = new JPanel();
+        userPanel.add(btnUser);
+        userPanel.setBackground(new Color(180, 238, 156));
+
+        panel.add(topPanel, BorderLayout.NORTH);
+        panel.add(centerPanel, BorderLayout.CENTER);
+        panel.add(bottomPanel, BorderLayout.SOUTH);
+        panel.add(userPanel, BorderLayout.EAST);
 
         add(panel);
         pack();
