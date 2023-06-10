@@ -486,7 +486,8 @@ public class Database {
                 "FROM users u " +
                 "LEFT JOIN user_friends uf ON u.user_id = uf.friend_id AND uf.user_id = ? " +
                 "LEFT JOIN status s ON uf.status = s.id " +
-                "WHERE u.name LIKE ?";
+                "WHERE u.name LIKE ? " +
+                "ORDER BY u.name ASC";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1,userId);
@@ -494,7 +495,7 @@ public class Database {
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()){
                 int user_id = resultSet.getInt("user_id");
-                if(user_id != userId){// excepting user himself in the search list
+                if (user_id != userId){// excepting user himself in the search list
                     String name = resultSet.getString("name");
                     String username = resultSet.getString("username");
                     String status = resultSet.getString("status");
