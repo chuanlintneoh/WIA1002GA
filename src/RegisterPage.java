@@ -179,6 +179,15 @@ public class RegisterPage extends JFrame implements ActionListener {
             }
             new User(name,username,password,emailAddress,contactNo,birthDate,gender);
             JOptionPane.showMessageDialog(this, "Account successfully registered.", "Registration Success", JOptionPane.INFORMATION_MESSAGE);
+            int userID = database.authenticateUser(username,password);
+            if (userID > 0){
+                JOptionPane.showMessageDialog(this, "Log in successful.", "Registration Success", JOptionPane.INFORMATION_MESSAGE);
+                tracebackFunction.pushPage(new HomePage(database.get("username",userID),tracebackFunction));
+                dispose();
+            }
+            else {
+                JOptionPane.showMessageDialog(this, "Username and password does not match! Please log in again.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
         else if (e.getSource() == btnLogin){
             if (loginPage == null){
