@@ -122,6 +122,24 @@ public class Database {
             e.printStackTrace();
         }
     }
+    public int getNumberOfFriends(int userId){
+        String query =
+                "SELECT COUNT(*) AS friendCount FROM user_friends WHERE user_id = ? AND status = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,userId);
+            statement.setInt(2,3);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()){
+                return resultSet.getInt("friendCount");
+            }
+            return 0;
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return 0;
+    }
     public byte[] getProfilePicture(int userId){
         String query =
                 "SELECT profile_picture FROM users WHERE user_id = ?";

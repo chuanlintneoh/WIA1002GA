@@ -12,7 +12,7 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
         new ViewAccountPage("vinnieying",1,new TracebackFunction());//view friend account
 //        new ViewAccountPage("vinnieying",0);//view self account
     }
-    private final JLabel lblName, txtName, lblUsername, txtUsername,lblEmail, txtEmail, lblContactNo, txtContactNo, lblDOB, txtDOB, lblGender, txtGender, lblHobbies, txtHobbies, lblJobHistory, lblAddress, txtAge, lblProfilePicture;
+    private final JLabel lblName, txtName, lblUsername, txtUsername,lblEmail, txtEmail, lblContactNo, txtContactNo, lblDOB, txtDOB, lblGender, txtGender, lblHobbies, txtHobbies, lblJobHistory, lblAddress, txtAge, lblProfilePicture, txtNoOfFriends;
     private final JTextArea txtJobHistory,txtAddress;
     private JButton btnHome, btnEditAcc, btnStatus, btnBack;
     private final Database database;
@@ -62,9 +62,10 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
         txtDOB = new JLabel(database.get("birthdate", userID));
         LocalDate birthDate = LocalDate.parse(database.get("birthdate",userID));
         int age = calculateAge(birthDate);
-        txtAge = new JLabel("Age:    " + String.valueOf(age) + "          ");
+        txtAge = new JLabel("Age:    " + age + "          ");
         lblGender = new JLabel("Gender:");
         txtGender = new JLabel(database.get("gender",userID));
+        txtNoOfFriends = new JLabel("No. of friends:    " + database.getNumberOfFriends(userID) + "          ");
 
         lblJobHistory = new JLabel("Job History:");
         Stack<Job> jobs = database.viewUserJobs(userID);
@@ -158,6 +159,8 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
         panel.add(lblGender, gbc);
         gbc.gridx = 1;
         panel.add(txtGender,gbc);
+        gbc.anchor = GridBagConstraints.EAST;
+        panel.add(txtNoOfFriends, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 6;
