@@ -265,7 +265,7 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
             if (btnStatus.getText().equals("Add Friend")){
                 database.insertStatus(database.getUserId(username), userID, 1);// send request
                 database.insertStatus(userID, database.getUserId(username), 2);// receive request
-                JOptionPane.showMessageDialog(this, "Your friend request is sent!.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Your friend request is sent!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 btnStatus.setText("Friend request sent");
                 btnStatus.setBackground(new Color(0,0,102));
                 btnStatus.setForeground(Color.white);
