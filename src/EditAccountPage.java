@@ -44,8 +44,11 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
         txtContactNo = new JTextField(database.get("contact_no", userID), 20);
         txtAddress = new JTextField(database.get("address",userID),20);
 
-        btnEditPic = new JButton("Edit Profile Picture");
+        btnEditPic = new JButton("<html><u>Edit Profile Picture</u></html>");
+        btnEditPic.setBorderPainted(false);
+        btnEditPic.setContentAreaFilled(false);
         btnEditPic.addActionListener(this);
+
         btnEditBday = new JButton(String.format("<html><u>%s</u></html>",database.get("birthdate",userID)));
         btnEditBday.setBorderPainted(false);
         btnEditBday.setContentAreaFilled(false);
@@ -53,6 +56,7 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
         btnEditBday.setForeground(Color.BLUE);
         btnEditBday.addActionListener(this);
         btnEditBday.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+
         btnEditGender = new JButton(String.format("<html><u>%s</u></html>",database.get("gender", userID)));
         btnEditGender.setBorderPainted(false);
         btnEditGender.setContentAreaFilled(false);
@@ -60,10 +64,21 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
         btnEditGender.setFont(btnEditGender.getFont().deriveFont(Font.PLAIN));
         btnEditGender.addActionListener(this);
         btnEditGender.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-        btnAddJob = new JButton("Add/Edit Job");
+
+        btnAddJob = new JButton("<html><u>Add/Edit Job</u></html>");
+        btnAddJob.setBorderPainted(false);
+        btnAddJob.setContentAreaFilled(false);
+        btnAddJob.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
         btnAddJob.addActionListener(this);
-        btnAddHobby = new JButton("Add/Edit Hobby");
+
+
+        btnAddHobby = new JButton("<html><u>Add/Edit Hobby</u></html>");
+        btnAddHobby.setBorderPainted(false);
+        btnAddHobby.setContentAreaFilled(false);
+        btnAddHobby.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
         btnAddHobby.addActionListener(this);
+
+
         btnEditPassword = new JButton("Edit Password");
         btnEditPassword.setBackground(Color.black);
         btnEditPassword.setForeground(Color.white);
@@ -81,10 +96,12 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
         btnCancel.addActionListener(this);
         btnBack = new JButton("Back");
         btnBack.addActionListener(this);
+        btnBack.setBackground(new Color(196, 164, 132));
 
         // Add components to the frame
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
+        panel.setBackground(new Color(200, 238, 176));
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.NONE;

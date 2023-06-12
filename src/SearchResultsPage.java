@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -12,6 +14,21 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
     private final int userID;
     private final String keyword;
     private final TracebackFunction tracebackFunction;
+    int maxWidth = 150;
+    int maxHeight = 180;
+
+    // Helper method to resize the image
+    private Image resizeImage(Image originalImage, int maxWidth, int maxHeight) {
+        int width = originalImage.getWidth(null);
+        int height = originalImage.getHeight(null);
+        double widthRatio = (double) maxWidth / width;
+        double heightRatio = (double) maxHeight / height;
+        double scaleRatio = Math.max(widthRatio, heightRatio);
+        int newWidth = (int) (width * scaleRatio);
+        int newHeight = (int) (height * scaleRatio);
+        return originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+    }
+
     public SearchResultsPage(int userId, String keyword, TracebackFunction tracebackFunction){
         super(String.format("Search Results of \"%s\"",keyword));
         this.database = new Database();
@@ -28,6 +45,10 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
         btnEditAcc = new JButton("Edit Account");
         btnLogOut = new JButton("Log Out");
         btnBack = new JButton("Back");
+        btnBack.setBackground(new Color(196, 164, 132));
+
+        btnSearch.setBackground(new Color(46,138,87));
+        btnSearch.setForeground(white);
 
         btnViewAcc.setForeground(new Color(58,30,0));
         btnViewAcc.setBackground(new Color(196, 164, 132));
@@ -70,6 +91,7 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
             }
         });
 
+        btnUser.setFont(new Font(btnUser.getFont().getName(), Font.BOLD, 16));
         btnUser.setBackground(new Color(180, 238, 156));
         btnUser.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 50));
         btnUser.addMouseListener(new MouseAdapter() {
@@ -107,36 +129,69 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
         scrollPane.getVerticalScrollBar().setUnitIncrement(10);
         scrollPane.getVerticalScrollBar().setBlockIncrement(100);
 
+
         ArrayList<Friend> searchResults = (ArrayList<Friend>) database.searchUser(userId,keyword);
         for (Friend searchResult : searchResults){
             JPanel framePanel = new JPanel(new BorderLayout());
-            framePanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            framePanel.setBorder(BorderFactory.createLineBorder(white));
 
             JPanel resultPanel = new JPanel(new GridBagLayout());
-            resultPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            resultPanel.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, new Color(110, 90, 50)));
             GridBagConstraints resultGBC = new GridBagConstraints();
-
+            resultPanel.setBackground(new Color(255,240,211));
             byte[] profilePictureData = database.getProfilePicture(searchResult.getUserId());
             JLabel lblProfilePicture = new JLabel();
-            if (profilePictureData != null){
-                lblProfilePicture.setIcon(new ImageIcon(profilePictureData));
+            Border border = LineBorder.createBlackLineBorder();
+            lblProfilePicture.setBorder(border);
+
+            if (profilePictureData != null) {
+                ImageIcon imageIcon = new ImageIcon(profilePictureData);
+                Image image = imageIcon.getImage();
+                Image resizedImage = resizeImage(image, maxWidth, maxHeight);
+                lblProfilePicture.setIcon(new ImageIcon(resizedImage));
+                lblProfilePicture.setPreferredSize(new Dimension(maxWidth, maxHeight));
+                lblProfilePicture.setHorizontalAlignment(SwingConstants.CENTER);
+                lblProfilePicture.setVerticalAlignment(SwingConstants.CENTER);
+            } else {
+                ImageIcon defaultIcon = new ImageIcon("src/default_profile_pic.jpg");
+                Image defaultImage = defaultIcon.getImage();
+                Image resizedImage = resizeImage(defaultImage, maxWidth, maxHeight);
+                lblProfilePicture.setIcon(new ImageIcon(resizedImage));
+                lblProfilePicture.setPreferredSize(new Dimension(maxWidth, maxHeight));
+                lblProfilePicture.setHorizontalAlignment(SwingConstants.CENTER);
+                lblProfilePicture.setVerticalAlignment(SwingConstants.CENTER);
             }
-            else {
-                lblProfilePicture.setIcon(new ImageIcon("src/default_profile_pic.jpg"));
-            }
+
+
             JLabel lblUsername = new JLabel(String.format("Username:   %-26s",searchResult.getUsername()));
             JLabel lblName = new JLabel(String.format("Name:   %-30s", searchResult.getName()));
             JLabel lblUserId = new JLabel(String.format("User ID:   %-100d", searchResult.getUserId()));
             JButton btnViewAcc = new JButton("View Account");
+            btnViewAcc.setBackground(new Color(200, 170, 105));
+            btnViewAcc.setForeground(new Color(58,30,0));
+
             JButton btnStatus = new JButton();
             if (searchResult.getStatus() == null){
                 btnStatus.setText("Add Friend");
+                btnStatus.setBackground(new Color(0,102,204));
+                btnStatus.setForeground(white);
+                btnStatus.addActionListener(this);
             }
             else {
                 btnStatus.setText(searchResult.getStatus());
+                if(btnStatus.getText().equals("Friend request sent")) {
+                    btnStatus.setBackground(new Color(0, 0, 102));
+                    btnStatus.setForeground(Color.WHITE);
+                }else if (btnStatus.getText().equals("Received friend request")) {
+                    btnStatus.setBackground(new Color(255,255,153));
+                }else if(btnStatus.getText().equals("Friend")){
+                    btnStatus.setBackground(new Color(0,204,0));
+                    btnStatus.setForeground(Color.WHITE);
+                }else{
+                    btnStatus.setForeground(Color.WHITE);
+                    btnStatus.setBackground(new Color(0,102,204));
+                }
             }
-            btnStatus.setForeground(Color.WHITE);
-            btnStatus.setBackground(new Color(0, 102, 204));
 
             resultGBC.gridx = 0;
             resultGBC.gridy = 0;
@@ -168,6 +223,8 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
                             database.insertStatus(searchResult.getUserId(), userID, 2);// receive request
                             JOptionPane.showMessageDialog(scrollPane, "Your friend request is sent!", "Success", JOptionPane.INFORMATION_MESSAGE);
                             btnStatus.setText("Friend request sent");
+                            btnStatus.setBackground(new Color(0,0,102));
+                            btnStatus.setForeground(Color.white);
                         }
                         else if (btnStatus.getText().equals("Friend request sent")) {
                             int response = JOptionPane.showConfirmDialog(scrollPane, "Are you sure you want to cancel your friend request?", "Confirm", JOptionPane.YES_NO_OPTION);
@@ -175,6 +232,8 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
                                 database.removeStatus(userID, searchResult.getUserId());// delete request
                                 JOptionPane.showMessageDialog(scrollPane, "Friend request cancelled.", "Success", JOptionPane.INFORMATION_MESSAGE);
                                 btnStatus.setText("Add Friend");
+                                btnStatus.setBackground(new Color(0,102,204));
+                                btnStatus.setForeground(Color.white);
                             }
                         }
                         else if (btnStatus.getText().equals("Received friend request")){
@@ -185,11 +244,15 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
                                 database.updateStatus(userID, searchResult.getUserId(),3);// Update status to friends
                                 JOptionPane.showMessageDialog(scrollPane, "You two are now friends!", "Success", JOptionPane.INFORMATION_MESSAGE);
                                 btnStatus.setText("Friend");
+                                btnStatus.setBackground(new Color(0,204,0));
+                                btnStatus.setForeground(Color.WHITE);
                             }
                             else if (response == 1){//delete
                                 database.removeStatus(userID, searchResult.getUserId());
                                 JOptionPane.showMessageDialog(scrollPane, "You deleted the friend request...", "Success", JOptionPane.INFORMATION_MESSAGE);
                                 btnStatus.setText("Add Friend");
+                                btnStatus.setBackground(new Color(0,102,204));
+                                btnStatus.setForeground(Color.WHITE);
                             }
                         }
                         else if (btnStatus.getText().equals("Friend")){
@@ -197,6 +260,8 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
                             if(response == JOptionPane.YES_OPTION) {
                                 database.removeStatus(userID,searchResult.getUserId());
                                 btnStatus.setText("Add Friend");
+                                btnStatus.setBackground(new Color(0,102,204));
+                                btnStatus.setForeground(Color.WHITE);
                             }
                         }
                     }
@@ -218,16 +283,18 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
         topPanel.add(btnUser);
         topPanel.setBackground(new Color(180, 238, 156));
 
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        searchPanel.setBackground(new Color(180, 238, 156));
+        searchPanel.add(txtSearch);
+        searchPanel.add(btnSearch);
+
         JPanel centerPanel = new JPanel(new GridBagLayout());
         GridBagConstraints centerGBC = new GridBagConstraints();
         centerGBC.gridx = 0;
         centerGBC.gridy = 0;
-        centerPanel.add(txtSearch, centerGBC);
-        centerGBC.gridx = 1;
-        centerPanel.add(btnSearch, centerGBC);
-        centerGBC.gridx = 0;
+        centerPanel.add(searchPanel);
         centerGBC.gridy = 1;
-        centerGBC.weightx = 1.0;
+        centerGBC.weightx = 1;
         centerGBC.anchor = GridBagConstraints.CENTER;
         centerPanel.add(scrollPane, centerGBC);
         centerPanel.setBackground(new Color(180, 238, 156));

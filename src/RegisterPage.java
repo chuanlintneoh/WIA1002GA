@@ -5,7 +5,7 @@ import java.util.Calendar;
 import java.util.Arrays;
 public class RegisterPage extends JFrame implements ActionListener {
     private final LoginPage loginPage;
-    private final JLabel lblName, lblUsername, lblPassword, lblConfirmPassword, lblEmail, lblContactNo, lblDOB, lblGender;
+    private final JLabel forestbook,lblName, lblUsername, lblPassword, lblConfirmPassword, lblEmail, lblContactNo, lblDOB, lblGender;
     private final JTextField txtName, txtUsername, txtEmail, txtContactNo;
     private final JPasswordField txtPassword, txtConfirmPassword;
     private final JComboBox<Integer> birthDay, birthYear;
@@ -20,6 +20,10 @@ public class RegisterPage extends JFrame implements ActionListener {
         this.tracebackFunction = tracebackFunction;
         this.database = new Database();
         // Initialize GUI components
+        forestbook = new JLabel("ForestBook");
+        forestbook.setFont(new Font("Curlz MT", Font.BOLD, 30));
+        forestbook.setForeground(new Color(0, 128, 0));
+
         lblName = new JLabel("Name:");
         txtName = new JTextField(20);
         lblUsername = new JLabel("Username:");
@@ -65,46 +69,53 @@ public class RegisterPage extends JFrame implements ActionListener {
         btnLogin.setForeground(Color.BLUE);
         btnLogin.addActionListener(this);
 
+        JPanel headerPanel = new JPanel();
+        headerPanel.setBackground(new Color(180, 238, 156));
+        headerPanel.add(forestbook);
         // Add components to the frame
         JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(new Color(180, 238, 156));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.gridx = 0;
         gbc.gridy = 0;
+        panel.add(headerPanel, gbc);
+
+        gbc.gridy = 1;
         panel.add(lblName, gbc);
         gbc.gridx = 1;
         panel.add(txtName, gbc);
         gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         panel.add(lblUsername, gbc);
         gbc.gridx = 1;
         panel.add(txtUsername, gbc);
         gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         panel.add(lblPassword, gbc);
         gbc.gridx = 1;
         panel.add(txtPassword, gbc);
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = 4;
         panel.add(lblConfirmPassword, gbc);
         gbc.gridx = 1;
         panel.add(txtConfirmPassword, gbc);
         gbc.gridx = 0;
-        gbc.gridy = 4;
+        gbc.gridy = 5;
         panel.add(lblEmail, gbc);
         gbc.gridx = 1;
         panel.add(txtEmail, gbc);
         gbc.gridx = 0;
-        gbc.gridy = 5;
+        gbc.gridy = 6;
         panel.add(lblContactNo, gbc);
         gbc.gridx = 1;
         panel.add(txtContactNo, gbc);
         gbc.gridx = 0;
-        gbc.gridy = 6;
+        gbc.gridy = 7;
         panel.add(lblDOB, gbc);
         gbc.gridx = 0;
-        gbc.gridy = 7;
+        gbc.gridy = 8;
         gbc.anchor = GridBagConstraints.CENTER;
         panel.add(birthDay, gbc);
         gbc.gridx = 1;
@@ -112,11 +123,11 @@ public class RegisterPage extends JFrame implements ActionListener {
         gbc.gridx = 2;
         panel.add(birthYear, gbc);
         gbc.gridx = 0;
-        gbc.gridy = 8;
+        gbc.gridy = 9;
         gbc.anchor = GridBagConstraints.WEST;
         panel.add(lblGender, gbc);
         gbc.gridx = 0;
-        gbc.gridy = 9;
+        gbc.gridy = 10;
         gbc.anchor = GridBagConstraints.CENTER;
         panel.add(radioMale, gbc);
         gbc.gridx = 1;
@@ -124,18 +135,18 @@ public class RegisterPage extends JFrame implements ActionListener {
         gbc.gridx = 2;
         panel.add(radioNotSet, gbc);
         gbc.gridx = 0;
-        gbc.gridy = 10;
+        gbc.gridy = 11;
         gbc.gridwidth = 4;
         panel.add(btnRegister, gbc);
         gbc.gridx = 0;
-        gbc.gridy = 11;
+        gbc.gridy = 12;
         gbc.gridwidth = 4;
         panel.add(btnLogin, gbc);
 
         // Set frame properties
         add(panel);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(550, 600);
+        setSize(550, 650);
         setLocationRelativeTo(null);
         setVisible(true);
     }

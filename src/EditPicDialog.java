@@ -58,7 +58,7 @@ public class EditPicDialog extends JDialog implements ActionListener{
                         return;
                     }
                     int maxWidth = 150;
-                    int maxHeight = 200;
+                    int maxHeight = 180;
                     int width = image.getWidth();
                     int height = image.getHeight();
                     double widthRatio = (double) maxWidth / width;
