@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import static java.awt.Color.*;
 public class SearchResultsPage extends JFrame implements Page, ActionListener {
     private final JTextField txtSearch;
-    private final JButton btnUser, btnSearch, btnViewAcc, btnEditAcc, btnLogOut, btnBack;
+    private final JButton btnUser, btnSearch, btnViewAcc, btnEditAcc, btnLogOut, btnHome, btnBack;
     private final JLabel forestbook;
     private final Database database;
     private final String username;
@@ -31,6 +31,9 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
         btnViewAcc = new JButton("View Account");
         btnEditAcc = new JButton("Edit Account");
         btnLogOut = new JButton("Log Out");
+        btnHome = new JButton("Home");
+        btnHome.setBackground(new Color(0, 128, 0));
+        btnHome.setForeground(Color.white);
         btnBack = new JButton("Back");
         btnBack.setBackground(new Color(196, 164, 132));
 
@@ -96,6 +99,7 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
         btnEditAcc.addActionListener(this);
         btnLogOut.addActionListener(this);
         btnSearch.addActionListener(this);
+        btnHome.addActionListener(this);
         btnBack.addActionListener(this);
 
         JPopupMenu accountMenu = new JPopupMenu();
@@ -288,6 +292,7 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
         eastPanel.setBackground(new Color(180, 238, 156));
 
         JPanel bottomPanel = new JPanel();
+        bottomPanel.add(btnHome);
         bottomPanel.add(btnBack);
         bottomPanel.setBackground(new Color(180, 238, 156));
 
@@ -346,6 +351,10 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
             else {
                 JOptionPane.showMessageDialog(this, "Please enter search query.", "Empty Search", JOptionPane.INFORMATION_MESSAGE);
             }
+        }
+        else if (e.getSource() == btnHome){
+            tracebackFunction.pushPage(new HomePage(username,tracebackFunction));
+            dispose();
         }
         else if (e.getSource() == btnBack){
             tracebackFunction.popPeek();
