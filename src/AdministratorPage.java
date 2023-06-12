@@ -76,6 +76,11 @@ public class AdministratorPage extends JFrame implements Page,ActionListener {
         }
     }
     private void deleteUser(int userId) {
+        int adminUserID = database.getUserId(username);
+        if (adminUserID == userId){
+            JOptionPane.showMessageDialog(this,"Deleting own account is not allowed.");
+            return;
+        }
         try {
             // Delete the user from the database
             database.deleteUser(userId);
