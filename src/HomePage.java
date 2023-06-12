@@ -26,6 +26,9 @@ public class HomePage extends JFrame implements Page,ActionListener{
         btnLogOut = new JButton("Log Out");
         btnBack = new JButton("Back");
 
+        btnSearch.setBackground(new Color(46,138,87));
+        btnSearch.setForeground(white);
+
         btnViewAcc.setForeground(new Color(58,30,0));
         btnViewAcc.setBackground(new Color(196, 164, 132));
         btnViewAcc.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -67,6 +70,7 @@ public class HomePage extends JFrame implements Page,ActionListener{
             }
         });
 
+        btnUser.setFont(new Font(btnUser.getFont().getName(), Font.BOLD, 16));
         btnUser.setBackground(new Color(180, 238, 156));
         btnUser.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 50));
         btnUser.addMouseListener(new MouseAdapter() {
@@ -80,6 +84,7 @@ public class HomePage extends JFrame implements Page,ActionListener{
             }
         });
 
+        btnBack.setBackground(new Color(196, 164, 132));
         btnViewAcc.addActionListener(this);
         btnEditAcc.addActionListener(this);
         btnLogOut.addActionListener(this);

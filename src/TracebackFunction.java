@@ -15,6 +15,11 @@ public class TracebackFunction {
             }
         }
     }
+    public void peek(){
+        if(!pageStack.isEmpty()){
+            pageStack.peek().showPage();;
+        }
+    }//refresh page
     public void clear(){
         pageStack.clear();
     }

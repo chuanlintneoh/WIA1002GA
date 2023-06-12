@@ -12,7 +12,7 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
         new ViewAccountPage("vinnieying",1,new TracebackFunction());//view friend account
 //        new ViewAccountPage("vinnieying",0);//view self account
     }
-    private final JLabel lblName, txtName, lblUsername, txtUsername,lblEmail, txtEmail, lblContactNo, txtContactNo, lblDOB, txtDOB, lblGender, txtGender, lblHobbies, txtHobbies, lblJobHistory, lblAddress, txtAge, lblProfilePicture;
+    private final JLabel lblName, txtName, lblUsername, txtUsername,lblEmail, txtEmail, lblContactNo, txtContactNo, lblDOB, txtDOB, lblGender, txtGender, lblHobbies, txtHobbies, lblJobHistory, lblAddress, txtAge, lblProfilePicture, txtNoOfFriends;
     private final JTextArea txtJobHistory,txtAddress;
     private JButton btnHome, btnEditAcc, btnStatus, btnBack;
     private final Database database;
@@ -50,6 +50,23 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
         if (profilePictureData != null){
             ImageIcon profilePicture = new ImageIcon(profilePictureData);
             lblProfilePicture.setIcon(profilePicture);
+        }else {
+            int maxWidth = 150;
+            int maxHeight = 180;
+            ImageIcon defaultIcon = new ImageIcon("src/default_profile_pic.jpg");
+            Image defaultImage = defaultIcon.getImage();
+            int width = defaultImage.getWidth(null);
+            int height = defaultImage.getHeight(null);
+            double widthRatio = (double) maxWidth / width;
+            double heightRatio = (double) maxHeight / height;
+            double scaleRatio = Math.max(widthRatio, heightRatio);
+            int newWidth = (int) (width * scaleRatio);
+            int newHeight = (int) (height * scaleRatio);
+            Image resizedImage = defaultImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+            lblProfilePicture.setIcon(new ImageIcon(resizedImage));
+            lblProfilePicture.setPreferredSize(new Dimension(maxWidth, maxHeight));
+            lblProfilePicture.setHorizontalAlignment(SwingConstants.CENTER);
+            lblProfilePicture.setVerticalAlignment(SwingConstants.CENTER);
         }
 
         txtAddress = new JTextArea(database.get("address",userID));
@@ -62,9 +79,10 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
         txtDOB = new JLabel(database.get("birthdate", userID));
         LocalDate birthDate = LocalDate.parse(database.get("birthdate",userID));
         int age = calculateAge(birthDate);
-        txtAge = new JLabel("Age:    " + String.valueOf(age) + "          ");
+        txtAge = new JLabel("Age:    " + age + "          ");
         lblGender = new JLabel("Gender:");
         txtGender = new JLabel(database.get("gender",userID));
+        txtNoOfFriends = new JLabel("No. of friends:    " + database.getNumberOfFriends(userID) + "          ");
 
         lblJobHistory = new JLabel("Job History:");
         Stack<Job> jobs = database.viewUserJobs(userID);
@@ -107,15 +125,19 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
         txtHobbies = new JLabel(hobbyList.toString());
 
         btnHome = new JButton("Home");
+        btnHome.setBackground(new Color(0, 128, 0));
+        btnHome.setForeground(Color.white);
         btnHome.addActionListener(this);
         btnEditAcc = new JButton("Edit Account");
         btnEditAcc.addActionListener(this);
         btnBack = new JButton("Back");
+        btnBack.setBackground(new Color(196, 164, 132));
         btnBack.addActionListener(this);
 
         // Add components to the frame
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
+        panel.setBackground(new Color(200, 238, 156));
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.NONE;
@@ -158,9 +180,12 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
         panel.add(lblGender, gbc);
         gbc.gridx = 1;
         panel.add(txtGender,gbc);
+        gbc.anchor = GridBagConstraints.EAST;
+        panel.add(txtNoOfFriends, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 6;
+        gbc.anchor = GridBagConstraints.WEST;
         panel.add(lblAddress, gbc);
         gbc.gridx = 1;
         panel.add(txtAddress, gbc);
@@ -262,7 +287,7 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
             if (btnStatus.getText().equals("Add Friend")){
                 database.insertStatus(database.getUserId(username), userID, 1);// send request
                 database.insertStatus(userID, database.getUserId(username), 2);// receive request
-                JOptionPane.showMessageDialog(this, "Your friend request is sent!.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Your friend request is sent!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 btnStatus.setText("Friend request sent");
                 btnStatus.setBackground(new Color(0,0,102));
                 btnStatus.setForeground(Color.white);

@@ -1,17 +1,34 @@
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import static java.awt.Color.*;
 public class SearchResultsPage extends JFrame implements Page, ActionListener {
     private final JTextField txtSearch;
-    private final JButton btnUser, btnSearch, btnViewAcc, btnEditAcc, btnLogOut, btnBack, btnStatus;
+    private final JButton btnUser, btnSearch, btnViewAcc, btnEditAcc, btnLogOut, btnBack;
     private final JLabel forestbook;
     private final Database database;
     private final String username;
     private final int userID;
     private final String keyword;
     private final TracebackFunction tracebackFunction;
+    int maxWidth = 150;
+    int maxHeight = 180;
+
+    // Helper method to resize the image
+    private Image resizeImage(Image originalImage, int maxWidth, int maxHeight) {
+        int width = originalImage.getWidth(null);
+        int height = originalImage.getHeight(null);
+        double widthRatio = (double) maxWidth / width;
+        double heightRatio = (double) maxHeight / height;
+        double scaleRatio = Math.max(widthRatio, heightRatio);
+        int newWidth = (int) (width * scaleRatio);
+        int newHeight = (int) (height * scaleRatio);
+        return originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+    }
+
     public SearchResultsPage(int userId, String keyword, TracebackFunction tracebackFunction){
         super(String.format("Search Results of \"%s\"",keyword));
         this.database = new Database();
@@ -28,111 +45,272 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
         btnEditAcc = new JButton("Edit Account");
         btnLogOut = new JButton("Log Out");
         btnBack = new JButton("Back");
-        btnStatus = new JButton("Add Friend");
+        btnBack.setBackground(new Color(196, 164, 132));
+
+        btnSearch.setBackground(new Color(46,138,87));
+        btnSearch.setForeground(white);
+
+        btnViewAcc.setForeground(new Color(58,30,0));
+        btnViewAcc.setBackground(new Color(196, 164, 132));
+        btnViewAcc.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        btnViewAcc.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnViewAcc.setForeground(WHITE); // Change to the desired color
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnViewAcc.setForeground(new Color(58,30,0)); // Change back to the default color
+            }
+        });
+        btnEditAcc.setForeground(new Color(58,30,0));
+        btnEditAcc.setBackground(new Color(196, 164, 132));
+        btnEditAcc.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        btnEditAcc.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnEditAcc.setForeground(WHITE); // Change to the desired color
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnEditAcc.setForeground(new Color(58,30,0)); // Change back to the default color
+            }
+
+        });
+        btnLogOut.setForeground(new Color(70,13,13));
+        btnLogOut.setBackground(new Color(196, 164, 132));
+        btnLogOut.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        btnLogOut.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnLogOut.setForeground(WHITE); // Change to the desired color
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnLogOut.setForeground(new Color(70,13,13)); // Change back to the default color
+            }
+        });
+
+        btnUser.setFont(new Font(btnUser.getFont().getName(), Font.BOLD, 16));
+        btnUser.setBackground(new Color(180, 238, 156));
+        btnUser.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 50));
+        btnUser.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnUser.setForeground(WHITE); // Change to the desired color
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnUser.setForeground(new Color(58,30,0)); // Change back to the default color
+            }
+        });
 
         btnViewAcc.addActionListener(this);
         btnEditAcc.addActionListener(this);
         btnLogOut.addActionListener(this);
         btnSearch.addActionListener(this);
         btnBack.addActionListener(this);
-        btnStatus.addActionListener(this);
 
         JPopupMenu accountMenu = new JPopupMenu();
+        accountMenu.setBackground(new Color(196,164,132));
         accountMenu.add(btnViewAcc);
         accountMenu.add(btnEditAcc);
         accountMenu.add(btnLogOut);
 
-        btnUser.addActionListener(e -> accountMenu.show(btnUser, 0, btnUser.getHeight()));
+        btnUser.addActionListener(e -> accountMenu.show(btnUser, -56, btnUser.getHeight()));
 
         forestbook.setFont(new Font("Curlz MT", Font.BOLD, 42));
         forestbook.setForeground(new Color(0, 128, 0));
 
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(0, 0, 0, 0);
-        GridBagConstraints componentsGBC = new GridBagConstraints();
-        componentsGBC.insets = new Insets(10,10,10,10);
-
-        JPanel panel1 = new JPanel();
-        panel1.add(forestbook,componentsGBC);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 0.2;
-        gbc.weighty = 0.2;
-        panel.add(panel1, gbc);
-
-        JPanel panel2 = new JPanel();
-        panel2.add(txtSearch,componentsGBC);
-        panel2.add(btnSearch,componentsGBC);
-        panel2.add(btnUser,componentsGBC);
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.weightx = 0.8;
-        gbc.weighty = 0.2;
-        panel.add(panel2, gbc);
-
-        JPanel searchResultsPanel = new JPanel(new GridBagLayout());
+        JPanel searchResultsPanel = new JPanel();
+        searchResultsPanel.setLayout(new BoxLayout(searchResultsPanel, BoxLayout.Y_AXIS));
         JScrollPane scrollPane = new JScrollPane(searchResultsPanel);
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 2;
-        gbc.weightx = 1.0;
-        gbc.weighty = 0.7;
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.BOTH;
-        panel.add(scrollPane, gbc);
+        scrollPane.setPreferredSize(new Dimension(655,500));
+        scrollPane.getVerticalScrollBar().setUnitIncrement(10);
+        scrollPane.getVerticalScrollBar().setBlockIncrement(100);
+
 
         ArrayList<Friend> searchResults = (ArrayList<Friend>) database.searchUser(userId,keyword);
         for (Friend searchResult : searchResults){
-            JPanel resultPanel = new JPanel(new GridBagLayout());
-            GridBagConstraints resultGBC = new GridBagConstraints();
+            JPanel framePanel = new JPanel(new BorderLayout());
+            framePanel.setBorder(BorderFactory.createLineBorder(white));
 
+            JPanel resultPanel = new JPanel(new GridBagLayout());
+            resultPanel.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, new Color(110, 90, 50)));
+            GridBagConstraints resultGBC = new GridBagConstraints();
+            resultPanel.setBackground(new Color(255,240,211));
             byte[] profilePictureData = database.getProfilePicture(searchResult.getUserId());
             JLabel lblProfilePicture = new JLabel();
-            if (profilePictureData != null){
-                lblProfilePicture.setIcon(new ImageIcon(profilePictureData));
+            Border border = LineBorder.createBlackLineBorder();
+            lblProfilePicture.setBorder(border);
+
+            if (profilePictureData != null) {
+                ImageIcon imageIcon = new ImageIcon(profilePictureData);
+                Image image = imageIcon.getImage();
+                Image resizedImage = resizeImage(image, maxWidth, maxHeight);
+                lblProfilePicture.setIcon(new ImageIcon(resizedImage));
+                lblProfilePicture.setPreferredSize(new Dimension(maxWidth, maxHeight));
+                lblProfilePicture.setHorizontalAlignment(SwingConstants.CENTER);
+                lblProfilePicture.setVerticalAlignment(SwingConstants.CENTER);
+            } else {
+                ImageIcon defaultIcon = new ImageIcon("src/default_profile_pic.jpg");
+                Image defaultImage = defaultIcon.getImage();
+                Image resizedImage = resizeImage(defaultImage, maxWidth, maxHeight);
+                lblProfilePicture.setIcon(new ImageIcon(resizedImage));
+                lblProfilePicture.setPreferredSize(new Dimension(maxWidth, maxHeight));
+                lblProfilePicture.setHorizontalAlignment(SwingConstants.CENTER);
+                lblProfilePicture.setVerticalAlignment(SwingConstants.CENTER);
+            }
+
+
+            JLabel lblUsername = new JLabel(String.format("Username:   %-26s",searchResult.getUsername()));
+            JLabel lblName = new JLabel(String.format("Name:   %-30s", searchResult.getName()));
+            JLabel lblUserId = new JLabel(String.format("User ID:   %-100d", searchResult.getUserId()));
+            JButton btnViewAcc = new JButton("View Account");
+            btnViewAcc.setBackground(new Color(200, 170, 105));
+            btnViewAcc.setForeground(new Color(58,30,0));
+
+            JButton btnStatus = new JButton();
+            if (searchResult.getStatus() == null){
+                btnStatus.setText("Add Friend");
+                btnStatus.setBackground(new Color(0,102,204));
+                btnStatus.setForeground(white);
+                btnStatus.addActionListener(this);
             }
             else {
-                lblProfilePicture.setIcon(new ImageIcon("src/default_profile_pic.jpg"));
+                btnStatus.setText(searchResult.getStatus());
+                if(btnStatus.getText().equals("Friend request sent")) {
+                    btnStatus.setBackground(new Color(0, 0, 102));
+                    btnStatus.setForeground(Color.WHITE);
+                }else if (btnStatus.getText().equals("Received friend request")) {
+                    btnStatus.setBackground(new Color(255,255,153));
+                }else if(btnStatus.getText().equals("Friend")){
+                    btnStatus.setBackground(new Color(0,204,0));
+                    btnStatus.setForeground(Color.WHITE);
+                }else{
+                    btnStatus.setForeground(Color.WHITE);
+                    btnStatus.setBackground(new Color(0,102,204));
+                }
             }
-            JLabel lblUsername = new JLabel(searchResult.getUsername());
-            JLabel lblName = new JLabel(searchResult.getName());
-            JLabel lblUserId = new JLabel(String.valueOf(searchResult.getUserId()));
-            JButton btnViewAcc = new JButton("View Account");
-            btnViewAcc.addActionListener(this);
 
-            resultGBC.gridx = 1;
-            resultGBC.gridy = 0;
-            resultPanel.add(lblUsername,resultGBC);
-            resultGBC.gridy = 1;
-            resultPanel.add(lblName,resultGBC);
-            resultGBC.gridy = 2;
-            resultPanel.add(lblUserId,resultGBC);
-            resultGBC.gridx = 2;
-            resultGBC.gridy = 0;
-            resultGBC.anchor = GridBagConstraints.EAST;
-            resultPanel.add(btnViewAcc,resultGBC);
             resultGBC.gridx = 0;
             resultGBC.gridy = 0;
-            resultGBC.gridheight = 3;
+            resultGBC.gridheight = 10;
             resultPanel.add(lblProfilePicture,resultGBC);
+            resultGBC.gridx = 1;
+            resultGBC.gridheight = 1;
+            resultGBC.insets = new Insets(10,10,10,10);
+            resultGBC.anchor = GridBagConstraints.WEST;
+            resultPanel.add(lblName,resultGBC);
+            resultGBC.gridy = 1;
+            resultPanel.add(lblUsername,resultGBC);
+            resultGBC.gridy = 2;
+            resultPanel.add(lblUserId,resultGBC);
+            resultGBC.gridy = 3;
+            resultPanel.add(btnStatus,resultGBC);
+            resultGBC.gridy = 4;
+            resultPanel.add(btnViewAcc,resultGBC);
 
-            resultPanel.setBackground(new Color(180, 238, 156));
-            gbc.weightx = 1.0;
-            gbc.weighty = 0.3;
-            gbc.insets = new Insets(10,10,10,10);
-            searchResultsPanel.add(resultPanel,gbc);
+            framePanel.add(resultPanel,BorderLayout.CENTER);
+            searchResultsPanel.add(framePanel);
+
+            ActionListener buttonActionListener = new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (e.getSource() == btnStatus){
+                        if (btnStatus.getText().equals("Add Friend")){
+                            database.insertStatus(userID, searchResult.getUserId(), 1);// send request
+                            database.insertStatus(searchResult.getUserId(), userID, 2);// receive request
+                            JOptionPane.showMessageDialog(scrollPane, "Your friend request is sent!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                            btnStatus.setText("Friend request sent");
+                            btnStatus.setBackground(new Color(0,0,102));
+                            btnStatus.setForeground(Color.white);
+                        }
+                        else if (btnStatus.getText().equals("Friend request sent")) {
+                            int response = JOptionPane.showConfirmDialog(scrollPane, "Are you sure you want to cancel your friend request?", "Confirm", JOptionPane.YES_NO_OPTION);
+                            if (response == JOptionPane.YES_OPTION) {
+                                database.removeStatus(userID, searchResult.getUserId());// delete request
+                                JOptionPane.showMessageDialog(scrollPane, "Friend request cancelled.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                                btnStatus.setText("Add Friend");
+                                btnStatus.setBackground(new Color(0,102,204));
+                                btnStatus.setForeground(Color.white);
+                            }
+                        }
+                        else if (btnStatus.getText().equals("Received friend request")){
+                            Object[] options = {"Confirm", "Delete"};
+                            int response = JOptionPane.showOptionDialog(scrollPane, "Confirm friend request?", "Confirm",
+                                    JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+                            if (response == 0){//confirm
+                                database.updateStatus(userID, searchResult.getUserId(),3);// Update status to friends
+                                JOptionPane.showMessageDialog(scrollPane, "You two are now friends!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                                btnStatus.setText("Friend");
+                                btnStatus.setBackground(new Color(0,204,0));
+                                btnStatus.setForeground(Color.WHITE);
+                            }
+                            else if (response == 1){//delete
+                                database.removeStatus(userID, searchResult.getUserId());
+                                JOptionPane.showMessageDialog(scrollPane, "You deleted the friend request...", "Success", JOptionPane.INFORMATION_MESSAGE);
+                                btnStatus.setText("Add Friend");
+                                btnStatus.setBackground(new Color(0,102,204));
+                                btnStatus.setForeground(Color.WHITE);
+                            }
+                        }
+                        else if (btnStatus.getText().equals("Friend")){
+                            int response = JOptionPane.showConfirmDialog(scrollPane, "UNFRIEND?", "Confirm", JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null);
+                            if(response == JOptionPane.YES_OPTION) {
+                                database.removeStatus(userID,searchResult.getUserId());
+                                btnStatus.setText("Add Friend");
+                                btnStatus.setBackground(new Color(0,102,204));
+                                btnStatus.setForeground(Color.WHITE);
+                            }
+                        }
+                    }
+                    else if (e.getSource() == btnViewAcc){
+                        tracebackFunction.pushPage(new ViewAccountPage(username,searchResult.getUserId(),tracebackFunction));
+                        dispose();
+                    }
+                }
+            };
+            btnStatus.addActionListener(buttonActionListener);
+            btnViewAcc.addActionListener(buttonActionListener);
         }
 
-        JPanel panel4 = new JPanel();
-        componentsGBC.anchor = GridBagConstraints.WEST;
-        panel4.add(btnBack,componentsGBC);
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 1;
-        gbc.weightx = 1.0;
-        gbc.weighty = 0.1;
-        panel.add(panel4, gbc);
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JPanel topPanel = new JPanel();
+        topPanel.add(forestbook);
+        topPanel.add(btnUser);
+        topPanel.setBackground(new Color(180, 238, 156));
+
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        searchPanel.setBackground(new Color(180, 238, 156));
+        searchPanel.add(txtSearch);
+        searchPanel.add(btnSearch);
+
+        JPanel centerPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints centerGBC = new GridBagConstraints();
+        centerGBC.gridx = 0;
+        centerGBC.gridy = 0;
+        centerPanel.add(searchPanel);
+        centerGBC.gridy = 1;
+        centerGBC.weightx = 1;
+        centerGBC.anchor = GridBagConstraints.CENTER;
+        centerPanel.add(scrollPane, centerGBC);
+        centerPanel.setBackground(new Color(180, 238, 156));
+
+        JPanel eastPanel = new JPanel();
+        eastPanel.add(btnUser);
+        eastPanel.setBackground(new Color(180, 238, 156));
+
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.add(btnBack);
+        bottomPanel.setBackground(new Color(180, 238, 156));
+
+        panel.add(topPanel, BorderLayout.NORTH);
+        panel.add(centerPanel, BorderLayout.CENTER);
+        panel.add(eastPanel, BorderLayout.EAST);
+        panel.add(bottomPanel, BorderLayout.SOUTH);
 
         add(panel);
         pack();

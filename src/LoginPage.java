@@ -6,6 +6,7 @@ public class LoginPage extends JFrame implements ActionListener {
     private final JTextField txtUsername;
     private final JPasswordField txtPassword;
     private final JButton btnLogin, btnRegister;
+    private final JLabel forestbook;
     private final Database database;
     private int userID;
     private final TracebackFunction tracebackFunction;
@@ -28,23 +29,32 @@ public class LoginPage extends JFrame implements ActionListener {
         btnRegister.setForeground(Color.BLUE);
 
         JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(new Color(180, 238, 156));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
+        forestbook = new JLabel("ForestBook");
+        forestbook.setFont(new Font("Curlz MT", Font.BOLD, 42));
+        forestbook.setForeground(new Color(0, 128, 0));
 
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
+        panel.add(forestbook,gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
         panel.add(txtUsername, gbc);
 
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         panel.add(txtPassword, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = 4;
         gbc.gridwidth = 2;
         panel.add(btnLogin, gbc);
 
-        gbc.gridy = 4;
+        gbc.gridy = 5;
         gbc.gridwidth = 1;
         gbc.gridx = 1;
         panel.add(btnRegister, gbc);

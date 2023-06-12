@@ -23,6 +23,24 @@ public class Database {
     }
     // executeQuery -> retrieve data
     // executeUpdate -> modify database
+    public boolean isUsernameAvailable(String username){
+        String query =
+                "SELECT COUNT(*) FROM users WHERE BINARY username = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1,username);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()){
+                int count = resultSet.getInt(1);
+                return count == 0;
+            }
+            return true;
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return false;
+    }
     public void registerUser(User user){
         try {
             String query =
@@ -37,7 +55,7 @@ public class Database {
     }
     public int authenticateUser(String username,String hashedPassword){
         String query =
-                "SELECT user_id FROM users WHERE (username = ? OR email_address = ? OR contact_no = ?) AND password = ?";
+                "SELECT user_id FROM users WHERE (BINARY username = ? OR BINARY email_address = ? OR BINARY contact_no = ?) AND BINARY password = ?";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1,username);
@@ -59,7 +77,7 @@ public class Database {
     }
     public int getUserId(String username){
         String query =
-                "SELECT user_id FROM users WHERE username = ?";
+                "SELECT user_id FROM users WHERE BINARY username = ?";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1,username);
@@ -103,6 +121,24 @@ public class Database {
         catch (SQLException e){
             e.printStackTrace();
         }
+    }
+    public int getNumberOfFriends(int userId){
+        String query =
+                "SELECT COUNT(*) AS friendCount FROM user_friends WHERE user_id = ? AND status = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,userId);
+            statement.setInt(2,3);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()){
+                return resultSet.getInt("friendCount");
+            }
+            return 0;
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return 0;
     }
     public byte[] getProfilePicture(int userId){
         String query =
@@ -172,10 +208,10 @@ public class Database {
         List<Friend> friendsRequests = new ArrayList<>();
         String query =
                 "SELECT uf.user_id, uf.friend_id, s.status, u.name AS friend_name, u.username AS friend_username " +
-                "FROM user_friends uf " +
-                "JOIN status s ON uf.status = s.id " +
-                "JOIN users u ON uf.friend_id = u.user_id " +
-                "WHERE uf.user_id = ?";
+                        "FROM user_friends uf " +
+                        "JOIN status s ON uf.status = s.id " +
+                        "JOIN users u ON uf.friend_id = u.user_id " +
+                        "WHERE uf.user_id = ?";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1,userId);
@@ -358,9 +394,9 @@ public class Database {
         Stack<Job> userJobs = new Stack<>();
         String query =
                 "SELECT uj.job_id, j.job, uj.start_date, uj.end_date " +
-                "FROM user_jobs uj " +
-                "JOIN jobs j ON uj.job_id = j.id " +
-                "WHERE uj.user_id = ?";
+                        "FROM user_jobs uj " +
+                        "JOIN jobs j ON uj.job_id = j.id " +
+                        "WHERE uj.user_id = ?";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1,userId);
@@ -447,10 +483,11 @@ public class Database {
         List<Friend> searchResult = new ArrayList<>();
         String query =
                 "SELECT u.user_id, u.name, u.username, s.status " +
-                "FROM users u " +
-                "LEFT JOIN user_friends uf ON u.user_id = uf.friend_id AND uf.user_id = ? " +
-                "LEFT JOIN status s ON uf.status = s.id " +
-                "WHERE u.name LIKE ?";
+                        "FROM users u " +
+                        "LEFT JOIN user_friends uf ON u.user_id = uf.friend_id AND uf.user_id = ? " +
+                        "LEFT JOIN status s ON uf.status = s.id " +
+                        "WHERE u.name LIKE ? " +
+                        "ORDER BY u.name ASC";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1,userId);
@@ -458,7 +495,7 @@ public class Database {
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()){
                 int user_id = resultSet.getInt("user_id");
-                if(user_id != userId){// excepting user himself in the search list
+                if (user_id != userId){// excepting user himself in the search list
                     String name = resultSet.getString("name");
                     String username = resultSet.getString("username");
                     String status = resultSet.getString("status");
@@ -476,11 +513,11 @@ public class Database {
         List<Friend> mutualFriends = new ArrayList<>();
         String query =
                 "SELECT u.user_id, u.name, u.username, s.status " +
-                "FROM user_friends uf1 " +
-                "JOIN user_friends uf2 ON uf1.friend_id = uf2.user_id " +
-                "JOIN users u ON uf2.friend_id = u.user_id " +
-                "JOIN status s ON uf2.status = s.id " +
-                "WHERE uf1.user_id = ? AND uf1.status = 3 AND uf2.status = 3";
+                        "FROM user_friends uf1 " +
+                        "JOIN user_friends uf2 ON uf1.friend_id = uf2.user_id " +
+                        "JOIN users u ON uf2.friend_id = u.user_id " +
+                        "JOIN status s ON uf2.status = s.id " +
+                        "WHERE uf1.user_id = ? AND uf1.status = 3 AND uf2.status = 3";
         //uf1 = user's friends, uf2 = user's mutual friends
         try {
             PreparedStatement statement = connection.prepareStatement(query);
