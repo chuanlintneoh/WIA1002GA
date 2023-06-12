@@ -4,12 +4,11 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
-
 import static java.awt.Color.*;
 public class HomePage extends JFrame implements Page,ActionListener{
     private final JTextField txtSearch;
     private final JButton btnSearch, btnUser, btnViewAcc, btnEditAcc, btnLogOut, btnBack;
-    private final JLabel forestbook;
+    private final JLabel forestbook, lblFriendReq, lblFriend, lblSuggestedFriend;
     private final Database database;
     private final int userID;
     private final String username;
@@ -30,6 +29,9 @@ public class HomePage extends JFrame implements Page,ActionListener{
         btnViewAcc = new JButton("View Account");
         btnEditAcc = new JButton("Edit Account");
         btnLogOut = new JButton("Log Out");
+        lblFriendReq = new JLabel("Friend Requests: 0");
+        lblFriend = new JLabel("Friends: " + database.getNumberOfFriends(userID));
+        lblSuggestedFriend = new JLabel("Suggested Friends: 0");
         btnBack = new JButton("Back");
 
         btnSearch.setBackground(new Color(46,138,87));
@@ -109,13 +111,14 @@ public class HomePage extends JFrame implements Page,ActionListener{
         forestbook.setForeground(new Color(0, 128, 0));
 
         JPanel mutualFriendsPanel = new JPanel();
-        mutualFriendsPanel.setLayout(new BoxLayout(mutualFriendsPanel, BoxLayout.X_AXIS));
+        mutualFriendsPanel.setLayout(new BoxLayout(mutualFriendsPanel, BoxLayout.Y_AXIS));
         JScrollPane scrollPane = new JScrollPane(mutualFriendsPanel);
-        scrollPane.setPreferredSize(new Dimension(655,250));
-        scrollPane.getHorizontalScrollBar().setUnitIncrement(10);
-        scrollPane.getHorizontalScrollBar().setBlockIncrement(100);
+        scrollPane.setPreferredSize(new Dimension(655,500));
+        scrollPane.getVerticalScrollBar().setUnitIncrement(10);
+        scrollPane.getVerticalScrollBar().setBlockIncrement(100);
 
         ArrayList<Friend> mutualFriends = (ArrayList<Friend>) database.findMutualFriends(userID);
+        int suggestedFriend = mutualFriends.size();
         for (Friend mutualFriend: mutualFriends){
             JPanel framePanel = new JPanel(new BorderLayout());
             framePanel.setBorder(BorderFactory.createLineBorder(white));
@@ -275,15 +278,25 @@ public class HomePage extends JFrame implements Page,ActionListener{
         GridBagConstraints centerGBC = new GridBagConstraints();
         centerGBC.gridx = 0;
         centerGBC.gridy = 0;
-        centerPanel.add(searchPanel);
+        centerPanel.add(searchPanel, centerGBC);
         centerGBC.gridy = 1;
+        lblSuggestedFriend.setText("Suggested Friends: " + suggestedFriend);
+        centerPanel.add(lblSuggestedFriend, centerGBC);
+        centerGBC.gridy = 2;
         centerGBC.weightx = 1;
         centerGBC.anchor = GridBagConstraints.CENTER;
         centerPanel.add(scrollPane, centerGBC);
         centerPanel.setBackground(new Color(180, 238, 156));
 
-        JPanel westPanel = new JPanel();
-//        westPanel.add();
+        JPanel westPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints westGBC = new GridBagConstraints();
+        westGBC.insets = new Insets(10,10,10,10);
+        westGBC.anchor = GridBagConstraints.CENTER;
+        westGBC.gridx = 0;
+        westGBC.gridy = 0;
+        westPanel.add(lblFriendReq,westGBC);
+        westGBC.gridy = 1;
+        westPanel.add(lblFriend,westGBC);
         westPanel.setBackground(new Color(180, 238, 156));
 
         JPanel eastPanel = new JPanel();
