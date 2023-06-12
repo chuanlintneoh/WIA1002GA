@@ -1,6 +1,10 @@
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+
 import static java.awt.Color.*;
 public class HomePage extends JFrame implements Page,ActionListener{
     private final JTextField txtSearch;
@@ -10,6 +14,8 @@ public class HomePage extends JFrame implements Page,ActionListener{
     private final int userID;
     private final String username;
     private final TracebackFunction tracebackFunction;
+    private final int maxWidth = 150;
+    private final int maxHeight = 180;
     public HomePage(String username, TracebackFunction tracebackFunction) {
         super("ForestBook Home Page");
         this.username = username;
@@ -102,6 +108,157 @@ public class HomePage extends JFrame implements Page,ActionListener{
         forestbook.setFont(new Font("Curlz MT", Font.BOLD, 42));
         forestbook.setForeground(new Color(0, 128, 0));
 
+        JPanel mutualFriendsPanel = new JPanel();
+        mutualFriendsPanel.setLayout(new BoxLayout(mutualFriendsPanel, BoxLayout.X_AXIS));
+        JScrollPane scrollPane = new JScrollPane(mutualFriendsPanel);
+        scrollPane.setPreferredSize(new Dimension(655,250));
+        scrollPane.getHorizontalScrollBar().setUnitIncrement(10);
+        scrollPane.getHorizontalScrollBar().setBlockIncrement(100);
+
+        ArrayList<Friend> mutualFriends = (ArrayList<Friend>) database.findMutualFriends(userID);
+        for (Friend mutualFriend: mutualFriends){
+            JPanel framePanel = new JPanel(new BorderLayout());
+            framePanel.setBorder(BorderFactory.createLineBorder(white));
+
+            JPanel resultPanel = new JPanel(new GridBagLayout());
+            resultPanel.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, new Color(110, 90, 50)));
+            GridBagConstraints resultGBC = new GridBagConstraints();
+            resultPanel.setBackground(new Color(255,240,211));
+            byte[] profilePictureData = database.getProfilePicture(mutualFriend.getUserId());
+            JLabel lblProfilePicture = new JLabel();
+            Border border = LineBorder.createBlackLineBorder();
+            lblProfilePicture.setBorder(border);
+
+            if (profilePictureData != null) {
+                ImageIcon imageIcon = new ImageIcon(profilePictureData);
+                Image image = imageIcon.getImage();
+                Image resizedImage = resizeImage(image, maxWidth, maxHeight);
+                lblProfilePicture.setIcon(new ImageIcon(resizedImage));
+                lblProfilePicture.setPreferredSize(new Dimension(maxWidth, maxHeight));
+                lblProfilePicture.setHorizontalAlignment(SwingConstants.CENTER);
+                lblProfilePicture.setVerticalAlignment(SwingConstants.CENTER);
+            } else {
+                ImageIcon defaultIcon = new ImageIcon("src/default_profile_pic.jpg");
+                Image defaultImage = defaultIcon.getImage();
+                Image resizedImage = resizeImage(defaultImage, maxWidth, maxHeight);
+                lblProfilePicture.setIcon(new ImageIcon(resizedImage));
+                lblProfilePicture.setPreferredSize(new Dimension(maxWidth, maxHeight));
+                lblProfilePicture.setHorizontalAlignment(SwingConstants.CENTER);
+                lblProfilePicture.setVerticalAlignment(SwingConstants.CENTER);
+            }
+
+            JLabel lblUsername = new JLabel(String.format("Username:   %-26s",mutualFriend.getUsername()));
+            JLabel lblName = new JLabel(String.format("Name:   %-30s", mutualFriend.getName()));
+            JLabel lblUserId = new JLabel(String.format("User ID:   %-100d", mutualFriend.getUserId()));
+            JButton btnViewAcc = new JButton("View Account");
+            btnViewAcc.setBackground(new Color(200, 170, 105));
+            btnViewAcc.setForeground(new Color(58,30,0));
+
+            JButton btnStatus = new JButton();
+            if (mutualFriend.getStatus() == null){
+                btnStatus.setText("Add Friend");
+                btnStatus.setBackground(new Color(0,102,204));
+                btnStatus.setForeground(white);
+                btnStatus.addActionListener(this);
+            }
+            else {
+                btnStatus.setText(mutualFriend.getStatus());
+                if(btnStatus.getText().equals("Friend request sent")) {
+                    btnStatus.setBackground(new Color(0, 0, 102));
+                    btnStatus.setForeground(Color.WHITE);
+                }else if (btnStatus.getText().equals("Received friend request")) {
+                    btnStatus.setBackground(new Color(255,255,153));
+                }else if(btnStatus.getText().equals("Friend")){
+                    btnStatus.setBackground(new Color(0,204,0));
+                    btnStatus.setForeground(Color.WHITE);
+                }else{
+                    btnStatus.setForeground(Color.WHITE);
+                    btnStatus.setBackground(new Color(0,102,204));
+                }
+            }
+
+            resultGBC.gridx = 0;
+            resultGBC.gridy = 0;
+            resultGBC.gridheight = 10;
+            resultPanel.add(lblProfilePicture,resultGBC);
+            resultGBC.gridx = 1;
+            resultGBC.gridheight = 1;
+            resultGBC.insets = new Insets(10,10,10,10);
+            resultGBC.anchor = GridBagConstraints.WEST;
+            resultPanel.add(lblName,resultGBC);
+            resultGBC.gridy = 1;
+            resultPanel.add(lblUsername,resultGBC);
+            resultGBC.gridy = 2;
+            resultPanel.add(lblUserId,resultGBC);
+            resultGBC.gridy = 3;
+            resultPanel.add(btnStatus,resultGBC);
+            resultGBC.gridy = 4;
+            resultPanel.add(btnViewAcc,resultGBC);
+
+            framePanel.add(resultPanel,BorderLayout.CENTER);
+            mutualFriendsPanel.add(framePanel);
+
+            ActionListener buttonActionListener = new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (e.getSource() == btnStatus){
+                        if (btnStatus.getText().equals("Add Friend")){
+                            database.insertStatus(userID, mutualFriend.getUserId(), 1);// send request
+                            database.insertStatus(mutualFriend.getUserId(), userID, 2);// receive request
+                            JOptionPane.showMessageDialog(scrollPane, "Your friend request is sent!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                            btnStatus.setText("Friend request sent");
+                            btnStatus.setBackground(new Color(0,0,102));
+                            btnStatus.setForeground(Color.white);
+                        }
+                        else if (btnStatus.getText().equals("Friend request sent")) {
+                            int response = JOptionPane.showConfirmDialog(scrollPane, "Are you sure you want to cancel your friend request?", "Confirm", JOptionPane.YES_NO_OPTION);
+                            if (response == JOptionPane.YES_OPTION) {
+                                database.removeStatus(userID, mutualFriend.getUserId());// delete request
+                                JOptionPane.showMessageDialog(scrollPane, "Friend request cancelled.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                                btnStatus.setText("Add Friend");
+                                btnStatus.setBackground(new Color(0,102,204));
+                                btnStatus.setForeground(Color.white);
+                            }
+                        }
+                        else if (btnStatus.getText().equals("Received friend request")){
+                            Object[] options = {"Confirm", "Delete"};
+                            int response = JOptionPane.showOptionDialog(scrollPane, "Confirm friend request?", "Confirm",
+                                    JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+                            if (response == 0){//confirm
+                                database.updateStatus(userID, mutualFriend.getUserId(),3);// Update status to friends
+                                JOptionPane.showMessageDialog(scrollPane, "You two are now friends!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                                btnStatus.setText("Friend");
+                                btnStatus.setBackground(new Color(0,204,0));
+                                btnStatus.setForeground(Color.WHITE);
+                            }
+                            else if (response == 1){//delete
+                                database.removeStatus(userID, mutualFriend.getUserId());
+                                JOptionPane.showMessageDialog(scrollPane, "You deleted the friend request...", "Success", JOptionPane.INFORMATION_MESSAGE);
+                                btnStatus.setText("Add Friend");
+                                btnStatus.setBackground(new Color(0,102,204));
+                                btnStatus.setForeground(Color.WHITE);
+                            }
+                        }
+                        else if (btnStatus.getText().equals("Friend")){
+                            int response = JOptionPane.showConfirmDialog(scrollPane, "UNFRIEND?", "Confirm", JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null);
+                            if(response == JOptionPane.YES_OPTION) {
+                                database.removeStatus(userID,mutualFriend.getUserId());
+                                btnStatus.setText("Add Friend");
+                                btnStatus.setBackground(new Color(0,102,204));
+                                btnStatus.setForeground(Color.WHITE);
+                            }
+                        }
+                    }
+                    else if (e.getSource() == btnViewAcc){
+                        tracebackFunction.pushPage(new ViewAccountPage(username,mutualFriend.getUserId(),tracebackFunction));
+                        dispose();
+                    }
+                }
+            };
+            btnStatus.addActionListener(buttonActionListener);
+            btnViewAcc.addActionListener(buttonActionListener);
+        }
+
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
@@ -109,31 +266,58 @@ public class HomePage extends JFrame implements Page,ActionListener{
         topPanel.add(forestbook);
         topPanel.setBackground(new Color(180, 238, 156));
 
-        JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        centerPanel.add(txtSearch);
-        centerPanel.add(btnSearch);
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        searchPanel.setBackground(new Color(180, 238, 156));
+        searchPanel.add(txtSearch);
+        searchPanel.add(btnSearch);
 
+        JPanel centerPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints centerGBC = new GridBagConstraints();
+        centerGBC.gridx = 0;
+        centerGBC.gridy = 0;
+        centerPanel.add(searchPanel);
+        centerGBC.gridy = 1;
+        centerGBC.weightx = 1;
+        centerGBC.anchor = GridBagConstraints.CENTER;
+        centerPanel.add(scrollPane, centerGBC);
         centerPanel.setBackground(new Color(180, 238, 156));
+
+        JPanel westPanel = new JPanel();
+//        westPanel.add();
+        westPanel.setBackground(new Color(180, 238, 156));
+
+        JPanel eastPanel = new JPanel();
+        eastPanel.add(btnUser);
+        eastPanel.setBackground(new Color(180, 238, 156));
 
         JPanel bottomPanel = new JPanel();
         bottomPanel.add(btnBack);
         bottomPanel.setBackground(new Color(180, 238, 156));
 
-        JPanel userPanel = new JPanel();
-        userPanel.add(btnUser);
-        userPanel.setBackground(new Color(180, 238, 156));
-
         panel.add(topPanel, BorderLayout.NORTH);
         panel.add(centerPanel, BorderLayout.CENTER);
+        panel.add(westPanel, BorderLayout.WEST);
+        panel.add(eastPanel, BorderLayout.EAST);
         panel.add(bottomPanel, BorderLayout.SOUTH);
-        panel.add(userPanel, BorderLayout.EAST);
 
         add(panel);
         pack();
+        Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+        setSize(bounds.width,bounds.height);
+        setResizable(false);
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(900,700);
         setLocationRelativeTo(null);
+    }
+    private Image resizeImage(Image originalImage, int maxWidth, int maxHeight) {
+        int width = originalImage.getWidth(null);
+        int height = originalImage.getHeight(null);
+        double widthRatio = (double) maxWidth / width;
+        double heightRatio = (double) maxHeight / height;
+        double scaleRatio = Math.max(widthRatio, heightRatio);
+        int newWidth = (int) (width * scaleRatio);
+        int newHeight = (int) (height * scaleRatio);
+        return originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
     }
     public void showPage(){
         new HomePage(username,tracebackFunction);

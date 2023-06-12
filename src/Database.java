@@ -513,23 +513,31 @@ public class Database {
     public List<Friend> findMutualFriends(int userId){
         List<Friend> mutualFriends = new ArrayList<>();
         String query =
-                "SELECT u.user_id, u.name, u.username, s.status " +
+                "SELECT u.user_id, u.name, u.username, " +
+                "CASE " +
+                "   WHEN EXISTS (SELECT 1 FROM user_friends uf3 WHERE uf3.user_id = ? AND uf3.friend_id = uf2.friend_id) THEN 'Friend' " +
+                "   WHEN EXISTS (SELECT 1 FROM user_friends uf3 WHERE uf3.user_id = uf2.friend_id AND uf3.friend_id = ?) THEN 'Received friend request' " +
+                "   ELSE 'Add Friend' " +
+                "END AS status " +
                 "FROM user_friends uf1 " +
                 "JOIN user_friends uf2 ON uf1.friend_id = uf2.user_id " +
                 "JOIN users u ON uf2.friend_id = u.user_id " +
-                "JOIN status s ON uf2.status = s.id " +
-                "WHERE uf1.user_id = ? AND uf1.status = 3 AND uf2.status = 3";
+                "WHERE uf1.user_id = ? AND uf1.status = 3 AND uf2.status = 3 " +
+                "AND uf2.friend_id NOT IN (SELECT friend_id FROM user_friends WHERE user_id = ?)";
         //uf1 = user's friends, uf2 = user's mutual friends
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1,userId);
+            statement.setInt(2,userId);
+            statement.setInt(3,userId);
+            statement.setInt(4,userId);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()){
                 int user_id = resultSet.getInt("user_id");
                 if (user_id != userId){// excepting user himself as a mutual friend
                     String name = resultSet.getString("name");
                     String username = resultSet.getString("username");
-                    String status = "Mutual friend";
+                    String status = resultSet.getString("status");
                     mutualFriends.add(new Friend(user_id,status,name,username));
                 }
             }
