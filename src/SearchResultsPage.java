@@ -14,21 +14,8 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
     private final int userID;
     private final String keyword;
     private final TracebackFunction tracebackFunction;
-    int maxWidth = 150;
-    int maxHeight = 180;
-
-    // Helper method to resize the image
-    private Image resizeImage(Image originalImage, int maxWidth, int maxHeight) {
-        int width = originalImage.getWidth(null);
-        int height = originalImage.getHeight(null);
-        double widthRatio = (double) maxWidth / width;
-        double heightRatio = (double) maxHeight / height;
-        double scaleRatio = Math.max(widthRatio, heightRatio);
-        int newWidth = (int) (width * scaleRatio);
-        int newHeight = (int) (height * scaleRatio);
-        return originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
-    }
-
+    private final int maxWidth = 150;
+    private final int maxHeight = 180;
     public SearchResultsPage(int userId, String keyword, TracebackFunction tracebackFunction){
         super(String.format("Search Results of \"%s\"",keyword));
         this.database = new Database();
@@ -129,7 +116,6 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
         scrollPane.getVerticalScrollBar().setUnitIncrement(10);
         scrollPane.getVerticalScrollBar().setBlockIncrement(100);
 
-
         ArrayList<Friend> searchResults = (ArrayList<Friend>) database.searchUser(userId,keyword);
         for (Friend searchResult : searchResults){
             JPanel framePanel = new JPanel(new BorderLayout());
@@ -161,7 +147,6 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
                 lblProfilePicture.setHorizontalAlignment(SwingConstants.CENTER);
                 lblProfilePicture.setVerticalAlignment(SwingConstants.CENTER);
             }
-
 
             JLabel lblUsername = new JLabel(String.format("Username:   %-26s",searchResult.getUsername()));
             JLabel lblName = new JLabel(String.format("Name:   %-30s", searchResult.getName()));
@@ -280,7 +265,6 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
 
         JPanel topPanel = new JPanel();
         topPanel.add(forestbook);
-        topPanel.add(btnUser);
         topPanel.setBackground(new Color(180, 238, 156));
 
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -318,6 +302,17 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(900, 700);
         setLocationRelativeTo(null);
+    }
+    // Helper method to resize the image
+    private Image resizeImage(Image originalImage, int maxWidth, int maxHeight) {
+        int width = originalImage.getWidth(null);
+        int height = originalImage.getHeight(null);
+        double widthRatio = (double) maxWidth / width;
+        double heightRatio = (double) maxHeight / height;
+        double scaleRatio = Math.max(widthRatio, heightRatio);
+        int newWidth = (int) (width * scaleRatio);
+        int newHeight = (int) (height * scaleRatio);
+        return originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
     }
     @Override
     public void showPage() {
