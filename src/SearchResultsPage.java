@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import static java.awt.Color.*;
 public class SearchResultsPage extends JFrame implements Page, ActionListener {
     private final JTextField txtSearch;
-    private final JButton btnUser, btnSearch, btnViewAcc, btnEditAcc, btnLogOut, btnHome, btnBack;
+    private final JButton btnNoti, btnUser, btnSearch, btnViewAcc, btnEditAcc, btnLogOut, btnHome, btnBack;
     private final JLabel forestbook;
     private final Database database;
     private final String username;
@@ -28,6 +28,7 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
         txtSearch = new JTextField(40);
         btnSearch = new JButton("Search");
         btnUser = new JButton(username);
+        btnNoti = new JButton("Notifications");
         btnViewAcc = new JButton("View Account");
         btnEditAcc = new JButton("Edit Account");
         btnLogOut = new JButton("Log Out");
@@ -99,6 +100,7 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
         btnEditAcc.addActionListener(this);
         btnLogOut.addActionListener(this);
         btnSearch.addActionListener(this);
+        btnNoti.addActionListener(this);
         btnHome.addActionListener(this);
         btnBack.addActionListener(this);
 
@@ -287,6 +289,7 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
         centerPanel.setBackground(new Color(180, 238, 156));
 
         JPanel eastPanel = new JPanel();
+        eastPanel.add(btnNoti);
         eastPanel.add(btnUser);
         eastPanel.setBackground(new Color(180, 238, 156));
 
@@ -302,9 +305,11 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
 
         add(panel);
         pack();
+        Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+        setSize(bounds.width,bounds.height);
+        setResizable(false);
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(900, 700);
         setLocationRelativeTo(null);
     }
     // Helper method to resize the image
@@ -350,6 +355,10 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
             else {
                 JOptionPane.showMessageDialog(this, "Please enter search query.", "Empty Search", JOptionPane.INFORMATION_MESSAGE);
             }
+        }
+        else if (e.getSource() == btnNoti){
+            NotificationScrollPane scrollPane = new NotificationScrollPane(userID);
+            scrollPane.show(btnNoti, 0, btnNoti.getHeight());
         }
         else if (e.getSource() == btnHome){
             tracebackFunction.pushPage(new HomePage(username,tracebackFunction));

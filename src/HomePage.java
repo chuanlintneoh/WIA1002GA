@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import static java.awt.Color.*;
 public class HomePage extends JFrame implements Page,ActionListener {
     private final JTextField txtSearch;
-    private final JButton btnSearch, btnUser, btnViewAcc, btnEditAcc, btnLogOut, btnBack;
+    private final JButton btnSearch, btnNoti, btnUser, btnViewAcc, btnEditAcc, btnLogOut, btnBack;
     private final JLabel forestbook, lblFriendReq, lblFriend, lblSuggestedFriend;
     private final Database database;
     private final int userID;
@@ -26,6 +26,7 @@ public class HomePage extends JFrame implements Page,ActionListener {
         txtSearch = new JTextField(40);
         btnSearch = new JButton("Search");
         btnUser = new JButton(username);
+        btnNoti = new JButton("Notifications");
         btnViewAcc = new JButton("View Account");
         btnEditAcc = new JButton("Edit Account");
         btnLogOut = new JButton("Log Out");
@@ -97,6 +98,7 @@ public class HomePage extends JFrame implements Page,ActionListener {
         btnEditAcc.addActionListener(this);
         btnLogOut.addActionListener(this);
         btnSearch.addActionListener(this);
+        btnNoti.addActionListener(this);
         btnBack.addActionListener(this);
 
         JPopupMenu accountMenu = new JPopupMenu();
@@ -300,6 +302,7 @@ public class HomePage extends JFrame implements Page,ActionListener {
         westPanel.setBackground(new Color(180, 238, 156));
 
         JPanel eastPanel = new JPanel();
+        eastPanel.add(btnNoti);
         eastPanel.add(btnUser);
         eastPanel.setBackground(new Color(180, 238, 156));
 
@@ -363,6 +366,10 @@ public class HomePage extends JFrame implements Page,ActionListener {
             else {
                 JOptionPane.showMessageDialog(this, "Please enter search query.", "Empty Search", JOptionPane.INFORMATION_MESSAGE);
             }
+        }
+        else if (e.getSource() == btnNoti){
+            NotificationScrollPane scrollPane = new NotificationScrollPane(userID);
+            scrollPane.show(btnNoti, 0, btnNoti.getHeight());
         }
         else if (e.getSource() == btnBack){
             tracebackFunction.popPeek();
