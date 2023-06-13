@@ -70,7 +70,7 @@ public class SendMessageDialog extends JDialog implements ActionListener {
                     if (message.length() == 0){
                         JOptionPane.showMessageDialog(this, "Please enter message.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
-                    else if (message.length() <= 100){
+                    else if (message.length() <= 200){
                         Notification notification = new Notification(userId,to,message);
                         database.createNotification(notification);
                         JOptionPane.showMessageDialog(this, "Message sent successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
