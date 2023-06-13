@@ -77,7 +77,7 @@ public class SendMessageDialog extends JDialog implements ActionListener {
                         dispose();
                     }
                     else {
-                        JOptionPane.showMessageDialog(this, "Message is too long! It must be less than or equal to 100 characters.", "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this, "Message is too long! It must be less than or equal to 200 characters.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
                 else {
