@@ -5,7 +5,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import static java.awt.Color.*;
-public class HomePage extends JFrame implements Page,ActionListener{
+public class HomePage extends JFrame implements Page,ActionListener {
     private final JTextField txtSearch;
     private final JButton btnSearch, btnUser, btnViewAcc, btnEditAcc, btnLogOut, btnBack;
     private final JLabel forestbook, lblFriendReq, lblFriend, lblSuggestedFriend;

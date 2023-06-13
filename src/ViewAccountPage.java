@@ -7,11 +7,7 @@ import java.util.List;
 import java.util.Stack;
 import javax.swing.border.*;
 import java.time.*;
-public class ViewAccountPage extends JFrame implements Page,ActionListener{
-    public static void main(String[] args) {
-        new ViewAccountPage("vinnieying",1,new TracebackFunction());//view friend account
-//        new ViewAccountPage("vinnieying",0);//view self account
-    }
+public class ViewAccountPage extends JFrame implements Page,ActionListener {
     private final JLabel lblName, txtName, lblUsername, txtUsername,lblEmail, txtEmail, lblContactNo, txtContactNo, lblDOB, txtDOB, lblGender, txtGender, lblHobbies, txtHobbies, lblJobHistory, lblAddress, txtAge, lblProfilePicture, txtNoOfFriends;
     private final JTextArea txtJobHistory,txtAddress;
     private JButton btnHome, btnEditAcc, btnStatus, btnBack;
@@ -23,7 +19,7 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
     public ViewAccountPage(String username, int friendID, TracebackFunction tracebackFunction) {
         super("View Account Page");
         this.username = username;
-        database = new Database();
+        this.database = new Database();
         this.tracebackFunction = tracebackFunction;
         this.friendID = friendID;
         if (friendID == 0) {// viewing own account
@@ -50,7 +46,8 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
         if (profilePictureData != null){
             ImageIcon profilePicture = new ImageIcon(profilePictureData);
             lblProfilePicture.setIcon(profilePicture);
-        }else {
+        }
+        else {
             int maxWidth = 150;
             int maxHeight = 180;
             ImageIcon defaultIcon = new ImageIcon("src/default_profile_pic.jpg");
@@ -252,6 +249,23 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
         gbc.gridy = 0;
         gbc.gridheight = 6;
         panel.add(lblProfilePicture, gbc);
+
+        if (friendID != 0){
+            gbc.gridy = 7;
+            gbc.gridheight = 1;
+            JButton btnSend = new JButton("Send Message");
+            panel.add(btnSend,gbc);
+            ActionListener buttonActionListener = new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (e.getSource() == btnSend){
+                        SendMessageDialog dialog = new SendMessageDialog(ViewAccountPage.this,database.getUserId(username),friendID);
+                        dialog.setVisible(true);
+                    }
+                }
+            };
+            btnSend.addActionListener(buttonActionListener);
+        }
 
         // Set frame properties
         add(panel);

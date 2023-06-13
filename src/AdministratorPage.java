@@ -8,7 +8,7 @@ public class AdministratorPage extends JFrame implements Page,ActionListener {
     private final Database database;
     private final JTable userTable;
     private final DefaultTableModel tableModel;
-    private final JButton deleteButton, viewButton, closeButton, btnBack;
+    private final JButton deleteButton, viewButton, sendButton, closeButton, btnBack;
     private final String username;
     private final TracebackFunction tracebackFunction;
     public AdministratorPage(String username, TracebackFunction tracebackFunction){
@@ -41,6 +41,8 @@ public class AdministratorPage extends JFrame implements Page,ActionListener {
         deleteButton.addActionListener(this);
         viewButton = new JButton("View User");
         viewButton.addActionListener(this);
+        sendButton = new JButton("Send Message");
+        sendButton.addActionListener(this);
         closeButton = new JButton("Close");
         closeButton.addActionListener(this);
         btnBack = new JButton("Back");
@@ -53,6 +55,7 @@ public class AdministratorPage extends JFrame implements Page,ActionListener {
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(deleteButton);
         buttonPanel.add(viewButton);
+        buttonPanel.add(sendButton);
         buttonPanel.add(btnBack);
         buttonPanel.add(closeButton);
         add(buttonPanel, BorderLayout.SOUTH);
@@ -160,6 +163,10 @@ public class AdministratorPage extends JFrame implements Page,ActionListener {
             } else {
                 JOptionPane.showMessageDialog(AdministratorPage.this, "Please select a user to delete.");
             }
+        }
+        else if (e.getSource() == sendButton){
+            SendMessageDialog dialog = new SendMessageDialog(this,database.getUserId(username));
+            dialog.setVisible(true);
         }
         else if (e.getSource() == closeButton){
             tracebackFunction.pushPage(new EditAccountPage(username,tracebackFunction));

@@ -164,7 +164,6 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
                 btnStatus.setText("Add Friend");
                 btnStatus.setBackground(new Color(0,102,204));
                 btnStatus.setForeground(white);
-                btnStatus.addActionListener(this);
             }
             else {
                 btnStatus.setText(searchResult.getStatus());
