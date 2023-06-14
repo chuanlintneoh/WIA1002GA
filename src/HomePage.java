@@ -18,7 +18,7 @@ public class HomePage extends JFrame implements Page,ActionListener {
     public HomePage(String username, TracebackFunction tracebackFunction) {
         super("ForestBook Home Page");
         this.username = username;
-        database = new Database();
+        this.database = new Database();
         this.userID = database.getUserId(username);
         this.tracebackFunction = tracebackFunction;
 
@@ -30,7 +30,7 @@ public class HomePage extends JFrame implements Page,ActionListener {
         btnViewAcc = new JButton("View Account");
         btnEditAcc = new JButton("Edit Account");
         btnLogOut = new JButton("Log Out");
-        lblFriendReq = new JLabel("Friend Requests: 0");
+        lblFriendReq = new JLabel("Friend Requests: " + database.getNumberOfFriendRequests(userID));
         lblFriend = new JLabel("Friends: " + database.getNumberOfFriends(userID));
         lblSuggestedFriend = new JLabel("Suggested Friends: 0");
         btnBack = new JButton("Back");
@@ -115,7 +115,7 @@ public class HomePage extends JFrame implements Page,ActionListener {
         JPanel mutualFriendsPanel = new JPanel();
         mutualFriendsPanel.setLayout(new BoxLayout(mutualFriendsPanel, BoxLayout.Y_AXIS));
         JScrollPane scrollPane = new JScrollPane(mutualFriendsPanel);
-        scrollPane.setPreferredSize(new Dimension(655,500));
+        scrollPane.setPreferredSize(new Dimension(630,500));
         scrollPane.getVerticalScrollBar().setUnitIncrement(10);
         scrollPane.getVerticalScrollBar().setBlockIncrement(100);
 
@@ -232,25 +232,22 @@ public class HomePage extends JFrame implements Page,ActionListener {
                             if (response == 0){//confirm
                                 database.updateStatus(userID, mutualFriend.getUserId(),3);// Update status to friends
                                 JOptionPane.showMessageDialog(scrollPane, "You two are now friends!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                                btnStatus.setText("Friend");
-                                btnStatus.setBackground(new Color(0,204,0));
-                                btnStatus.setForeground(Color.WHITE);
+                                tracebackFunction.peek();
+                                dispose();
                             }
                             else if (response == 1){//delete
                                 database.removeStatus(userID, mutualFriend.getUserId());
                                 JOptionPane.showMessageDialog(scrollPane, "You deleted the friend request...", "Success", JOptionPane.INFORMATION_MESSAGE);
-                                btnStatus.setText("Add Friend");
-                                btnStatus.setBackground(new Color(0,102,204));
-                                btnStatus.setForeground(Color.WHITE);
+                                tracebackFunction.peek();
+                                dispose();
                             }
                         }
                         else if (btnStatus.getText().equals("Friend")){
                             int response = JOptionPane.showConfirmDialog(scrollPane, "UNFRIEND?", "Confirm", JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null);
                             if(response == JOptionPane.YES_OPTION) {
                                 database.removeStatus(userID,mutualFriend.getUserId());
-                                btnStatus.setText("Add Friend");
-                                btnStatus.setBackground(new Color(0,102,204));
-                                btnStatus.setForeground(Color.WHITE);
+                                tracebackFunction.peek();
+                                dispose();
                             }
                         }
                     }
@@ -280,14 +277,14 @@ public class HomePage extends JFrame implements Page,ActionListener {
         GridBagConstraints centerGBC = new GridBagConstraints();
         centerGBC.gridx = 0;
         centerGBC.gridy = 0;
-        centerPanel.add(searchPanel, centerGBC);
+        centerPanel.add(searchPanel,centerGBC);
         centerGBC.gridy = 1;
         lblSuggestedFriend.setText("Suggested Friends: " + suggestedFriend);
-        centerPanel.add(lblSuggestedFriend, centerGBC);
+        centerPanel.add(lblSuggestedFriend,centerGBC);
         centerGBC.gridy = 2;
         centerGBC.weightx = 1;
         centerGBC.anchor = GridBagConstraints.CENTER;
-        centerPanel.add(scrollPane, centerGBC);
+        centerPanel.add(scrollPane,centerGBC);
         centerPanel.setBackground(new Color(180, 238, 156));
 
         JPanel westPanel = new JPanel(new GridBagLayout());
@@ -298,12 +295,25 @@ public class HomePage extends JFrame implements Page,ActionListener {
         westGBC.gridy = 0;
         westPanel.add(lblFriendReq,westGBC);
         westGBC.gridy = 1;
-        westPanel.add(lblFriend,westGBC);
+        westPanel.add(new FriendsProfilePicturePanel(this,userID,false,tracebackFunction),westGBC);
         westPanel.setBackground(new Color(180, 238, 156));
 
-        JPanel eastPanel = new JPanel();
-        eastPanel.add(btnNoti);
-        eastPanel.add(btnUser);
+        JPanel eastPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints eastGBC = new GridBagConstraints();
+        eastGBC.insets = new Insets(10,10,10,10);
+        eastGBC.anchor = GridBagConstraints.CENTER;
+        eastGBC.gridx = 0;
+        eastGBC.gridy = 0;
+        eastPanel.add(btnNoti,eastGBC);
+        eastGBC.gridx = 1;
+        eastPanel.add(btnUser,eastGBC);
+        eastGBC.anchor = GridBagConstraints.CENTER;
+        eastGBC.gridx = 0;
+        eastGBC.gridy = 1;
+        eastGBC.gridwidth = 2;
+        eastPanel.add(lblFriend,eastGBC);
+        eastGBC.gridy = 2;
+        eastPanel.add(new FriendsProfilePicturePanel(this,userID,true,tracebackFunction),eastGBC);
         eastPanel.setBackground(new Color(180, 238, 156));
 
         JPanel bottomPanel = new JPanel();

@@ -12,6 +12,8 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
     private final int userID;
     private final String username;
     private final TracebackFunction tracebackFunction;
+    private final int maxWidth = 150;
+    private final int maxHeight = 180;
     public EditAccountPage(String username, TracebackFunction tracebackFunction) {
         super("Edit Account Page");
         this.username = username;
@@ -34,10 +36,16 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
         Border border = LineBorder.createBlackLineBorder();
         lblProfilePicture.setBorder(border);
         byte[] profilePictureData = database.getProfilePicture(userID);
+        ImageIcon profilePicture;
+        Image resizedImage;
         if (profilePictureData != null){
-            ImageIcon profilePicture = new ImageIcon(profilePictureData);
-            lblProfilePicture.setIcon(profilePicture);
+            profilePicture = new ImageIcon(profilePictureData);
         }
+        else {
+            profilePicture = new ImageIcon("src/default_profile_pic.jpg");
+        }
+        resizedImage = resizeImage(profilePicture.getImage());
+        lblProfilePicture.setIcon(new ImageIcon(resizedImage));
 
         txtName = new JTextField(database.get("name", userID),20);
         txtEmail = new JTextField(database.get("email_address", userID), 20);
@@ -205,6 +213,16 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
         setSize(550, 600);
         setLocationRelativeTo(null);
         setVisible(true);
+    }
+    private Image resizeImage(Image originalImage) {
+        int width = originalImage.getWidth(null);
+        int height = originalImage.getHeight(null);
+        double widthRatio = (double) maxWidth / width;
+        double heightRatio = (double) maxHeight / height;
+        double scaleRatio = Math.max(widthRatio, heightRatio);
+        int newWidth = (int) (width * scaleRatio);
+        int newHeight = (int) (height * scaleRatio);
+        return originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
     }
     public void showPage(){
         new EditAccountPage(username,tracebackFunction);

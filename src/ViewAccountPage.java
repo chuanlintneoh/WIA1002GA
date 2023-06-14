@@ -16,6 +16,8 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
     private final int friendID;// friend's account ID
     private final String username;// current user's username
     private final TracebackFunction tracebackFunction;
+    private final int maxWidth = 150;
+    private final int maxHeight = 180;
     public ViewAccountPage(String username, int friendID, TracebackFunction tracebackFunction) {
         super("View Account Page");
         this.username = username;
@@ -43,28 +45,16 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
         Border border = LineBorder.createBlackLineBorder();
         lblProfilePicture.setBorder(border);
         byte[] profilePictureData = database.getProfilePicture(userID);
+        ImageIcon profilePicture;
+        Image resizedImage;
         if (profilePictureData != null){
-            ImageIcon profilePicture = new ImageIcon(profilePictureData);
-            lblProfilePicture.setIcon(profilePicture);
+            profilePicture = new ImageIcon(profilePictureData);
         }
         else {
-            int maxWidth = 150;
-            int maxHeight = 180;
-            ImageIcon defaultIcon = new ImageIcon("src/default_profile_pic.jpg");
-            Image defaultImage = defaultIcon.getImage();
-            int width = defaultImage.getWidth(null);
-            int height = defaultImage.getHeight(null);
-            double widthRatio = (double) maxWidth / width;
-            double heightRatio = (double) maxHeight / height;
-            double scaleRatio = Math.max(widthRatio, heightRatio);
-            int newWidth = (int) (width * scaleRatio);
-            int newHeight = (int) (height * scaleRatio);
-            Image resizedImage = defaultImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
-            lblProfilePicture.setIcon(new ImageIcon(resizedImage));
-            lblProfilePicture.setPreferredSize(new Dimension(maxWidth, maxHeight));
-            lblProfilePicture.setHorizontalAlignment(SwingConstants.CENTER);
-            lblProfilePicture.setVerticalAlignment(SwingConstants.CENTER);
+            profilePicture = new ImageIcon("src/default_profile_pic.jpg");
         }
+        resizedImage = resizeImage(profilePicture.getImage());
+        lblProfilePicture.setIcon(new ImageIcon(resizedImage));
 
         txtAddress = new JTextArea(database.get("address",userID));
         txtAddress.setEditable(false);
@@ -274,6 +264,16 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
         setSize(550, 600);
         setLocationRelativeTo(null);
         setVisible(true);
+    }
+    private Image resizeImage(Image originalImage) {
+        int width = originalImage.getWidth(null);
+        int height = originalImage.getHeight(null);
+        double widthRatio = (double) maxWidth / width;
+        double heightRatio = (double) maxHeight / height;
+        double scaleRatio = Math.max(widthRatio, heightRatio);
+        int newWidth = (int) (width * scaleRatio);
+        int newHeight = (int) (height * scaleRatio);
+        return originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
     }
     private int calculateAge(LocalDate birthDate) {
         LocalDate currentDate = LocalDate.now();

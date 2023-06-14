@@ -12,7 +12,6 @@ public class Database {
             Class.forName("com.mysql.cj.jdbc.Driver");//Register the driver class
             connection = DriverManager.getConnection(url,username,password);//Create connection
             statement = connection.createStatement();//Create statement
-            System.out.println("Database Connection Successful!");
         }
         catch (ClassNotFoundException e){
             e.printStackTrace();
@@ -145,6 +144,24 @@ public class Database {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1,userId);
             statement.setInt(2,3);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()){
+                return resultSet.getInt("friendCount");
+            }
+            return 0;
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    public int getNumberOfFriendRequests(int userId){
+        String query =
+                "SELECT COUNT(*) AS friendCount FROM user_friends WHERE user_id = ? AND status = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,userId);
+            statement.setInt(2,2);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()){
                 return resultSet.getInt("friendCount");

@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Calendar;
-
 public class SetDateDialog extends JDialog implements ActionListener {
     private final JLabel lblDay, lblMonth, lblYear;
     private final JComboBox<Integer> dateDay, dateYear;
@@ -66,6 +65,14 @@ public class SetDateDialog extends JDialog implements ActionListener {
     public String getSelectedDate(){
         return selectedDate;
     }
+    private boolean isValidDate(int day, int month, int year) {
+
+        int[] daysInMonth = {31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+        return day >= 1 && day <= daysInMonth[month - 1];
+    }
+    private boolean isLeapYear(int year) {
+        return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
+    }
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnSet){
@@ -87,13 +94,5 @@ public class SetDateDialog extends JDialog implements ActionListener {
             isDateSelected = false;
         }
         dispose();
-    }
-    private boolean isValidDate(int day, int month, int year) {
-
-        int[] daysInMonth = {31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-        return day >= 1 && day <= daysInMonth[month - 1];
-    }
-    private boolean isLeapYear(int year) {
-        return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
     }
 }
