@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import static java.awt.Color.*;
 public class HomePage extends JFrame implements Page,ActionListener {
     private final JTextField txtSearch;
-    private final JButton btnSearch, btnNoti, btnUser, btnViewAcc, btnEditAcc, btnLogOut, btnBack;
+    private final JButton btnSearch, btnNoti, btnUser, btnBack;
     private final JLabel forestbook, lblFriendReq, lblFriend, lblSuggestedFriend;
     private final Database database;
     private final int userID;
@@ -16,7 +16,6 @@ public class HomePage extends JFrame implements Page,ActionListener {
     private final int maxWidth = 150;
     private final int maxHeight = 180;
     public HomePage(String username, TracebackFunction tracebackFunction) {
-        super("ForestBook Home Page");
         this.username = username;
         this.database = new Database();
         this.userID = database.getUserId(username);
@@ -27,9 +26,6 @@ public class HomePage extends JFrame implements Page,ActionListener {
         btnSearch = new JButton("Search");
         btnUser = new JButton(username);
         btnNoti = new JButton("Notifications");
-        btnViewAcc = new JButton("View Account");
-        btnEditAcc = new JButton("Edit Account");
-        btnLogOut = new JButton("Log Out");
         lblFriendReq = new JLabel("Friend Requests: " + database.getNumberOfFriendRequests(userID));
         lblFriend = new JLabel("Friends: " + database.getNumberOfFriends(userID));
         lblSuggestedFriend = new JLabel("Suggested Friends: 0");
@@ -37,47 +33,6 @@ public class HomePage extends JFrame implements Page,ActionListener {
 
         btnSearch.setBackground(new Color(46,138,87));
         btnSearch.setForeground(white);
-
-        btnViewAcc.setForeground(new Color(58,30,0));
-        btnViewAcc.setBackground(new Color(196, 164, 132));
-        btnViewAcc.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        btnViewAcc.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                btnViewAcc.setForeground(WHITE); // Change to the desired color
-            }
-            @Override
-            public void mouseExited(MouseEvent e) {
-                btnViewAcc.setForeground(new Color(58,30,0)); // Change back to the default color
-            }
-        });
-        btnEditAcc.setForeground(new Color(58,30,0));
-        btnEditAcc.setBackground(new Color(196, 164, 132));
-        btnEditAcc.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        btnEditAcc.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                btnEditAcc.setForeground(WHITE); // Change to the desired color
-            }
-            @Override
-            public void mouseExited(MouseEvent e) {
-                btnEditAcc.setForeground(new Color(58,30,0)); // Change back to the default color
-            }
-
-        });
-        btnLogOut.setForeground(new Color(70,13,13));
-        btnLogOut.setBackground(new Color(196, 164, 132));
-        btnLogOut.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        btnLogOut.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                btnLogOut.setForeground(WHITE); // Change to the desired color
-            }
-            @Override
-            public void mouseExited(MouseEvent e) {
-                btnLogOut.setForeground(new Color(70,13,13)); // Change back to the default color
-            }
-        });
 
         btnUser.setFont(new Font(btnUser.getFont().getName(), Font.BOLD, 16));
         btnUser.setBackground(new Color(180, 238, 156));
@@ -94,20 +49,11 @@ public class HomePage extends JFrame implements Page,ActionListener {
         });
 
         btnBack.setBackground(new Color(196, 164, 132));
-        btnViewAcc.addActionListener(this);
-        btnEditAcc.addActionListener(this);
-        btnLogOut.addActionListener(this);
         btnSearch.addActionListener(this);
         btnNoti.addActionListener(this);
         btnBack.addActionListener(this);
 
-        JPopupMenu accountMenu = new JPopupMenu();
-        accountMenu.setBackground(new Color(196,164,132));
-        accountMenu.add(btnViewAcc);
-        accountMenu.add(btnEditAcc);
-        accountMenu.add(btnLogOut);
-
-        btnUser.addActionListener(e -> accountMenu.show(btnUser, -56, btnUser.getHeight()));
+        btnUser.addActionListener(e -> new AccountMenu(username,tracebackFunction,this).show(btnUser, -56, btnUser.getHeight()));
 
         forestbook.setFont(new Font("Curlz MT", Font.BOLD, 42));
         forestbook.setForeground(new Color(0, 128, 0));
@@ -137,7 +83,7 @@ public class HomePage extends JFrame implements Page,ActionListener {
             if (profilePictureData != null) {
                 ImageIcon imageIcon = new ImageIcon(profilePictureData);
                 Image image = imageIcon.getImage();
-                Image resizedImage = resizeImage(image, maxWidth, maxHeight);
+                Image resizedImage = resizeImage(image);
                 lblProfilePicture.setIcon(new ImageIcon(resizedImage));
                 lblProfilePicture.setPreferredSize(new Dimension(maxWidth, maxHeight));
                 lblProfilePicture.setHorizontalAlignment(SwingConstants.CENTER);
@@ -145,7 +91,7 @@ public class HomePage extends JFrame implements Page,ActionListener {
             } else {
                 ImageIcon defaultIcon = new ImageIcon("src/default_profile_pic.jpg");
                 Image defaultImage = defaultIcon.getImage();
-                Image resizedImage = resizeImage(defaultImage, maxWidth, maxHeight);
+                Image resizedImage = resizeImage(defaultImage);
                 lblProfilePicture.setIcon(new ImageIcon(resizedImage));
                 lblProfilePicture.setPreferredSize(new Dimension(maxWidth, maxHeight));
                 lblProfilePicture.setHorizontalAlignment(SwingConstants.CENTER);
@@ -326,16 +272,13 @@ public class HomePage extends JFrame implements Page,ActionListener {
         panel.add(eastPanel, BorderLayout.EAST);
         panel.add(bottomPanel, BorderLayout.SOUTH);
 
-        add(panel);
+        getContentPane().add(panel);
         pack();
-        Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-        setSize(bounds.width,bounds.height);
-        setResizable(false);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setResizable(true);
         setVisible(true);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
     }
-    private Image resizeImage(Image originalImage, int maxWidth, int maxHeight) {
+    private Image resizeImage(Image originalImage) {
         int width = originalImage.getWidth(null);
         int height = originalImage.getHeight(null);
         double widthRatio = (double) maxWidth / width;
@@ -348,25 +291,12 @@ public class HomePage extends JFrame implements Page,ActionListener {
     public void showPage(){
         new HomePage(username,tracebackFunction);
     }
+    public String getTitle(){
+        return "Home Page";
+    }
     @Override
     public void actionPerformed(ActionEvent e){
-        if (e.getSource() == btnLogOut){
-            //LoginPage
-            tracebackFunction.clear();
-            new LoginPage(tracebackFunction);
-            dispose();
-        }
-        else if (e.getSource() == btnViewAcc){
-            //ViewAccountPage (own account)
-            tracebackFunction.pushPage(new ViewAccountPage(username,0,tracebackFunction));
-            dispose();
-        }
-        else if (e.getSource() == btnEditAcc){
-            //EditAccountPage
-            tracebackFunction.pushPage(new EditAccountPage(username,tracebackFunction));
-            dispose();
-        }
-        else if (e.getSource() == btnSearch){
+        if (e.getSource() == btnSearch){
             String keyword = txtSearch.getText();
             //SearchResultsPage
             if (!keyword.isEmpty()){

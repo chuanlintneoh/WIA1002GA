@@ -659,6 +659,8 @@ public class Database {
                 "DELETE FROM user_hobbies WHERE user_id = ?";
         String deleteJobsQuery =
                 "DELETE FROM user_jobs WHERE user_id = ?";
+        String deleteNotificationsQuery =
+                "DELETE FROM user_notifications WHERE from_id = ? OR to_id = ?";
         try {
             PreparedStatement statement = connection.prepareStatement(deleteUserQuery);
             statement.setInt(1,userId);
@@ -687,6 +689,15 @@ public class Database {
         try {
             PreparedStatement statement = connection.prepareStatement(deleteJobsQuery);
             statement.setInt(1,userId);
+            statement.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        try {
+            PreparedStatement statement = connection.prepareStatement(deleteNotificationsQuery);
+            statement.setInt(1,userId);
+            statement.setInt(2,userId);
             statement.executeUpdate();
         }
         catch (SQLException e){

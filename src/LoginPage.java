@@ -70,6 +70,7 @@ public class LoginPage extends JFrame implements ActionListener {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(450, 300);
         setLocationRelativeTo(null);
+        setResizable(false);
         setVisible(true);
     }
     @Override
