@@ -743,6 +743,43 @@ public class Database {
         }
         return notificationsList;
     }
+    // Messages
+    public void sendMessage(Message message){
+        createNotification(new Notification(message.getFrom(),message.getTo(),get("username", message.getFrom()) + "sent you a message: " + message.getText()));
+        String query =
+                "INSERT INTO user_messages (from_id, to_id, message, timestamp) VALUES (?, ?, ?, ?)";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,message.getFrom());
+            statement.setInt(2,message.getTo());
+            statement.setString(3,message.getText());
+            statement.setString(4,message.getTimeStamp());
+            statement.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+    public List<Message> retrieveMessage(int from, int to){
+        List<Message> messages = new LinkedList<>();
+        String query =
+                "SELECT * FROM user_messages WHERE from_id = ? AND to_id = ? ORDER BY timestamp ASC";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,from);
+            statement.setInt(2,to);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()){
+                String text = resultSet.getString("message");
+                String timeStamp = resultSet.getString("timestamp");
+                messages.add(new Message(from,to,text,timeStamp));
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return messages;
+    }
     public void close(){
         try {
             statement.close();
