@@ -146,8 +146,9 @@ public class RegisterPage extends JFrame implements ActionListener {
         // Set frame properties
         add(panel);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(550, 650);
+        setSize(580, 650);
         setLocationRelativeTo(null);
+        setResizable(false);
         setVisible(true);
     }
     @Override

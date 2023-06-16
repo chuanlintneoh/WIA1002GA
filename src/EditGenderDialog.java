@@ -7,10 +7,12 @@ public class EditGenderDialog extends JDialog implements ActionListener {
     private final JButton btnSave, btnCancel;
     private final JButton btnGender;
     private final int userID;
+    private final Database database;
     public EditGenderDialog(Frame parent, int userID, JButton btnGender) {
         super(parent, "Edit Gender", true);
         this.userID = userID;
         this.btnGender = btnGender;
+        this.database = new Database();
 
         radioMale = new JRadioButton("Male");
         radioFemale = new JRadioButton("Female");
@@ -60,7 +62,6 @@ public class EditGenderDialog extends JDialog implements ActionListener {
                 JOptionPane.showMessageDialog(this,"Please choose an option.");
                 return;
             }
-            Database database = new Database();
             database.set("gender",gender, userID);
             btnGender.setText(gender);
             JOptionPane.showMessageDialog(this, "Your gender is changed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);

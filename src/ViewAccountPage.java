@@ -2,28 +2,31 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import javax.swing.border.*;
 import java.time.*;
-public class ViewAccountPage extends JFrame implements Page,ActionListener{
-    public static void main(String[] args) {
-        new ViewAccountPage("vinnieying",1,new TracebackFunction());//view friend account
-//        new ViewAccountPage("vinnieying",0);//view self account
-    }
-    private final JLabel lblName, txtName, lblUsername, txtUsername,lblEmail, txtEmail, lblContactNo, txtContactNo, lblDOB, txtDOB, lblGender, txtGender, lblHobbies, txtHobbies, lblJobHistory, lblAddress, txtAge, lblProfilePicture, txtNoOfFriends;
-    private final JTextArea txtJobHistory,txtAddress;
-    private JButton btnHome, btnEditAcc, btnStatus, btnBack;
+
+import static java.awt.Color.WHITE;
+import static java.awt.Color.white;
+
+public class ViewAccountPage extends JFrame implements Page,ActionListener {
+    private final JLabel forestbook,lblFriendReq, lblFriend,lblName, txtName, lblUsername, txtUsername,lblEmail, txtEmail, lblContactNo, txtContactNo, lblDOB, txtDOB, lblGender, txtGender, lblHobbies, txtHobbies, lblJobHistory, lblAddress, txtAge, lblProfilePicture, txtNoOfFriends;
+    private final JTextArea txtJobHistory, txtAddress;
+    private JButton btnHome, btnNoti, btnUser,btnEditAcc, btnStatus, btnBack;
     private final Database database;
     private final int userID;// viewing account's ID
     private final int friendID;// friend's account ID
     private final String username;// current user's username
     private final TracebackFunction tracebackFunction;
+    private final int maxWidth = 150;
+    private final int maxHeight = 180;
     public ViewAccountPage(String username, int friendID, TracebackFunction tracebackFunction) {
-        super("View Account Page");
         this.username = username;
-        database = new Database();
+        this.database = new Database();
         this.tracebackFunction = tracebackFunction;
         this.friendID = friendID;
         if (friendID == 0) {// viewing own account
@@ -34,6 +37,9 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
         }
 
         // Initialize GUI components
+        forestbook = new JLabel("ForestBook");
+        lblFriendReq = new JLabel("My Friend Request(s): "+database.getNumberOfFriendRequests(database.getUserId(username)));
+        lblFriend = new JLabel(database.get("name",userID)+"'s Friend(s): "+database.getNumberOfFriends(userID));
         lblUsername = new JLabel("Username:");
         txtUsername = new JLabel(database.get("username", userID));
         txtName = new JLabel(database.get("name", userID));
@@ -47,27 +53,16 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
         Border border = LineBorder.createBlackLineBorder();
         lblProfilePicture.setBorder(border);
         byte[] profilePictureData = database.getProfilePicture(userID);
+        ImageIcon profilePicture;
+        Image resizedImage;
         if (profilePictureData != null){
-            ImageIcon profilePicture = new ImageIcon(profilePictureData);
-            lblProfilePicture.setIcon(profilePicture);
-        }else {
-            int maxWidth = 150;
-            int maxHeight = 180;
-            ImageIcon defaultIcon = new ImageIcon("src/default_profile_pic.jpg");
-            Image defaultImage = defaultIcon.getImage();
-            int width = defaultImage.getWidth(null);
-            int height = defaultImage.getHeight(null);
-            double widthRatio = (double) maxWidth / width;
-            double heightRatio = (double) maxHeight / height;
-            double scaleRatio = Math.max(widthRatio, heightRatio);
-            int newWidth = (int) (width * scaleRatio);
-            int newHeight = (int) (height * scaleRatio);
-            Image resizedImage = defaultImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
-            lblProfilePicture.setIcon(new ImageIcon(resizedImage));
-            lblProfilePicture.setPreferredSize(new Dimension(maxWidth, maxHeight));
-            lblProfilePicture.setHorizontalAlignment(SwingConstants.CENTER);
-            lblProfilePicture.setVerticalAlignment(SwingConstants.CENTER);
+            profilePicture = new ImageIcon(profilePictureData);
         }
+        else {
+            profilePicture = new ImageIcon("src/default_profile_pic.jpg");
+        }
+        resizedImage = resizeImage(profilePicture.getImage());
+        lblProfilePicture.setIcon(new ImageIcon(resizedImage));
 
         txtAddress = new JTextArea(database.get("address",userID));
         txtAddress.setEditable(false);
@@ -128,79 +123,114 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
         btnHome.setBackground(new Color(0, 128, 0));
         btnHome.setForeground(Color.white);
         btnHome.addActionListener(this);
+
+        btnNoti = new JButton("Notifications");
+        btnNoti.setBackground(new Color(46,138,87));
+        btnNoti.setForeground(white);
+        btnNoti.addActionListener(this);
+
+        btnUser = new JButton(username);
+        btnUser.setFont(new Font(btnUser.getFont().getName(), Font.BOLD, 16));
+        btnUser.setBackground(new Color(180, 238, 156));
+        btnUser.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 50));
+        btnUser.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnUser.setForeground(WHITE); // Change to the desired color
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnUser.setForeground(new Color(58,30,0)); // Change back to the default color
+            }
+        });
+        btnUser.addActionListener(e -> new AccountMenu(username,tracebackFunction,this).show(btnUser, -5, btnUser.getHeight()));
+
         btnEditAcc = new JButton("Edit Account");
+        btnEditAcc.setBackground(new Color(58,30,0));
+        btnEditAcc.setForeground(white);
         btnEditAcc.addActionListener(this);
         btnBack = new JButton("Back");
-        btnBack.setBackground(new Color(196, 164, 132));
+        btnBack.setBackground(new Color(92, 94, 41));
+        btnBack.setForeground(white);
         btnBack.addActionListener(this);
 
         // Add components to the frame
-        JPanel panel = new JPanel(new GridBagLayout());
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JPanel topPanel = new JPanel();
+        forestbook.setFont(new Font("Curlz MT", Font.BOLD, 42));
+        forestbook.setForeground(new Color(0, 128, 0));
+        topPanel.add(forestbook);
+        topPanel.setBackground(new Color(180, 238, 156));
+
+        JPanel centerPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        panel.setBackground(new Color(200, 238, 156));
+        centerPanel.setBackground(new Color(200, 238, 156));
+        centerPanel.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, new Color(110, 90, 50)));
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.NONE;
 
         gbc.gridx = 0;
         gbc.gridy = 0;
-        panel.add(lblUsername, gbc);
+        centerPanel.add(lblUsername, gbc);
         gbc.gridx = 1;
-        panel.add(txtUsername, gbc);
+        centerPanel.add(txtUsername, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 1;
-        panel.add(lblName, gbc);
+        centerPanel.add(lblName, gbc);
         gbc.gridx = 1;
-        panel.add(txtName, gbc);
+        centerPanel.add(txtName, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 2;
-        panel.add(lblEmail, gbc);
+        centerPanel.add(lblEmail, gbc);
         gbc.gridx = 1;
-        panel.add(txtEmail, gbc);
+        centerPanel.add(txtEmail, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 3;
-        panel.add(lblContactNo, gbc);
+        centerPanel.add(lblContactNo, gbc);
         gbc.gridx = 1;
-        panel.add(txtContactNo, gbc);
+        centerPanel.add(txtContactNo, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 4;
-        panel.add(lblDOB, gbc);
+        centerPanel.add(lblDOB, gbc);
         gbc.gridx = 1;
-        panel.add(txtDOB, gbc);
+        centerPanel.add(txtDOB, gbc);
         gbc.anchor = GridBagConstraints.EAST;
-        panel.add(txtAge, gbc);
+        centerPanel.add(txtAge, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.anchor = GridBagConstraints.WEST;
-        panel.add(lblGender, gbc);
+        centerPanel.add(lblGender, gbc);
         gbc.gridx = 1;
-        panel.add(txtGender,gbc);
+        centerPanel.add(txtGender,gbc);
         gbc.anchor = GridBagConstraints.EAST;
-        panel.add(txtNoOfFriends, gbc);
+        centerPanel.add(txtNoOfFriends, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 6;
         gbc.anchor = GridBagConstraints.WEST;
-        panel.add(lblAddress, gbc);
+        centerPanel.add(lblAddress, gbc);
         gbc.gridx = 1;
-        panel.add(txtAddress, gbc);
+        centerPanel.add(txtAddress, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 7;
-        panel.add(lblJobHistory, gbc);
+        centerPanel.add(lblJobHistory, gbc);
         gbc.gridx = 1;
-        panel.add(txtJobHistory,gbc);
+        centerPanel.add(txtJobHistory,gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 8;
-        panel.add(lblHobbies, gbc);
+        centerPanel.add(lblHobbies, gbc);
         gbc.gridx = 1;
-        panel.add(txtHobbies,gbc);
+        centerPanel.add(txtHobbies,gbc);
 
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.gridx = 2;
@@ -216,12 +246,24 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
                         btnStatus.setForeground(Color.WHITE);
                     } else if (btnStatus.getText().equals("Received friend request")) {
                         btnStatus.setBackground(new Color(255,255,153));
+                        btnStatus.addMouseListener(new MouseAdapter() {
+                            @Override
+                            public void mouseEntered(MouseEvent e) {
+                                btnStatus.setForeground(Color.WHITE); // Change to the desired color
+                                btnStatus.setBackground(new Color(155, 155, 53));
+                            }
+                            @Override
+                            public void mouseExited(MouseEvent e) {
+                                btnStatus.setForeground(Color.black); // Change back to the default color
+                                btnStatus.setBackground(new Color(255, 255, 153));
+                            }
+                        });
                     } else if(btnStatus.getText().equals("Friend")){
                         btnStatus.setBackground(new Color(0,204,0));
                         btnStatus.setForeground(Color.WHITE);
                     }
                     btnStatus.addActionListener(this);
-                    panel.add(btnStatus,gbc);
+                    centerPanel.add(btnStatus,gbc);
                     friendFound = true;
                     break;
                 }
@@ -231,35 +273,120 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
                 btnStatus.setForeground(Color.WHITE);
                 btnStatus.setBackground(new Color(0,102,204));
                 btnStatus.addActionListener(this);
-                panel.add(btnStatus, gbc);
+                centerPanel.add(btnStatus, gbc);
             }
         }
         else {
-            panel.add(btnEditAcc,gbc);
+            centerPanel.add(btnEditAcc,gbc);
         }
 
         gbc.gridx = 0;
         gbc.anchor = GridBagConstraints.EAST;
-        panel.add(btnHome,gbc);
+        centerPanel.add(btnHome,gbc);
 
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        panel.add(btnBack,gbc);
+        centerPanel.add(btnBack,gbc);
 
         lblProfilePicture.setPreferredSize(new Dimension(150,180));
         gbc.anchor = GridBagConstraints.NORTH;
         gbc.gridx = 2;
         gbc.gridy = 0;
         gbc.gridheight = 6;
-        panel.add(lblProfilePicture, gbc);
+        centerPanel.add(lblProfilePicture, gbc);
+
+        if (friendID != 0){
+            gbc.gridy = 7;
+            gbc.gridheight = 1;
+            JButton btnSend = new JButton("Send Message");
+            Border lineBorder = BorderFactory.createLineBorder(new Color(0, 100, 0), 2);
+            Insets spacingInsets = new Insets(5, 10, 5, 10);
+            Border spacingBorder = BorderFactory.createEmptyBorder(spacingInsets.top, spacingInsets.left, spacingInsets.bottom, spacingInsets.right);
+            Border compoundBorder = BorderFactory.createCompoundBorder(lineBorder, spacingBorder);
+            btnSend.setBackground(new Color(166, 220, 156));
+            btnSend.setForeground(new Color(0,100,0));
+            btnSend.setBorder(compoundBorder);
+
+            centerPanel.add(btnSend,gbc);
+            ActionListener buttonActionListener = new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (e.getSource() == btnSend){
+                        SendMessageDialog dialog = new SendMessageDialog(ViewAccountPage.this,database.getUserId(username),friendID);
+                        dialog.setVisible(true);
+                    }
+                }
+            };
+            btnSend.addActionListener(buttonActionListener);
+            btnSend.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    btnSend.setForeground(WHITE);
+                    btnSend.setBackground(new Color(0,100,0));
+                }
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    btnSend.setForeground(new Color(0,100,0));
+                    btnSend.setBackground(new Color(166, 220, 156));
+                }
+            });
+        }
+        JPanel westPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints westGBC = new GridBagConstraints();
+        westGBC.insets = new Insets(10,10,10,10);
+        westGBC.anchor = GridBagConstraints.CENTER;
+        westGBC.gridx = 0;
+        westGBC.gridy = 0;
+        westPanel.add(lblFriendReq,westGBC);
+        westGBC.gridy = 1;
+        westPanel.add(new FriendsProfilePicturePanel(this,database.getUserId(username),false,tracebackFunction),westGBC);
+        westPanel.setBackground(new Color(180, 238, 156));
+
+        JPanel eastPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints eastGBC = new GridBagConstraints();
+        eastGBC.insets = new Insets(10,10,10,10);
+        eastGBC.anchor = GridBagConstraints.CENTER;
+        eastGBC.gridx = 0;
+        eastGBC.gridy = 0;
+        eastPanel.add(btnNoti,eastGBC);
+        eastGBC.gridx = 1;
+        eastPanel.add(btnUser,eastGBC);
+        eastGBC.anchor = GridBagConstraints.CENTER;
+        eastGBC.gridx = 0;
+        eastGBC.gridy = 1;
+        eastGBC.gridwidth = 2;
+        eastPanel.add(lblFriend,eastGBC);
+        eastGBC.gridy = 2;
+        eastPanel.add(new FriendsProfilePicturePanel(this,userID,true,tracebackFunction),eastGBC);
+        eastPanel.setBackground(new Color(180, 238, 156));
+
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.add(btnHome);
+        bottomPanel.add(btnBack);
+        bottomPanel.setBackground(new Color(180, 238, 156));
+
+        panel.add(topPanel, BorderLayout.NORTH);
+        panel.add(centerPanel, BorderLayout.CENTER);
+        panel.add(westPanel, BorderLayout.WEST);
+        panel.add(eastPanel, BorderLayout.EAST);
+        panel.add(bottomPanel, BorderLayout.SOUTH);
 
         // Set frame properties
-        add(panel);
+        getContentPane().add(panel);
         pack();
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(550, 600);
-        setLocationRelativeTo(null);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setResizable(true);
         setVisible(true);
+    }
+    private Image resizeImage(Image originalImage) {
+        int width = originalImage.getWidth(null);
+        int height = originalImage.getHeight(null);
+        double widthRatio = (double) maxWidth / width;
+        double heightRatio = (double) maxHeight / height;
+        double scaleRatio = Math.max(widthRatio, heightRatio);
+        int newWidth = (int) (width * scaleRatio);
+        int newHeight = (int) (height * scaleRatio);
+        return originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
     }
     private int calculateAge(LocalDate birthDate) {
         LocalDate currentDate = LocalDate.now();
@@ -269,11 +396,19 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener{
     public void showPage(){
         new ViewAccountPage(username,friendID,tracebackFunction);
     }
+
+    public String getTitle(){
+        return "View Account Page (" + database.get("username",userID) + ")";
+    }
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnEditAcc){
             tracebackFunction.pushPage(new EditAccountPage(username,tracebackFunction));
             dispose();
+        }
+        else if (e.getSource() == btnNoti){
+            NotificationScrollPane scrollPane = new NotificationScrollPane(userID);
+            scrollPane.show(btnNoti, 0, btnNoti.getHeight());
         }
         else if (e.getSource() == btnHome){
             tracebackFunction.pushPage(new HomePage(username,tracebackFunction));

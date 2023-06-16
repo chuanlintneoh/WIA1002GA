@@ -12,7 +12,7 @@ public class EditBirthdayDialog extends JDialog implements ActionListener {
     private final JButton btnDOB;
     public EditBirthdayDialog(Frame parent, int userID, JButton btnDOB) {
         super(parent, "Edit Birthday", true);
-        database = new Database();
+        this.database = new Database();
         this.userID = userID;
         this.btnDOB = btnDOB;
 
@@ -100,7 +100,6 @@ public class EditBirthdayDialog extends JDialog implements ActionListener {
             return true;
         }
     }
-
     public boolean isLeapYear(int year) {
         if (year % 4 != 0) {
             return false;

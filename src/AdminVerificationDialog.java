@@ -6,9 +6,11 @@ public class AdminVerificationDialog extends JDialog implements ActionListener {
     private final JPasswordField txtAdminPassword;
     private final JButton btnVerify;
     private final int userId;
+    private final Database database;
     public AdminVerificationDialog(Frame parent, int userId) {
         super(parent, "Admin Verification", true);
         this.userId = userId;
+        this.database = new Database();
 
         // Initialize components
         txtAdminPassword = new JPasswordField(15);
@@ -37,8 +39,6 @@ public class AdminVerificationDialog extends JDialog implements ActionListener {
         if (e.getSource() == btnVerify) {
             String adminPassword = new String(txtAdminPassword.getPassword());
             String hashedPassword = PasswordHashing.hashPassword(adminPassword);
-            Database database = new Database();
-
             if (database.verifyAdmin(userId, hashedPassword)) {
                 JOptionPane.showMessageDialog(this, "Admin verification successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 dispose();

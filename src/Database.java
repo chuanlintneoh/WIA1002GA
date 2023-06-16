@@ -12,7 +12,6 @@ public class Database {
             Class.forName("com.mysql.cj.jdbc.Driver");//Register the driver class
             connection = DriverManager.getConnection(url,username,password);//Create connection
             statement = connection.createStatement();//Create statement
-            System.out.println("Database Connection Successful!");
         }
         catch (ClassNotFoundException e){
             e.printStackTrace();
@@ -41,6 +40,20 @@ public class Database {
         }
         return false;
     }
+    public boolean userExists(int userID){
+        String query =
+                "SELECT user_id FROM users WHERE user_id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,userID);
+            ResultSet resultSet = statement.executeQuery();
+            return resultSet.next();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return false;
+    }
     public void registerUser(User user){
         try {
             String query =
@@ -52,6 +65,8 @@ public class Database {
         catch (SQLException e){
             e.printStackTrace();
         }
+        Notification notification = new Notification(0,user.getUserId(),"Welcome to ForestBook!");
+        createNotification(notification);
     }
     public int authenticateUser(String username,String hashedPassword){
         String query =
@@ -129,6 +144,24 @@ public class Database {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1,userId);
             statement.setInt(2,3);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()){
+                return resultSet.getInt("friendCount");
+            }
+            return 0;
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    public int getNumberOfFriendRequests(int userId){
+        String query =
+                "SELECT COUNT(*) AS friendCount FROM user_friends WHERE user_id = ? AND status = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,userId);
+            statement.setInt(2,2);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()){
                 return resultSet.getInt("friendCount");
@@ -245,6 +278,8 @@ public class Database {
         catch (SQLException e){
             e.printStackTrace();
         }
+        Notification notification = new Notification(userId,friendId,get("username",userId) + " sent you a friend request.");
+        createNotification(notification);
     }// send request, receive request
     public void updateStatus(int userId, int friendId,int statusId){// update 2 rows in database
         //***Note: do once is enough
@@ -263,6 +298,8 @@ public class Database {
         catch (SQLException e){
             e.printStackTrace();
         }
+        Notification notification = new Notification(userId,friendId,get("username",userId) + " accepted your friend request. You and " + get("username",userId) + " are now friends.");
+        createNotification(notification);
     }// accept request
     public void removeStatus(int userId,int friendId){// remove 2 rows in database
         //***Note: do once is enough
@@ -279,6 +316,8 @@ public class Database {
         catch (SQLException e){
             e.printStackTrace();
         }
+        Notification notification = new Notification(userId,friendId,get("username",userId) + " removed their status with you.");
+        createNotification(notification);
     }// delete request, unfriend
     //user_hobbies
     public List<String> viewUserHobbies(int userId){
@@ -491,6 +530,7 @@ public class Database {
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1,userId);
+            statement.setString(2,"%"+keyword+"%");
             statement.setString(3,"%"+keyword+"%");
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()){
@@ -512,23 +552,31 @@ public class Database {
     public List<Friend> findMutualFriends(int userId){
         List<Friend> mutualFriends = new ArrayList<>();
         String query =
-                "SELECT u.user_id, u.name, u.username, s.status " +
+                "SELECT u.user_id, u.name, u.username, " +
+                        "CASE " +
+                        "   WHEN EXISTS (SELECT 1 FROM user_friends uf3 WHERE uf3.user_id = ? AND uf3.friend_id = uf2.friend_id) THEN 'Friend' " +
+                        "   WHEN EXISTS (SELECT 1 FROM user_friends uf3 WHERE uf3.user_id = uf2.friend_id AND uf3.friend_id = ?) THEN 'Received friend request' " +
+                        "   ELSE 'Add Friend' " +
+                        "END AS status " +
                         "FROM user_friends uf1 " +
                         "JOIN user_friends uf2 ON uf1.friend_id = uf2.user_id " +
                         "JOIN users u ON uf2.friend_id = u.user_id " +
-                        "JOIN status s ON uf2.status = s.id " +
-                        "WHERE uf1.user_id = ? AND uf1.status = 3 AND uf2.status = 3";
+                        "WHERE uf1.user_id = ? AND uf1.status = 3 AND uf2.status = 3 " +
+                        "AND uf2.friend_id NOT IN (SELECT friend_id FROM user_friends WHERE user_id = ?)";
         //uf1 = user's friends, uf2 = user's mutual friends
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1,userId);
+            statement.setInt(2,userId);
+            statement.setInt(3,userId);
+            statement.setInt(4,userId);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()){
                 int user_id = resultSet.getInt("user_id");
                 if (user_id != userId){// excepting user himself as a mutual friend
                     String name = resultSet.getString("name");
                     String username = resultSet.getString("username");
-                    String status = "Mutual friend";
+                    String status = resultSet.getString("status");
                     mutualFriends.add(new Friend(user_id,status,name,username));
                 }
             }
@@ -611,6 +659,8 @@ public class Database {
                 "DELETE FROM user_hobbies WHERE user_id = ?";
         String deleteJobsQuery =
                 "DELETE FROM user_jobs WHERE user_id = ?";
+        String deleteNotificationsQuery =
+                "DELETE FROM user_notifications WHERE from_id = ? OR to_id = ?";
         try {
             PreparedStatement statement = connection.prepareStatement(deleteUserQuery);
             statement.setInt(1,userId);
@@ -644,6 +694,91 @@ public class Database {
         catch (SQLException e){
             e.printStackTrace();
         }
+        try {
+            PreparedStatement statement = connection.prepareStatement(deleteNotificationsQuery);
+            statement.setInt(1,userId);
+            statement.setInt(2,userId);
+            statement.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+    // Notifications
+    public void createNotification(Notification notification){
+        String query =
+                "INSERT INTO user_notifications (from_id,to_id,description,date,seen) VALUES (?,?,?,?,?)";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,notification.getFrom());
+            statement.setInt(2,notification.getTo());
+            statement.setString(3,notification.getDescription());
+            statement.setString(4,notification.getDate());
+            statement.setBoolean(5,notification.isSeen());
+            statement.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+    public List<Notification> getNotifications(int userID){
+        List<Notification> notificationsList = new ArrayList<>();
+        String query =
+                "SELECT from_id,to_id,description,date,seen FROM user_notifications WHERE to_id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,userID);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()){
+                int from = resultSet.getInt("from_id");
+                int to = resultSet.getInt("to_id");
+                String description = resultSet.getString("description");
+                String date = resultSet.getString("date");
+                boolean seen = resultSet.getBoolean("seen");
+                notificationsList.add(new Notification(from,to,description,date,seen));
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return notificationsList;
+    }
+    // Messages
+    public void sendMessage(Message message){
+        createNotification(new Notification(message.getFrom(),message.getTo(),get("username", message.getFrom()) + "sent you a message: " + message.getText()));
+        String query =
+                "INSERT INTO user_messages (from_id, to_id, message, timestamp) VALUES (?, ?, ?, ?)";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,message.getFrom());
+            statement.setInt(2,message.getTo());
+            statement.setString(3,message.getText());
+            statement.setString(4,message.getTimeStamp());
+            statement.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+    public List<Message> retrieveMessage(int from, int to){
+        List<Message> messages = new LinkedList<>();
+        String query =
+                "SELECT * FROM user_messages WHERE from_id = ? AND to_id = ? ORDER BY timestamp ASC";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,from);
+            statement.setInt(2,to);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()){
+                String text = resultSet.getString("message");
+                String timeStamp = resultSet.getString("timestamp");
+                messages.add(new Message(from,to,text,timeStamp));
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return messages;
     }
     public void close(){
         try {

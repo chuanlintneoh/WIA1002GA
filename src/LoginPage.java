@@ -18,7 +18,9 @@ public class LoginPage extends JFrame implements ActionListener {
 
         // Initialize GUI components
         txtUsername = new JTextField("Username",20);
+        txtUsername.setToolTipText("Enter your username/ email address/ contact no. here.");
         txtPassword = new JPasswordField("Password",20);
+        txtPassword.setToolTipText("Enter your password here.");
         btnLogin = new JButton("Log In");
         btnLogin.setBackground(new Color(46,138,87));
         btnLogin.setForeground(Color.WHITE);
@@ -68,6 +70,7 @@ public class LoginPage extends JFrame implements ActionListener {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(450, 300);
         setLocationRelativeTo(null);
+        setResizable(false);
         setVisible(true);
     }
     @Override
