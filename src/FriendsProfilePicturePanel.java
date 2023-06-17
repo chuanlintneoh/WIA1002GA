@@ -111,8 +111,8 @@ public class FriendsProfilePicturePanel extends JPanel implements ActionListener
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         if (e.getSource() == btnChat) {
-                            SendMessageDialog dialog = new SendMessageDialog(parent, myID, correspondingIDs.get(index),tracebackFunction);
-                            dialog.setVisible(true);
+                            ChatBoxFrame chatBoxFrame = new ChatBoxFrame(parent,myID,correspondingIDs.get(index));
+                            tracebackFunction.addHistory("Entered conversation with " + database.get("username",correspondingIDs.get(index)) + ".");
                         }
                     }
                 };

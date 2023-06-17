@@ -290,17 +290,36 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
             gbc.gridy = 7;
             gbc.gridheight = 1;
             JButton btnSend = new JButton("Send Message");
+            Border lineBorder = BorderFactory.createLineBorder(new Color(0, 100, 0), 2);
+            Insets spacingInsets = new Insets(5, 10, 5, 10);
+            Border spacingBorder = BorderFactory.createEmptyBorder(spacingInsets.top, spacingInsets.left, spacingInsets.bottom, spacingInsets.right);
+            Border compoundBorder = BorderFactory.createCompoundBorder(lineBorder, spacingBorder);
+            btnSend.setBackground(new Color(166, 220, 156));
+            btnSend.setForeground(new Color(0,100,0));
+            btnSend.setBorder(compoundBorder);
             centerPanel.add(btnSend,gbc);
             ActionListener buttonActionListener = new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (e.getSource() == btnSend){
-                        SendMessageDialog dialog = new SendMessageDialog(ViewAccountPage.this,userID,friendID,tracebackFunction);
-                        dialog.setVisible(true);
+                        ChatBoxFrame chatBoxFrame = new ChatBoxFrame(ViewAccountPage.this,userID,friendID);
+                        tracebackFunction.addHistory("Entered conversation with " + database.get("username",friendID) + ".");
                     }
                 }
             };
             btnSend.addActionListener(buttonActionListener);
+            btnSend.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    btnSend.setForeground(WHITE);
+                    btnSend.setBackground(new Color(0,100,0));
+                }
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    btnSend.setForeground(new Color(0,100,0));
+                    btnSend.setBackground(new Color(166, 220, 156));
+                }
+            });
         }
 
         JPanel westPanel = new JPanel(new GridBagLayout());

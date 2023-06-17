@@ -768,21 +768,23 @@ public class Database {
             e.printStackTrace();
         }
     }
-    public List<Message> retrieveMessage(int from, int to){
+    public List<Message> retrieveMessage(int user1, int user2){
         List<Message> messages = new LinkedList<>();
         String query =
                 "SELECT * FROM user_messages WHERE (from_id = ? AND to_id = ?) OR (from_id = ? AND to_id = ?) ORDER BY timestamp ASC";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
-            statement.setInt(1,from);
-            statement.setInt(2,to);
-            statement.setInt(3,to);
-            statement.setInt(4,from);
+            statement.setInt(1,user1);
+            statement.setInt(2,user2);
+            statement.setInt(3,user2);
+            statement.setInt(4,user1);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()){
+                int from_id = resultSet.getInt("from_id");
+                int to_id = resultSet.getInt("to_id");
                 String text = resultSet.getString("message");
                 String timeStamp = resultSet.getString("timestamp");
-                messages.add(new Message(from,to,text,timeStamp));
+                messages.add(new Message(from_id,to_id,text,timeStamp));
             }
         }
         catch (SQLException e){

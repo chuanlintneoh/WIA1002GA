@@ -1,5 +1,5 @@
 import java.time.format.DateTimeFormatter;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 public class Message {
     private final int from;
     private final int to;
@@ -7,7 +7,7 @@ public class Message {
     private final String timeStamp;
     public Message(int from, int to, String text){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDate date = LocalDate.now();
+        LocalDateTime date = LocalDateTime.now();
         this.from = from;
         this.to = to;
         this.text = text;
