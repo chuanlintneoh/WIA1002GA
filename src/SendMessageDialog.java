@@ -5,8 +5,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import static java.awt.Color.WHITE;
-
 public class SendMessageDialog extends JDialog implements ActionListener {
     private final JLabel lblFrom, lblTo, lblMessage;
     private final JTextField txtTo;

@@ -10,16 +10,17 @@ public class FriendsProfilePicturePanel extends JPanel implements ActionListener
     private final JFrame parent;
     private final JPanel mainPanel;
     private final JScrollPane scrollPane;
-    private final int userID;
+    private final int viewID;
+    private final int myID;
     private final Database database;
     private final TracebackFunction tracebackFunction;
     private final int maxWidth = 105;
     private final int maxHeight = 140;
     Color panelBckgrd = new Color(220,230,190);
-
-    public FriendsProfilePicturePanel(JFrame parent, int userID, boolean friends, TracebackFunction tracebackFunction) {
+    public FriendsProfilePicturePanel(JFrame parent, int viewID, int myID, boolean friends, TracebackFunction tracebackFunction){
         this.parent = parent;
-        this.userID = userID;
+        this.viewID = viewID;
+        this.myID = myID;
         this.tracebackFunction = tracebackFunction;
         this.database = new Database();
 
@@ -45,27 +46,18 @@ public class FriendsProfilePicturePanel extends JPanel implements ActionListener
         refreshFriendRequests(friends);
         setLayout(new BorderLayout());
         add(scrollPane, BorderLayout.NORTH);
-    }
+    }// stranger's friends
+    public FriendsProfilePicturePanel(JFrame parent, int myID, boolean friends, TracebackFunction tracebackFunction) {
+        this(parent,myID,myID,friends,tracebackFunction);
+    }// own account
     private void refreshFriendRequests(boolean friends) {
         mainPanel.removeAll();
-        ArrayList<Friend> friendsRequests = (ArrayList<Friend>) database.viewFriendsRequests(userID);
+        ArrayList<Friend> friendsRequests = (ArrayList<Friend>) database.viewFriendsRequests(viewID);
         ArrayList<Image> profilePictures = new ArrayList<>();
         ArrayList<Integer> correspondingIDs = new ArrayList<>();
 
         for (Friend user : friendsRequests) {
-            if ((friends && user.getStatus().equals("Friend")) || (!friends && user.getStatus().equals("Received friend request"))) {
-                byte[] profilePictureData = database.getProfilePicture(user.getUserId());
-                Image resizedImage;
-                if (profilePictureData != null) {
-                    ImageIcon imageIcon = new ImageIcon(profilePictureData);
-                    resizedImage = resizeImage(imageIcon.getImage());
-                } else {
-                    ImageIcon defaultIcon = new ImageIcon("src/default_profile_pic.jpg");
-                    resizedImage = resizeImage(defaultIcon.getImage());
-                }
-                profilePictures.add(resizedImage);
-                correspondingIDs.add(database.getUserId(user.getUsername()));
-            } else if (!friends && user.getStatus().equals("Received friend request")) {
+            if (friends && user.getStatus().equals("Friend") || !friends && user.getStatus().equals("Received friend request")) {
                 byte[] profilePictureData = database.getProfilePicture(user.getUserId());
                 Image resizedImage;
                 if (profilePictureData != null) {
@@ -119,8 +111,9 @@ public class FriendsProfilePicturePanel extends JPanel implements ActionListener
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         if (e.getSource() == btnChat) {
-                            SendMessageDialog dialog = new SendMessageDialog(parent, userID, correspondingIDs.get(index));
-                            dialog.setVisible(true);
+                            ChatBoxFrame chatFrame = new ChatBoxFrame(parent,myID,correspondingIDs.get(index));
+//                            chatFrame.loadChatHistory();
+                            chatFrame.setVisible(true);
                         }
                     }
                 };
@@ -199,68 +192,75 @@ public class FriendsProfilePicturePanel extends JPanel implements ActionListener
                         if (e.getSource() == btnConfirm) {
                             int response = JOptionPane.showConfirmDialog(FriendsProfilePicturePanel.this, "Confirm friend request?", "Confirm", JOptionPane.YES_NO_OPTION);
                             if (response == JOptionPane.YES_OPTION) {
-                                database.updateStatus(correspondingIDs.get(index), userID, 3);
+                                database.updateStatus(correspondingIDs.get(index), myID, 3);
                                 JOptionPane.showMessageDialog(FriendsProfilePicturePanel.this, "You two are now friends!", "Success", JOptionPane.INFORMATION_MESSAGE);
-
-                                Container parent = getParent();
-                                Window window = SwingUtilities.getWindowAncestor(FriendsProfilePicturePanel.this);
-                                if (window != null) {
-                                    window.dispose();
-                                }
-                                if (parent != null) {
-                                    parent.removeAll();
-                                    parent.add(new HomePage(database.get("username",userID),tracebackFunction)); // Create a new homepage panel
-                                    parent.revalidate();
-                                    parent.repaint();
-                                }
+                                tracebackFunction.peek();// refresh page
+//                                Container parent = getParent();
+//                                Window window = SwingUtilities.getWindowAncestor(FriendsProfilePicturePanel.this);
+//                                if (window != null) {
+//                                    window.dispose();
+//                                }
+//                                if (parent != null) {
+//                                    parent.removeAll();
+//                                    parent.add(new HomePage(database.get("username",myID),tracebackFunction)); // Create a new homepage panel
+//                                    parent.revalidate();
+//                                    parent.repaint();
+//                                }
                             }
                         } else if (e.getSource() == btnDelete) {
                             int response = JOptionPane.showConfirmDialog(FriendsProfilePicturePanel.this, "Delete Friend Request?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null);
                             if (response == JOptionPane.YES_OPTION) {
-                                database.removeStatus(correspondingIDs.get(index), userID);
-                                Container parent = getParent();
-                                Window window = SwingUtilities.getWindowAncestor(FriendsProfilePicturePanel.this);
-                                if (window != null) {
-                                    window.dispose();
-                                }
-                                if (parent != null) {
-                                    parent.removeAll();
-                                    parent.add(new HomePage(database.get("username",userID),tracebackFunction)); // Create a new homepage panel
-                                    parent.revalidate();
-                                    parent.repaint();
-                                }
+                                database.removeStatus(correspondingIDs.get(index), myID);
+                                tracebackFunction.peek();// refresh page
+//                                Container parent = getParent();
+//                                Window window = SwingUtilities.getWindowAncestor(FriendsProfilePicturePanel.this);
+//                                if (window != null) {
+//                                    window.dispose();
+//                                }
+//                                if (parent != null) {
+//                                    parent.removeAll();
+//                                    parent.add(new HomePage(database.get("username",userID),tracebackFunction)); // Create a new homepage panel
+//                                    parent.revalidate();
+//                                    parent.repaint();
+//                                }
                             }
                         }
                         int correspondingID = Integer.parseInt(e.getActionCommand());
-                        tracebackFunction.pushPage(new ViewAccountPage(database.get("username", userID), correspondingID, tracebackFunction));
+                        tracebackFunction.pushPage(new ViewAccountPage(database.get("username", myID), correspondingID, tracebackFunction));
                         parent.dispose();
                     }
                 };
                 btnConfirm.addActionListener(buttonActionListener);
                 btnDelete.addActionListener(buttonActionListener);
             }
-                mainPanel.add(friendPanel);
-            }
-
-            setLayout(new BorderLayout());
-            add(scrollPane, BorderLayout.NORTH);
+            mainPanel.add(friendPanel);
         }
 
-        private Image resizeImage (Image originalImage){
-            int width = originalImage.getWidth(null);
-            int height = originalImage.getHeight(null);
-            double widthRatio = (double) maxWidth / width;
-            double heightRatio = (double) maxHeight / height;
-            double scaleRatio = Math.max(widthRatio, heightRatio);
-            int newWidth = (int) (width * scaleRatio);
-            int newHeight = (int) (height * scaleRatio);
-            return originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
-        }
+        setLayout(new BorderLayout());
+        add(scrollPane, BorderLayout.NORTH);
+    }
+
+    private Image resizeImage (Image originalImage){
+        int width = originalImage.getWidth(null);
+        int height = originalImage.getHeight(null);
+        double widthRatio = (double) maxWidth / width;
+        double heightRatio = (double) maxHeight / height;
+        double scaleRatio = Math.max(widthRatio, heightRatio);
+        int newWidth = (int) (width * scaleRatio);
+        int newHeight = (int) (height * scaleRatio);
+        return originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+    }
 
     @Override
-        public void actionPerformed (ActionEvent e){
-            int correspondingID = Integer.parseInt(e.getActionCommand());
-            tracebackFunction.pushPage(new ViewAccountPage(database.get("username", userID), correspondingID, tracebackFunction));
+    public void actionPerformed (ActionEvent e){
+        int correspondingID = Integer.parseInt(e.getActionCommand());
+        if (myID == correspondingID){
+            tracebackFunction.pushPage(new ViewAccountPage(database.get("username", myID), 0, tracebackFunction));
+            parent.dispose();
+        }
+        else {
+            tracebackFunction.pushPage(new ViewAccountPage(database.get("username", myID), correspondingID, tracebackFunction));
             parent.dispose();
         }
     }
+}

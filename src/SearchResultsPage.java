@@ -73,6 +73,12 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
         scrollPane.setPreferredSize(new Dimension(630,460));
         scrollPane.getVerticalScrollBar().setUnitIncrement(10);
         scrollPane.getVerticalScrollBar().setBlockIncrement(100);
+        Dimension preferredSize = searchResultsPanel.getPreferredSize();
+        if (preferredSize.height <= 460) {
+            scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        }else {
+            scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        }scrollPane.setPreferredSize(new Dimension(630, Math.max(preferredSize.height, 460)));
 
         ArrayList<Friend> searchResults = (ArrayList<Friend>) database.searchUser(userId,keyword);
         int results = searchResults.size();

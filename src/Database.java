@@ -549,6 +549,37 @@ public class Database {
         return searchResult;
     }
     //Find mutual friends
+    public List<Friend> getFriends(int userId){
+        List<Friend> friends = new ArrayList<>();
+        String query =
+                "SELECT uf.user_id, uf.friend_id, s.status, u.name AS friend_name, u.username AS friend_username " +
+                        "FROM user_friends uf " +
+                        "JOIN status s ON uf.status = s.id " +
+                        "JOIN users u ON uf.friend_id = u.user_id " +
+                        "WHERE uf.user_id = ? AND s.id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,userId);
+            statement.setInt(2,3);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()){
+                int friendId = resultSet.getInt("friend_id");
+                String status = resultSet.getString("status");
+                String friendName = resultSet.getString("friend_name");
+                String friendUsername = resultSet.getString("friend_username");
+                friends.add(new Friend(friendId,status,friendName,friendUsername));
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return friends;
+    }
+    public List<Friend> getMutualFriends(int userId){
+        List<Friend> mutualFriends = new ArrayList<>();
+        List<Friend> friends = getFriends(userId);
+        return mutualFriends;
+    }
     public List<Friend> findMutualFriends(int userId){
         List<Friend> mutualFriends = new ArrayList<>();
         String query =
@@ -571,9 +602,19 @@ public class Database {
             statement.setInt(3,userId);
             statement.setInt(4,userId);
             ResultSet resultSet = statement.executeQuery();
+            boolean added;
             while (resultSet.next()){
+                added = false;
                 int user_id = resultSet.getInt("user_id");
-                if (user_id != userId){// excepting user himself as a mutual friend
+                if (!mutualFriends.isEmpty()){
+                    for (Friend mutualFriend: mutualFriends){
+                        if (mutualFriend.getUserId() == user_id){
+                            added = true;
+                            break;
+                        }
+                    }
+                }
+                if (user_id != userId && !added){// excepting user himself as a mutual friend
                     String name = resultSet.getString("name");
                     String username = resultSet.getString("username");
                     String status = resultSet.getString("status");
@@ -763,11 +804,13 @@ public class Database {
     public List<Message> retrieveMessage(int from, int to){
         List<Message> messages = new LinkedList<>();
         String query =
-                "SELECT * FROM user_messages WHERE from_id = ? AND to_id = ? ORDER BY timestamp ASC";
+                "SELECT * FROM user_messages WHERE (from_id = ? AND to_id = ?) OR (from_id = ? AND to_id = ?) ORDER BY timestamp ASC";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1,from);
             statement.setInt(2,to);
+            statement.setInt(3,to);
+            statement.setInt(4,from);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()){
                 String text = resultSet.getString("message");

@@ -1,6 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Objects;
+
 public class LoginPage extends JFrame implements ActionListener {
     private final RegisterPage registerPage;
     private final JTextField txtUsername;
@@ -78,7 +80,7 @@ public class LoginPage extends JFrame implements ActionListener {
         if (e.getSource() == btnLogin){
             String username = txtUsername.getText();
             String password = PasswordHashing.hashPassword(new String(txtPassword.getPassword()));
-            if (username.isEmpty() || password.isEmpty()){
+            if (username.isEmpty() || Objects.requireNonNull(password).isEmpty()){
                 JOptionPane.showMessageDialog(this, "All fields are required.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
