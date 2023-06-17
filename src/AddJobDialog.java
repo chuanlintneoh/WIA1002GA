@@ -16,11 +16,13 @@ public class AddJobDialog extends JDialog implements ActionListener {
     private Stack<Job> oriJobs;
     private final int userId;
     private final Database database;
+    private final TracebackFunction tracebackFunction;
     private final Frame parent;
-    public AddJobDialog(Frame parent, int userId){
+    public AddJobDialog(Frame parent, int userId, TracebackFunction tracebackFunction){
         super(parent,"Jobs",true);
         this.parent = parent;
         this.userId = userId;
+        this.tracebackFunction = tracebackFunction;
         lblYourJobs = new JLabel("Your Jobs: ");
         lblOther = new JLabel("Other jobs: ");
 
@@ -136,6 +138,7 @@ public class AddJobDialog extends JDialog implements ActionListener {
             }
         }
         else if (e.getSource() == btnClose){
+            tracebackFunction.addHistory("Edited jobs.");
             dispose();
         }
     }

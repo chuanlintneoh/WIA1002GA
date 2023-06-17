@@ -2,97 +2,84 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
-import javax.swing.DefaultListModel;
+import java.util.LinkedList;
 
 public class ChatBoxFrame extends JFrame implements ActionListener{
-    private JTextArea chatArea;
-    private JTextField messageField;
-    private JButton sendButton;
-    private DefaultListModel<String> chatListModel;
-
-    private int userID;
-    private int friendID;
-    private Database database;
-
+    private final int userID;
+    private final int friendID;
+    private final Database database;
+    private final JTextArea chatArea;
+    private final JTextField txtmessage;
+    private final JButton sendButton;
+    private final Timer timer;
     public ChatBoxFrame(Frame parent, int userID, int friendID) {
         this.userID = userID;
         this.friendID = friendID;
         this.database = new Database();
 
-        chatListModel = new DefaultListModel<>();
-
-        initializeUI();
-        loadMessages();
-
-        setLocationRelativeTo(parent);
-    }
-
-    private void initializeUI() {
-        setTitle("Chat Room with " + database.get("username", friendID));
-        setPreferredSize(new Dimension(400, 300));
-
-        chatArea = new JTextArea(1, 20);
-        chatArea.setLineWrap(true);
-        chatArea.setWrapStyleWord(true);
+        chatArea = new JTextArea();
         chatArea.setEditable(false);
+        chatArea.setWrapStyleWord(true);
+        chatArea.setLineWrap(true);
+        txtmessage = new JTextField();
+        sendButton = new JButton("Send");
+        sendButton.addActionListener(this);
+
         JScrollPane scrollPane = new JScrollPane(chatArea);
 
-        messageField = new JTextField();
-        sendButton = new JButton("Send");
+        JPanel messagePanel = new JPanel(new BorderLayout());
+        messagePanel.add(txtmessage,BorderLayout.CENTER);
+        messagePanel.add(sendButton,BorderLayout.EAST);
 
-        sendButton.addActionListener(this);
-//        sendButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                String text = messageField.getText();
-//                if (!text.isEmpty()) {
-//                    Message message = new Message(userID, friendID, text);
-//                    database.sendMessage(message);
-//
-//                    String displayMessage = "[" + message.getTimeStamp() + "] You: " + message.getText();
-//                    chatListModel.addElement(displayMessage);
-//                    chatArea.append(displayMessage + "\n"); // Append the message directly to the chatArea
-//
-//                    messageField.setText("");
-//                }
-//            }
-//        });
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(scrollPane,BorderLayout.CENTER);
+        panel.add(messagePanel,BorderLayout.SOUTH);
 
-        JPanel inputPanel = new JPanel(new BorderLayout());
-        inputPanel.add(messageField, BorderLayout.CENTER);
-        inputPanel.add(sendButton, BorderLayout.EAST);
-
-        getContentPane().setLayout(new BorderLayout());
-        getContentPane().add(scrollPane, BorderLayout.CENTER);
-        getContentPane().add(inputPanel, BorderLayout.SOUTH);
-
-        pack();
+        setContentPane(panel);
+        setTitle("Conversation with " + database.get("username",friendID));
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setSize(400, 300);
+        setLocationRelativeTo(parent);
         setVisible(true);
+
+        timer = new Timer(30000, this);// refresh page every 30 seconds
+        timer.setInitialDelay(0);
+        timer.start();
+
+        refreshMessages();
     }
-
-    private void loadMessages() {
-        List<Message> messages = database.retrieveMessage(userID, friendID);
-
-        for (Message message : messages) {
-            String displayMessage = "[" + message.getTimeStamp() + "] " +
-                    getUserName(message.getFrom()) + ": " +
-                    message.getText();
-            chatListModel.addElement(displayMessage);
+    private void refreshMessages(){
+        LinkedList<Message> messages = (LinkedList<Message>) database.retrieveMessage(userID,friendID);
+        chatArea.setText("");
+        for (Message message: messages){
+            String sender = database.get("username",message.getFrom());
+            String timeStamp = message.getTimeStamp();
+            String text = message.getText();
+            String formattedMessage = "";
+            if (message.getFrom() == friendID){
+                formattedMessage = sender + ":\n" + text + "\n[" + timeStamp + "]\n";
+            }// align left
+            else if (message.getTo() == friendID){
+                formattedMessage = sender + ":\n" + text + "\n[" + timeStamp + "]\n";
+            }// align right
+            chatArea.append(formattedMessage + "\n");
         }
-        chatArea.setText(chatListModel.toString());
     }
-
-    private String getUserName(int userId) {
-        return database.get("username", userId);
-    }
+    @Override
     public void actionPerformed(ActionEvent e){
-        if(e.getSource() == sendButton){
-            String toText = messageField.getText().trim();
-            database.sendMessage(new Message(userID,friendID,toText));
-            messageField.setText("");
-
-            loadMessages();
+        if (e.getSource() == sendButton){
+            String text = txtmessage.getText().trim();
+            if (text.isEmpty()){
+                JOptionPane.showMessageDialog(this, "Please enter a message.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            else {
+                database.sendMessage(new Message(userID,friendID,text));
+                txtmessage.setText("");
+                refreshMessages();
+            }
+        }
+        else if (e.getSource() == timer){
+            refreshMessages();
         }
     }
 }

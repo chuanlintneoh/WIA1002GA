@@ -32,6 +32,9 @@ public class TracebackFunction {
             pageStack.peek().showPage();
         }
     }// refresh page
+    public void addHistory(String activity){
+        pageHistory.add("[" + getFormattedTimestamp() + "]: " + activity);
+    }
     public LinkedList<String> getPageHistory(){
         return pageHistory;
     }

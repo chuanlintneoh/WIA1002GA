@@ -17,10 +17,12 @@ public class AddHobbyDialog extends JDialog implements ActionListener {
     private final JTextField hobbyTextField;
     private final int userID;
     private final Database database;
-    public AddHobbyDialog(Frame parent, int userID) {
+    private final TracebackFunction tracebackFunction;
+    public AddHobbyDialog(Frame parent, int userID, TracebackFunction tracebackFunction) {
         super(parent,"Hobbies",true);
         this.userID = userID;
         database = new Database();
+        this.tracebackFunction = tracebackFunction;
 
         lblYourHobby = new JLabel("Your Hobbies:");
         lblSelect = new JLabel("Select your hobbies:");
@@ -155,10 +157,11 @@ public class AddHobbyDialog extends JDialog implements ActionListener {
                 }
             } else {
                 List<String> hobbies= new ArrayList<>();
-                for(int i=0;i<hobbyListModel.getSize();i++){
+                for(int i = 0; i < hobbyListModel.getSize(); i++){
                     hobbies.add(hobbyListModel.getElementAt(i));
                 }
                 database.editUserHobbies(userID,hobbies);
+                tracebackFunction.addHistory("Edited hobbies.");
                 JOptionPane.showMessageDialog(this, "Your hobbies are SUCCESSFULLY saved!","Success",JOptionPane.INFORMATION_MESSAGE);
                 dispose();
             }

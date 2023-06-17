@@ -8,10 +8,12 @@ public class EditPasswordDialog extends JDialog implements ActionListener {
     private final JLabel lblErrorMessage;
     private final int userID;
     private final Database database;
-    public EditPasswordDialog(Frame parent, int userID) {
+    private final TracebackFunction tracebackFunction;
+    public EditPasswordDialog(Frame parent, int userID, TracebackFunction tracebackFunction) {
         super(parent, "Edit Password", true);
         this.userID = userID;
         this.database = new Database();
+        this.tracebackFunction = tracebackFunction;
 
         // Initialize components
         txtPassword = new JPasswordField(15);
@@ -126,8 +128,8 @@ public class EditPasswordDialog extends JDialog implements ActionListener {
             char[] password = txtPassword.getPassword();
             char[] newPassword = txtNewPassword.getPassword();
             char[] confirmNewPassword = txtConfirmNewPassword.getPassword();
-            String hashpassword =PasswordHashing.hashPassword(new String(txtPassword.getPassword()));
-            if(!hashpassword.equals(database.get("password",userID))){
+            String hashpassword = PasswordHashing.hashPassword(new String(txtPassword.getPassword()));
+            if (!hashpassword.equals(database.get("password",userID))){
                 lblErrorMessage.setText("Your current password is wrong!");
             } else if (isEmpty(password) || isEmpty(newPassword) || isEmpty(confirmNewPassword)) {
                 lblErrorMessage.setText("Please fill in all fields.");
@@ -136,6 +138,7 @@ public class EditPasswordDialog extends JDialog implements ActionListener {
             } else if (isPasswordMatch(newPassword, confirmNewPassword)) {
                 JOptionPane.showMessageDialog(this, "Your password is changed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 database.set("password",hashpassword,userID);
+                tracebackFunction.addHistory("Changed account password.");
                 dispose();
             } else {
                 // Passwords don't match, display error message

@@ -182,6 +182,8 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
                         if (btnStatus.getText().equals("Add Friend")){
                             database.insertStatus(userID, searchResult.getUserId(), 1);// send request
                             database.insertStatus(searchResult.getUserId(), userID, 2);// receive request
+                            database.createNotification(new Notification(userID,searchResult.getUserId(),database.get("username",userID) + " sent you a friend request."));
+                            tracebackFunction.addHistory("Sent friend request to " + database.get("username",searchResult.getUserId()) + ".");
                             JOptionPane.showMessageDialog(scrollPane, "Your friend request is sent!", "Success", JOptionPane.INFORMATION_MESSAGE);
                             btnStatus.setText("Friend request sent");
                             btnStatus.setBackground(new Color(0,0,102));
@@ -191,6 +193,7 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
                             int response = JOptionPane.showConfirmDialog(scrollPane, "Are you sure you want to cancel your friend request?", "Confirm", JOptionPane.YES_NO_OPTION);
                             if (response == JOptionPane.YES_OPTION) {
                                 database.removeStatus(userID, searchResult.getUserId());// delete request
+                                tracebackFunction.addHistory("Cancelled friend request to " + database.get("username",searchResult.getUserId()) + ".");
                                 JOptionPane.showMessageDialog(scrollPane, "Friend request cancelled.", "Success", JOptionPane.INFORMATION_MESSAGE);
                                 btnStatus.setText("Add Friend");
                                 btnStatus.setBackground(new Color(0,102,204));
@@ -203,12 +206,14 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
                                     JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
                             if (response == 0){//confirm
                                 database.updateStatus(userID, searchResult.getUserId(),3);// Update status to friends
+                                tracebackFunction.addHistory("Became friends with " + database.get("username",searchResult.getUserId()) + ".");
                                 JOptionPane.showMessageDialog(scrollPane, "You two are now friends!", "Success", JOptionPane.INFORMATION_MESSAGE);
                                 tracebackFunction.peek();
                                 dispose();
                             }
                             else if (response == 1){//delete
                                 database.removeStatus(userID, searchResult.getUserId());
+                                tracebackFunction.addHistory("Deleted friend request from " + database.get("username",searchResult.getUserId()) + ".");
                                 JOptionPane.showMessageDialog(scrollPane, "You deleted the friend request...", "Success", JOptionPane.INFORMATION_MESSAGE);
                                 tracebackFunction.peek();
                                 dispose();
@@ -216,7 +221,8 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
                         }
                         else if (btnStatus.getText().equals("Friend")){
                             int response = JOptionPane.showConfirmDialog(scrollPane, "UNFRIEND?", "Confirm", JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null);
-                            if(response == JOptionPane.YES_OPTION) {
+                            tracebackFunction.addHistory("Deleted friend request from " + database.get("username",searchResult.getUserId()) + ".");
+                            if (response == JOptionPane.YES_OPTION) {
                                 database.removeStatus(userID,searchResult.getUserId());
                                 tracebackFunction.peek();
                                 dispose();
@@ -319,6 +325,9 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
     @Override
     public void showPage() {
         new SearchResultsPage(userID,keyword,tracebackFunction);
+    }
+    public String getTitle(){
+        return "Search Results Page for \"" + keyword + "\"";
     }
     @Override
     public void actionPerformed(ActionEvent e) {
