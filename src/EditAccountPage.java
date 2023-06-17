@@ -61,6 +61,16 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
         btnEditPic.setBorderPainted(false);
         btnEditPic.setContentAreaFilled(false);
         btnEditPic.addActionListener(this);
+        btnEditPic.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnEditPic.setForeground(new Color(144,20,24));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnEditPic.setForeground(black);
+            }
+        });
 
         btnEditBday = new JButton(String.format("<html><u>%s</u></html>",database.get("birthdate",userID)));
         btnEditBday.setBorderPainted(false);
@@ -69,6 +79,16 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
         btnEditBday.setForeground(Color.BLUE);
         btnEditBday.addActionListener(this);
         btnEditBday.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+        btnEditBday.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnEditBday.setForeground(new Color(144,20,24));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnEditBday.setForeground(Color.BLUE);
+            }
+        });
 
         btnEditGender = new JButton(String.format("<html><u>%s</u></html>",database.get("gender", userID)));
         btnEditGender.setBorderPainted(false);
@@ -77,23 +97,65 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
         btnEditGender.setFont(btnEditGender.getFont().deriveFont(Font.PLAIN));
         btnEditGender.addActionListener(this);
         btnEditGender.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+        btnEditGender.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnEditGender.setForeground(new Color(144,20,24));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnEditGender.setForeground(Color.BLUE);
+            }
+        });
 
         btnAddJob = new JButton("<html><u>Add/Edit Job</u></html>");
         btnAddJob.setBorderPainted(false);
         btnAddJob.setContentAreaFilled(false);
         btnAddJob.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
         btnAddJob.addActionListener(this);
+        btnAddJob.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnAddJob.setForeground(new Color(144,20,24));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnAddJob.setForeground(black);
+            }
+        });
 
         btnAddHobby = new JButton("<html><u>Add/Edit Hobby</u></html>");
         btnAddHobby.setBorderPainted(false);
         btnAddHobby.setContentAreaFilled(false);
         btnAddHobby.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
         btnAddHobby.addActionListener(this);
+        btnAddHobby.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnAddHobby.setForeground(new Color(144,20,24));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnAddHobby.setForeground(black);
+            }
+        });
 
         btnEditPassword = new JButton("Edit Password");
         btnEditPassword.setBackground(Color.black);
         btnEditPassword.setForeground(Color.white);
         btnEditPassword.addActionListener(this);
+        btnEditPassword.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnEditPassword.setForeground(black);
+                btnEditPassword.setBackground(new Color(150,150,150));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnEditPassword.setBackground(Color.black);
+                btnEditPassword.setForeground(Color.white);
+            }
+        });
         btnUser = new JButton(username);
         btnUser.setFont(new Font(btnUser.getFont().getName(), Font.BOLD, 16));
         btnUser.setBackground(new Color(180, 238, 156));
@@ -121,12 +183,48 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
         }
         btnAdmin.addActionListener(this);
         btnSaveChanges = new JButton("Save");
+        btnSaveChanges.setForeground(Color.WHITE);
+        btnSaveChanges.setBackground(new Color(46, 138, 87));
         btnSaveChanges.addActionListener(this);
+        btnSaveChanges.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnSaveChanges.setBackground(new Color(20,75,30));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnSaveChanges.setBackground(new Color(46, 138, 87));
+            }
+        });
+
         btnCancel = new JButton("Cancel");
+        btnCancel.setForeground(white);
+        btnCancel.setBackground(new Color(218,195,80));
         btnCancel.addActionListener(this);
+        btnCancel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnCancel.setForeground(black);
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnCancel.setForeground(white);
+            }
+        });
         btnBack = new JButton("Back");
         btnBack.addActionListener(this);
-        btnBack.setBackground(new Color(196, 164, 132));
+        btnBack.setBackground(new Color(92, 94, 41));
+        btnBack.setForeground(white);
+        btnBack.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnBack.setBackground(new Color(58,30,0));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnBack.setBackground(new Color(92, 94, 41));
+            }
+        });
 
         // Add components to the frame
         JPanel panel = new JPanel(new BorderLayout());
@@ -135,6 +233,16 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
         JPanel topPanel = new JPanel();
         forestbook.setFont(new Font("Curlz MT", Font.BOLD, 42));
         forestbook.setForeground(new Color(0, 128, 0));
+        forestbook.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                forestbook.setForeground(new Color(92, 94, 41));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                forestbook.setForeground(new Color(0, 128, 0));
+            }
+        });
         topPanel.add(forestbook);
         topPanel.setBackground(new Color(180, 238, 156));
 
@@ -213,6 +321,16 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
         centerPanel.add(btnAdmin, gbc);
         btnAdmin.setForeground(Color.white);
         btnAdmin.setBackground(new Color(200,0,127));
+        btnAdmin.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnAdmin.setBackground(new Color(150,30,130));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnAdmin.setBackground(new Color(200,0,127));
+            }
+        });
 
         JPanel closePanel = new JPanel();
         gbc.gridx = 2;
@@ -220,8 +338,7 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.WEST;
         closePanel.add(btnSaveChanges,gbc);
-        btnSaveChanges.setForeground(Color.WHITE);
-        btnSaveChanges.setBackground(new Color(46, 138, 87));
+        closePanel.setBackground(new Color(255,240,211));
         closePanel.add(btnCancel);
         centerPanel.add(closePanel, gbc);
 

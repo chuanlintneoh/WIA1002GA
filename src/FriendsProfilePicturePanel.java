@@ -111,9 +111,8 @@ public class FriendsProfilePicturePanel extends JPanel implements ActionListener
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         if (e.getSource() == btnChat) {
-                            ChatBoxFrame chatFrame = new ChatBoxFrame(parent,myID,correspondingIDs.get(index));
-//                            chatFrame.loadChatHistory();
-                            chatFrame.setVisible(true);
+                            ChatBoxFrame chatBoxFrame = new ChatBoxFrame(parent,myID,correspondingIDs.get(index));
+                            tracebackFunction.addHistory("Entered conversation with " + database.get("username",correspondingIDs.get(index)) + ".");
                         }
                     }
                 };
@@ -143,9 +142,29 @@ public class FriendsProfilePicturePanel extends JPanel implements ActionListener
                 JButton btnConfirm = new JButton("Confirm");
                 btnConfirm.setBackground(new Color(46,138,87));
                 btnConfirm.setForeground(Color.white);
+                btnConfirm.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        btnConfirm.setBackground(new Color(20,75,30));
+                    }
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        btnConfirm.setBackground(new Color(46, 138, 87));
+                    }
+                });
                 JButton btnDelete = new JButton("Delete");
                 btnDelete.setBackground(new Color(200, 7, 14));
                 btnDelete.setForeground(Color.white);
+                btnDelete.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        btnDelete.setBackground(new Color(166,100,100));
+                    }
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        btnDelete.setBackground(new Color(200, 7, 14));
+                    }
+                });
 
                 Dimension buttonSize = new Dimension(100, 30);
                 btnConfirm.setMaximumSize(buttonSize);
