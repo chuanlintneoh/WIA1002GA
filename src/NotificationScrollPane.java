@@ -19,17 +19,19 @@ public class NotificationScrollPane extends JPopupMenu {
 
         ArrayList<Notification> notifications = (ArrayList<Notification>) database.getNotifications(userID);
         for (Notification notification: notifications){
-            JButton noti = new JButton("<html><body>" +
+            JButton noti = new JButton("<html><body>" +notification.getDate() +  "<br>" +
                     "From: " + database.get("username", notification.getFrom()) + "<br>" +
-                    notification.getDescription() + "<br>" +
-                    notification.getDate() +
-                    "</body></html>");
+                    "<font color='#527FD4'>" + notification.getDescription() +
+                    "</font></body></html>");
+
+
             noti.setMaximumSize(new Dimension(245, Integer.MAX_VALUE));
             noti.setHorizontalAlignment(SwingConstants.LEFT);
             noti.setBorderPainted(false);
             noti.setFocusPainted(false);
             noti.setContentAreaFilled(false);
-            notificationsPanel.add(noti);
+            noti.setFont(noti.getFont().deriveFont(Font.PLAIN));
+            notificationsPanel.add(noti,0);
         }
 
         int contentHeight = notificationsPanel.getPreferredSize().height;

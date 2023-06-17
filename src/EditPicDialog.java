@@ -12,11 +12,14 @@ public class EditPicDialog extends JDialog implements ActionListener{
     private final JButton btnUpload, btnDelete, btnClose;
     private final JLabel lblProfilePicture;
     private final Database database;
-    public EditPicDialog(Frame parent, int userID, JLabel lblProfilePicture) {
+    private final TracebackFunction tracebackFunction;
+    public EditPicDialog(Frame parent, int userID, JLabel lblProfilePicture, TracebackFunction tracebackFunction) {
         super(parent, "Edit Profile Picture", true);
         this.userID = userID;
         this.lblProfilePicture = lblProfilePicture;
-        database = new Database();
+        this.database = new Database();
+        this.tracebackFunction = tracebackFunction;
+
         btnUpload = new JButton("Upload");
         btnUpload.addActionListener(this);
         btnUpload.setForeground(Color.WHITE);
@@ -76,6 +79,7 @@ public class EditPicDialog extends JDialog implements ActionListener{
                     byte[] picture = baos.toByteArray();
 
                     database.setProfilePicture(picture, userID);
+                    tracebackFunction.addHistory("Changed profile picture.");
                     lblProfilePicture.setIcon(new ImageIcon(resizedImage));
                     lblProfilePicture.setPreferredSize(new Dimension(newWidth, newHeight));
                 }

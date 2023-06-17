@@ -65,7 +65,7 @@ public class Database {
         catch (SQLException e){
             e.printStackTrace();
         }
-        Notification notification = new Notification(0,user.getUserId(),"Welcome to ForestBook!");
+        Notification notification = new Notification(getUserId(user.getUsername()),getUserId(user.getUsername()),"Welcome to ForestBook!");
         createNotification(notification);
     }
     public int authenticateUser(String username,String hashedPassword){
@@ -278,8 +278,6 @@ public class Database {
         catch (SQLException e){
             e.printStackTrace();
         }
-        Notification notification = new Notification(userId,friendId,get("username",userId) + " sent you a friend request.");
-        createNotification(notification);
     }// send request, receive request
     public void updateStatus(int userId, int friendId,int statusId){// update 2 rows in database
         //***Note: do once is enough
@@ -571,9 +569,19 @@ public class Database {
             statement.setInt(3,userId);
             statement.setInt(4,userId);
             ResultSet resultSet = statement.executeQuery();
+            boolean added;
             while (resultSet.next()){
+                added = false;
                 int user_id = resultSet.getInt("user_id");
-                if (user_id != userId){// excepting user himself as a mutual friend
+                if (!mutualFriends.isEmpty()){
+                    for (Friend mutualFriend: mutualFriends){
+                        if (mutualFriend.getUserId() == user_id){
+                            added = true;
+                            break;
+                        }
+                    }
+                }
+                if (user_id != userId && !added){// excepting user himself as a mutual friend
                     String name = resultSet.getString("name");
                     String username = resultSet.getString("username");
                     String status = resultSet.getString("status");
@@ -659,6 +667,8 @@ public class Database {
                 "DELETE FROM user_hobbies WHERE user_id = ?";
         String deleteJobsQuery =
                 "DELETE FROM user_jobs WHERE user_id = ?";
+        String deleteNotificationsQuery =
+                "DELETE FROM user_notifications WHERE from_id = ? OR to_id = ?";
         try {
             PreparedStatement statement = connection.prepareStatement(deleteUserQuery);
             statement.setInt(1,userId);
@@ -687,6 +697,15 @@ public class Database {
         try {
             PreparedStatement statement = connection.prepareStatement(deleteJobsQuery);
             statement.setInt(1,userId);
+            statement.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        try {
+            PreparedStatement statement = connection.prepareStatement(deleteNotificationsQuery);
+            statement.setInt(1,userId);
+            statement.setInt(2,userId);
             statement.executeUpdate();
         }
         catch (SQLException e){
@@ -731,6 +750,47 @@ public class Database {
             e.printStackTrace();
         }
         return notificationsList;
+    }
+    // Messages
+    public void sendMessage(Message message){
+        createNotification(new Notification(message.getFrom(),message.getTo(),get("username", message.getFrom()) + "sent you a message: " + message.getText()));
+        String query =
+                "INSERT INTO user_messages (from_id, to_id, message, timestamp) VALUES (?, ?, ?, ?)";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,message.getFrom());
+            statement.setInt(2,message.getTo());
+            statement.setString(3,message.getText());
+            statement.setString(4,message.getTimeStamp());
+            statement.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+    public List<Message> retrieveMessage(int user1, int user2){
+        List<Message> messages = new LinkedList<>();
+        String query =
+                "SELECT * FROM user_messages WHERE (from_id = ? AND to_id = ?) OR (from_id = ? AND to_id = ?) ORDER BY timestamp ASC";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1,user1);
+            statement.setInt(2,user2);
+            statement.setInt(3,user2);
+            statement.setInt(4,user1);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()){
+                int from_id = resultSet.getInt("from_id");
+                int to_id = resultSet.getInt("to_id");
+                String text = resultSet.getString("message");
+                String timeStamp = resultSet.getString("timestamp");
+                messages.add(new Message(from_id,to_id,text,timeStamp));
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return messages;
     }
     public void close(){
         try {

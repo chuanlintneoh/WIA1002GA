@@ -3,23 +3,45 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
+import static java.awt.Color.*;
 public class AdministratorPage extends JFrame implements Page,ActionListener {
     private final Database database;
+    private final JLabel forestbook;
+    private JPanel centerPanel;
     private final JTable userTable;
     private final DefaultTableModel tableModel;
-    private final JButton deleteButton, viewButton, sendButton, closeButton, btnBack;
+    private final JButton btnNoti, btnUser, deleteButton, viewButton, sendButton, closeButton, btnBack;
     private final String username;
     private final TracebackFunction tracebackFunction;
     public AdministratorPage(String username, TracebackFunction tracebackFunction){
-        super("Admin Page");
         this.database = new Database();
         this.username = username;
         this.tracebackFunction = tracebackFunction;
-        setSize(800, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
         setLayout(new BorderLayout());
+
+        forestbook = new JLabel("ForestBook");
+        forestbook.setFont(new Font("Curlz MT", Font.BOLD, 42));
+        forestbook.setForeground(new Color(0, 128, 0));
+        btnNoti = new JButton("Notifications");
+        btnNoti.addActionListener(this);
+        btnUser = new JButton(username);
+//        btnUser.setFont(new Font(btnUser.getFont().getName(), Font.BOLD, 16));
+//        btnUser.setBackground(new Color(180, 238, 156));
+//        btnUser.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 50));
+//        btnUser.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseEntered(MouseEvent e) {
+//                btnUser.setForeground(WHITE); // Change to the desired color
+//            }
+//            @Override
+//            public void mouseExited(MouseEvent e) {
+//                btnUser.setForeground(new Color(58,30,0)); // Change back to the default color
+//            }
+//        });
+        btnUser.addActionListener(e -> new AccountMenu(username,tracebackFunction,this).show(btnUser, -56, btnUser.getHeight()));
 
         // Create components
         userTable = new JTable();
@@ -48,9 +70,23 @@ public class AdministratorPage extends JFrame implements Page,ActionListener {
         btnBack = new JButton("Back");
         btnBack.addActionListener(this);
 
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.add(forestbook,BorderLayout.CENTER);
+        JPanel eastPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints eastGBC = new GridBagConstraints();
+        eastGBC.insets = new Insets(10,10,10,10);
+        eastGBC.anchor = GridBagConstraints.CENTER;
+        eastGBC.gridx = 0;
+        eastGBC.gridy = 0;
+        eastPanel.add(btnNoti,eastGBC);
+        eastGBC.gridx = 1;
+        eastPanel.add(btnUser,eastGBC);
+        topPanel.add(eastPanel,BorderLayout.EAST);
+
         // Add components to the frame
-        add(scrollPane, BorderLayout.CENTER);
-        add(deleteButton, BorderLayout.SOUTH);
+        add(topPanel,BorderLayout.NORTH);
+        add(scrollPane,BorderLayout.CENTER);
+        add(deleteButton,BorderLayout.SOUTH);
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(deleteButton);
@@ -63,6 +99,9 @@ public class AdministratorPage extends JFrame implements Page,ActionListener {
         // Fetch all users from the database and populate the table
         fetchUsers();
 
+        pack();
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setResizable(true);
         setVisible(true);
     }
     private void fetchUsers() {
@@ -87,6 +126,7 @@ public class AdministratorPage extends JFrame implements Page,ActionListener {
         try {
             // Delete the user from the database
             database.deleteUser(userId);
+            tracebackFunction.addHistory("<Admin Feature> Deleted user: " + database.get("username",userId));
             JOptionPane.showMessageDialog(this, "User deleted successfully.");
             fetchUsers(); // Refresh the table
         } catch (Exception e) {
@@ -107,8 +147,7 @@ public class AdministratorPage extends JFrame implements Page,ActionListener {
         }
         if (selectedUser != null) {
             // Create a panel to hold the user details and profile picture
-            JPanel panel = new JPanel();
-            panel.setLayout(new BorderLayout());
+            centerPanel.setLayout(new BorderLayout());
 
             // Create a label for the profile picture
             JLabel profilePictureLabel = new JLabel();
@@ -132,11 +171,11 @@ public class AdministratorPage extends JFrame implements Page,ActionListener {
             userDetailsTextArea.append("Birthdate: " + selectedUser.getBirthDate() + "\n");
 
             // Add the profile picture and user details to the panel
-            panel.add(profilePictureLabel, BorderLayout.WEST);
-            panel.add(userDetailsTextArea, BorderLayout.CENTER);
+            centerPanel.add(profilePictureLabel, BorderLayout.WEST);
+            centerPanel.add(userDetailsTextArea, BorderLayout.CENTER);
 
             // Show the panel with the user details and profile picture
-            JOptionPane.showMessageDialog(this, panel, "User Details", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, centerPanel, "User Details", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(this, "User not found.");
         }
@@ -144,12 +183,20 @@ public class AdministratorPage extends JFrame implements Page,ActionListener {
     public void showPage(){
         new AdministratorPage(username,tracebackFunction);
     }
+    public String getTitle(){
+        return "Administrator Page";
+    }
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == viewButton){
+        if (e.getSource() == btnNoti){
+            NotificationScrollPane scrollPane = new NotificationScrollPane(database.getUserId(username));
+            scrollPane.show(btnNoti, 0, btnNoti.getHeight());
+        }
+        else if (e.getSource() == viewButton){
             int selectedRow = userTable.getSelectedRow();
             if (selectedRow != -1) {
                 Integer userId = (Integer) userTable.getValueAt(selectedRow, 0);
+                centerPanel = new JPanel();
                 viewUser(userId);
             } else {
                 JOptionPane.showMessageDialog(AdministratorPage.this, "Please select a user to view.");
@@ -165,7 +212,7 @@ public class AdministratorPage extends JFrame implements Page,ActionListener {
             }
         }
         else if (e.getSource() == sendButton){
-            SendMessageDialog dialog = new SendMessageDialog(this,database.getUserId(username));
+            SendMessageDialog dialog = new SendMessageDialog(this,database.getUserId(username),tracebackFunction);
             dialog.setVisible(true);
         }
         else if (e.getSource() == closeButton){

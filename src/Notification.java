@@ -1,25 +1,25 @@
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.LocalDate;
 public class Notification {
     private final int from;
     private final int to;
     private final String description;
-    private final String date;
+    private final String datetime;
     private final boolean seen;
     public Notification(int from, int to, String description){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-        LocalDate date = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime dateTime = LocalDateTime.now();
         this.from = from;
         this.to = to;
+        this.datetime = formatter.format(dateTime);
         this.description = description;
-        this.date = formatter.format(date);
         this.seen = false;
     }// create notification
-    public Notification(int from, int to, String description, String date, boolean seen){
+    public Notification(int from, int to, String description, String datetime, boolean seen){
         this.from = from;
         this.to = to;
         this.description = description;
-        this.date = date;
+        this.datetime = datetime;
         this.seen = seen;
     }// get notification
     public int getFrom(){
@@ -32,7 +32,7 @@ public class Notification {
         return description;
     }
     public String getDate(){
-        return date;
+        return datetime;
     }
     public boolean isSeen(){
         return seen;
