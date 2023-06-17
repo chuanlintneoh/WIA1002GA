@@ -305,7 +305,7 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnEditPassword) {
-            EditPasswordDialog dialog = new EditPasswordDialog(this,userID);
+            EditPasswordDialog dialog = new EditPasswordDialog(this,userID,tracebackFunction);
             dialog.setVisible(true);
         }
         else if (e.getSource() == btnSaveChanges) {
@@ -317,25 +317,26 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
             database.set("name",name,userID);
             database.set("contact_no",contactNo,userID);
             database.set("address",address,userID);
+            tracebackFunction.addHistory("Edited and saved changes on account.");
             // Save changes made in the EditAccountPage window
             JOptionPane.showMessageDialog(this, "*ALL CHANGES ARE SAVED*", "Selections", JOptionPane.INFORMATION_MESSAGE);
             tracebackFunction.pushPage(new ViewAccountPage(username,0,tracebackFunction));
             dispose();
         }
         else if (e.getSource() == btnEditBday) {
-            EditBirthdayDialog dialog = new EditBirthdayDialog(this,userID,btnEditBday);
+            EditBirthdayDialog dialog = new EditBirthdayDialog(this,userID,btnEditBday,tracebackFunction);
             dialog.setVisible(true);
         }
         else if(e.getSource() == btnEditGender){
-            EditGenderDialog dialog = new EditGenderDialog(this,userID,btnEditGender);
+            EditGenderDialog dialog = new EditGenderDialog(this,userID,btnEditGender,tracebackFunction);
             dialog.setVisible(true);
         }
         else if(e.getSource() == btnAddJob){
-            AddJobDialog dialog = new AddJobDialog(this,userID);
+            AddJobDialog dialog = new AddJobDialog(this,userID,tracebackFunction);
             dialog.setVisible(true);
         }
         else if(e.getSource() == btnAddHobby){
-            AddHobbyDialog dialog = new AddHobbyDialog(this,userID);
+            AddHobbyDialog dialog = new AddHobbyDialog(this,userID,tracebackFunction);
             dialog.setVisible(true);
         }
         else if (e.getSource() == btnAdmin){
@@ -348,12 +349,13 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
                 AdminVerificationDialog dialog = new AdminVerificationDialog(this,userID);
                 dialog.setVisible(true);
                 if (database.isAdmin(userID)){
+                    tracebackFunction.addHistory("Verified as an admin.");
                     btnAdmin.setText("Administrator Control");
                 }
             }
         }
         else if (e.getSource() == btnEditPic){
-            EditPicDialog dialog = new EditPicDialog(this,userID,lblProfilePicture);
+            EditPicDialog dialog = new EditPicDialog(this,userID,lblProfilePicture,tracebackFunction);
             dialog.setVisible(true);
             tracebackFunction.peek();
             dispose();
@@ -366,7 +368,7 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
             tracebackFunction.popPeek();
             dispose();
         }
-        else if(e.getSource() ==btnNoti){
+        else if(e.getSource() == btnNoti){
             NotificationScrollPane scrollPane = new NotificationScrollPane(userID);
             scrollPane.show(btnNoti, 0, btnNoti.getHeight());
         }

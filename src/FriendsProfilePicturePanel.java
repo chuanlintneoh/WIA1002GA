@@ -111,7 +111,7 @@ public class FriendsProfilePicturePanel extends JPanel implements ActionListener
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         if (e.getSource() == btnChat) {
-                            SendMessageDialog dialog = new SendMessageDialog(parent, myID, correspondingIDs.get(index));
+                            SendMessageDialog dialog = new SendMessageDialog(parent, myID, correspondingIDs.get(index),tracebackFunction);
                             dialog.setVisible(true);
                         }
                     }
@@ -166,9 +166,6 @@ public class FriendsProfilePicturePanel extends JPanel implements ActionListener
                 respondPanel.add(spacingPanel2);
                 respondPanel.add(btnDelete);
 
-                btnConfirm.addActionListener(this);
-                btnDelete.addActionListener(this);
-
                 btnFriend.setBorder(LineBorder.createBlackLineBorder());
                 btnFriend.setPreferredSize(new Dimension(maxWidth, maxHeight));
                 btnFriend.setHorizontalAlignment(SwingConstants.CENTER);
@@ -191,42 +188,21 @@ public class FriendsProfilePicturePanel extends JPanel implements ActionListener
                         if (e.getSource() == btnConfirm) {
                             int response = JOptionPane.showConfirmDialog(FriendsProfilePicturePanel.this, "Confirm friend request?", "Confirm", JOptionPane.YES_NO_OPTION);
                             if (response == JOptionPane.YES_OPTION) {
-                                database.updateStatus(correspondingIDs.get(index), myID, 3);
+                                database.updateStatus(myID, correspondingIDs.get(index), 3);
+                                tracebackFunction.addHistory("Became friends with " + database.get("username",correspondingIDs.get(index)) + ".");
                                 JOptionPane.showMessageDialog(FriendsProfilePicturePanel.this, "You two are now friends!", "Success", JOptionPane.INFORMATION_MESSAGE);
                                 tracebackFunction.peek();// refresh page
-//                                Container parent = getParent();
-//                                Window window = SwingUtilities.getWindowAncestor(FriendsProfilePicturePanel.this);
-//                                if (window != null) {
-//                                    window.dispose();
-//                                }
-//                                if (parent != null) {
-//                                    parent.removeAll();
-//                                    parent.add(new HomePage(database.get("username",myID),tracebackFunction)); // Create a new homepage panel
-//                                    parent.revalidate();
-//                                    parent.repaint();
-//                                }
+                                parent.dispose();
                             }
                         } else if (e.getSource() == btnDelete) {
                             int response = JOptionPane.showConfirmDialog(FriendsProfilePicturePanel.this, "Delete Friend Request?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null);
                             if (response == JOptionPane.YES_OPTION) {
                                 database.removeStatus(correspondingIDs.get(index), myID);
+                                tracebackFunction.addHistory("Deleted friend request from " + database.get("username",correspondingIDs.get(index)) + ".");
                                 tracebackFunction.peek();// refresh page
-//                                Container parent = getParent();
-//                                Window window = SwingUtilities.getWindowAncestor(FriendsProfilePicturePanel.this);
-//                                if (window != null) {
-//                                    window.dispose();
-//                                }
-//                                if (parent != null) {
-//                                    parent.removeAll();
-//                                    parent.add(new HomePage(database.get("username",userID),tracebackFunction)); // Create a new homepage panel
-//                                    parent.revalidate();
-//                                    parent.repaint();
-//                                }
+                                parent.dispose();
                             }
                         }
-                        int correspondingID = Integer.parseInt(e.getActionCommand());
-                        tracebackFunction.pushPage(new ViewAccountPage(database.get("username", myID), correspondingID, tracebackFunction));
-                        parent.dispose();
                     }
                 };
                 btnConfirm.addActionListener(buttonActionListener);

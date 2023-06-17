@@ -8,13 +8,15 @@ public class EditBirthdayDialog extends JDialog implements ActionListener {
     private final JComboBox<String> birthMonth;
     private final JComboBox<Integer> birthYear;
     private final Database database;
+    private final TracebackFunction tracebackFunction;
     private final int userID;
     private final JButton btnDOB;
-    public EditBirthdayDialog(Frame parent, int userID, JButton btnDOB) {
+    public EditBirthdayDialog(Frame parent, int userID, JButton btnDOB, TracebackFunction tracebackFunction) {
         super(parent, "Edit Birthday", true);
         this.database = new Database();
         this.userID = userID;
         this.btnDOB = btnDOB;
+        this.tracebackFunction = tracebackFunction;
 
         // Initialize components
         birthDay = new JComboBox<>();
@@ -79,6 +81,7 @@ public class EditBirthdayDialog extends JDialog implements ActionListener {
 
             btnDOB.setText(formattedDate);
             database.set("birthdate", formattedDate, userID);
+            tracebackFunction.addHistory("Changed birthdate.");
         } else if (e.getActionCommand().equals("Cancel")) {
             JOptionPane.showMessageDialog(this, "Your birthdate has not been changed.", "Success", JOptionPane.INFORMATION_MESSAGE);
         }

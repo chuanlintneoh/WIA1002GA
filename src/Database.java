@@ -65,7 +65,7 @@ public class Database {
         catch (SQLException e){
             e.printStackTrace();
         }
-        Notification notification = new Notification(0,user.getUserId(),"Welcome to ForestBook!");
+        Notification notification = new Notification(getUserId(user.getUsername()),getUserId(user.getUsername()),"Welcome to ForestBook!");
         createNotification(notification);
     }
     public int authenticateUser(String username,String hashedPassword){
@@ -278,8 +278,6 @@ public class Database {
         catch (SQLException e){
             e.printStackTrace();
         }
-        Notification notification = new Notification(userId,friendId,get("username",userId) + " sent you a friend request.");
-        createNotification(notification);
     }// send request, receive request
     public void updateStatus(int userId, int friendId,int statusId){// update 2 rows in database
         //***Note: do once is enough
@@ -549,37 +547,6 @@ public class Database {
         return searchResult;
     }
     //Find mutual friends
-    public List<Friend> getFriends(int userId){
-        List<Friend> friends = new ArrayList<>();
-        String query =
-                "SELECT uf.user_id, uf.friend_id, s.status, u.name AS friend_name, u.username AS friend_username " +
-                "FROM user_friends uf " +
-                "JOIN status s ON uf.status = s.id " +
-                "JOIN users u ON uf.friend_id = u.user_id " +
-                "WHERE uf.user_id = ? AND s.id = ?";
-        try {
-            PreparedStatement statement = connection.prepareStatement(query);
-            statement.setInt(1,userId);
-            statement.setInt(2,3);
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()){
-                int friendId = resultSet.getInt("friend_id");
-                String status = resultSet.getString("status");
-                String friendName = resultSet.getString("friend_name");
-                String friendUsername = resultSet.getString("friend_username");
-                friends.add(new Friend(friendId,status,friendName,friendUsername));
-            }
-        }
-        catch (SQLException e){
-            e.printStackTrace();
-        }
-        return friends;
-    }
-    public List<Friend> getMutualFriends(int userId){
-        List<Friend> mutualFriends = new ArrayList<>();
-        List<Friend> friends = getFriends(userId);
-        return mutualFriends;
-    }
     public List<Friend> findMutualFriends(int userId){
         List<Friend> mutualFriends = new ArrayList<>();
         String query =

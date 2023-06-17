@@ -31,7 +31,7 @@ public class NotificationScrollPane extends JPopupMenu {
             noti.setFocusPainted(false);
             noti.setContentAreaFilled(false);
             noti.setFont(noti.getFont().deriveFont(Font.PLAIN));
-            notificationsPanel.add(noti);
+            notificationsPanel.add(noti,0);
         }
 
         int contentHeight = notificationsPanel.getPreferredSize().height;

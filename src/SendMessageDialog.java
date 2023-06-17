@@ -14,10 +14,12 @@ public class SendMessageDialog extends JDialog implements ActionListener {
     private final JButton btnSend;
     private final int userId;
     private final Database database;
-    public SendMessageDialog(Frame parent, int userId, int friendId){
+    private final TracebackFunction tracebackFunction;
+    public SendMessageDialog(Frame parent, int userId, int friendId, TracebackFunction tracebackFunction){
         super(parent,"Send Message",true);
         this.userId = userId;
         this.database = new Database();
+        this.tracebackFunction = tracebackFunction;
 
         lblFrom = new JLabel("From User ID: " + userId);
         lblTo = new JLabel("To User ID: ");
@@ -70,8 +72,8 @@ public class SendMessageDialog extends JDialog implements ActionListener {
         setSize(400, 400);
         setLocationRelativeTo(parent);
     }
-    public SendMessageDialog(Frame parent, int userId){
-        this(parent,userId,-1);
+    public SendMessageDialog(Frame parent, int userId, TracebackFunction tracebackFunction){
+        this(parent,userId,-1,tracebackFunction);
     }
     @Override
     public void actionPerformed(ActionEvent e){
@@ -91,6 +93,7 @@ public class SendMessageDialog extends JDialog implements ActionListener {
                     else if (message.length() <= 200){
                         Notification notification = new Notification(userId,to,message);
                         database.createNotification(notification);
+                        tracebackFunction.addHistory("<Admin Feature> Sent notification to " + database.get("username",to) + ".");
                         JOptionPane.showMessageDialog(this, "Message sent successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                         dispose();
                     }

@@ -126,6 +126,7 @@ public class AdministratorPage extends JFrame implements Page,ActionListener {
         try {
             // Delete the user from the database
             database.deleteUser(userId);
+            tracebackFunction.addHistory("<Admin Feature> Deleted user: " + database.get("username",userId));
             JOptionPane.showMessageDialog(this, "User deleted successfully.");
             fetchUsers(); // Refresh the table
         } catch (Exception e) {
@@ -211,7 +212,7 @@ public class AdministratorPage extends JFrame implements Page,ActionListener {
             }
         }
         else if (e.getSource() == sendButton){
-            SendMessageDialog dialog = new SendMessageDialog(this,database.getUserId(username));
+            SendMessageDialog dialog = new SendMessageDialog(this,database.getUserId(username),tracebackFunction);
             dialog.setVisible(true);
         }
         else if (e.getSource() == closeButton){

@@ -8,11 +8,13 @@ public class EditGenderDialog extends JDialog implements ActionListener {
     private final JButton btnGender;
     private final int userID;
     private final Database database;
-    public EditGenderDialog(Frame parent, int userID, JButton btnGender) {
+    private final TracebackFunction tracebackFunction;
+    public EditGenderDialog(Frame parent, int userID, JButton btnGender, TracebackFunction tracebackFunction) {
         super(parent, "Edit Gender", true);
         this.userID = userID;
         this.btnGender = btnGender;
         this.database = new Database();
+        this.tracebackFunction = tracebackFunction;
 
         radioMale = new JRadioButton("Male");
         radioFemale = new JRadioButton("Female");
@@ -63,6 +65,7 @@ public class EditGenderDialog extends JDialog implements ActionListener {
                 return;
             }
             database.set("gender",gender, userID);
+            tracebackFunction.addHistory("Changed gender.");
             btnGender.setText(gender);
             JOptionPane.showMessageDialog(this, "Your gender is changed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
             dispose();

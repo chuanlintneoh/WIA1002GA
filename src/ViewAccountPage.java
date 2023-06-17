@@ -248,12 +248,12 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
             for (Friend friend : friendList){
                 if(friend.getUserId() == friendID){
                     btnStatus = new JButton(friend.getStatus());
-                    if(btnStatus.getText().equals("Friend request sent")){
+                    if (btnStatus.getText().equals("Friend request sent")){
                         btnStatus.setBackground(new Color(0,0,102));
                         btnStatus.setForeground(Color.WHITE);
                     } else if (btnStatus.getText().equals("Received friend request")) {
                         btnStatus.setBackground(new Color(255,255,153));
-                    } else if(btnStatus.getText().equals("Friend")){
+                    } else if (btnStatus.getText().equals("Friend")){
                         btnStatus.setBackground(new Color(0,204,0));
                         btnStatus.setForeground(Color.WHITE);
                     }
@@ -295,7 +295,7 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (e.getSource() == btnSend){
-                        SendMessageDialog dialog = new SendMessageDialog(ViewAccountPage.this,userID,friendID);
+                        SendMessageDialog dialog = new SendMessageDialog(ViewAccountPage.this,userID,friendID,tracebackFunction);
                         dialog.setVisible(true);
                     }
                 }
@@ -409,6 +409,8 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
             if (btnStatus.getText().equals("Add Friend")){
                 database.insertStatus(userID, friendID, 1);// send request
                 database.insertStatus(friendID, userID, 2);// receive request
+                database.createNotification(new Notification(userID,friendID,database.get("username",userID) + " sent you a friend request."));
+                tracebackFunction.addHistory("Sent friend request to " + database.get("username",friendID) + ".");
                 JOptionPane.showMessageDialog(this, "Your friend request is sent!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 btnStatus.setText("Friend request sent");
                 btnStatus.setBackground(new Color(0,0,102));
@@ -418,6 +420,7 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
                 int response = JOptionPane.showConfirmDialog(this, "Are you sure you want to cancel your friend request?", "Confirm", JOptionPane.YES_NO_OPTION);
                 if (response == JOptionPane.YES_OPTION) {
                     database.removeStatus(userID,friendID);// delete request
+                    tracebackFunction.addHistory("Cancelled friend request to " + database.get("username",friendID) + ".");
                     JOptionPane.showMessageDialog(this, "Friend request cancelled.", "Success", JOptionPane.INFORMATION_MESSAGE);
                     btnStatus.setText("Add Friend");
                     btnStatus.setBackground(new Color(0,102,204));
@@ -430,6 +433,7 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
                         JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
                 if (response == 0){//confirm
                     database.updateStatus(userID,friendID,3);// Update status to friends
+                    tracebackFunction.addHistory("Became friends with " + database.get("username",friendID) + ".");
                     JOptionPane.showMessageDialog(this, "You two are now friends!", "Success", JOptionPane.INFORMATION_MESSAGE);
                     btnStatus.setText("Friend");
                     btnStatus.setBackground(new Color(0,204,0));
@@ -437,6 +441,7 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
                 }
                 else if (response == 1){//delete
                     database.removeStatus(userID,friendID);
+                    tracebackFunction.addHistory("Deleted friend request from " + database.get("username",friendID) + ".");
                     JOptionPane.showMessageDialog(this, "You deleted the friend request...", "Success", JOptionPane.INFORMATION_MESSAGE);
                     btnStatus.setText("Add Friend");
                     btnStatus.setBackground(new Color(0,102,204));
@@ -447,6 +452,7 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
                 int response = JOptionPane.showConfirmDialog(this, "UNFRIEND?", "Confirm", JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null);
                 if(response == JOptionPane.YES_OPTION) {
                     database.removeStatus(userID,friendID);
+                    tracebackFunction.addHistory("Unfriended " + database.get("username",friendID) + ".");
                     btnStatus.setText("Add Friend");
                     btnStatus.setBackground(new Color(0,102,204));
                     btnStatus.setForeground(Color.white);
