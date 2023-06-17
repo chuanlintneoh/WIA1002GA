@@ -150,6 +150,16 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
         btnNoti.setForeground(white);
         btnNoti.setBackground(new Color(46,138,87));
         btnNoti.addActionListener(this);
+        btnNoti.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnNoti.setBackground(new Color(20,75,30));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnNoti.setBackground(new Color(46, 138, 87));
+            }
+        });
         btnUser = new JButton(username);
         btnUser.setFont(new Font(btnUser.getFont().getName(), Font.BOLD, 16));
         btnUser.setBackground(new Color(180, 238, 156));

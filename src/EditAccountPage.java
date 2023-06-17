@@ -175,6 +175,16 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
         btnNoti.setBackground(new Color(46,138,87));
         btnNoti.setForeground(white);
         btnNoti.addActionListener(this);
+        btnNoti.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnNoti.setBackground(new Color(20,75,30));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnNoti.setBackground(new Color(46, 138, 87));
+            }
+        });
         if (database.isAdmin(userID)){
             btnAdmin = new JButton("Administrator Control");
         }

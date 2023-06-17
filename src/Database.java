@@ -753,7 +753,7 @@ public class Database {
     }
     // Messages
     public void sendMessage(Message message){
-        createNotification(new Notification(message.getFrom(),message.getTo(),get("username", message.getFrom()) + "sent you a message: " + message.getText()));
+        createNotification(new Notification(message.getFrom(),message.getTo(),get("username", message.getFrom()) + " sent you a message: " + message.getText()));
         String query =
                 "INSERT INTO user_messages (from_id, to_id, message, timestamp) VALUES (?, ?, ?, ?)";
         try {
