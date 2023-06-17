@@ -26,11 +26,15 @@ public class HomePage extends JFrame implements Page,ActionListener {
         btnSearch = new JButton("Search");
         btnUser = new JButton(username);
         btnNoti = new JButton("Notifications");
-        lblFriendReq = new JLabel("Friend Requests: " + database.getNumberOfFriendRequests(userID));
-        lblFriend = new JLabel("Friends: " + database.getNumberOfFriends(userID));
-        lblSuggestedFriend = new JLabel("Suggested Friends: 0");
+        lblFriendReq = new JLabel("Friend Request(s): " + database.getNumberOfFriendRequests(userID));
+        lblFriend = new JLabel("Friend(s): " + database.getNumberOfFriends(userID));
+        lblSuggestedFriend = new JLabel("Suggested Friend(s): 0");
         btnBack = new JButton("Back");
 
+        btnBack.setBackground(new Color(92, 94, 41));
+        btnBack.setForeground(white);
+        btnNoti.setBackground(new Color(46,138,87));
+        btnNoti.setForeground(white);
         btnSearch.setBackground(new Color(46,138,87));
         btnSearch.setForeground(white);
 
@@ -48,20 +52,19 @@ public class HomePage extends JFrame implements Page,ActionListener {
             }
         });
 
-        btnBack.setBackground(new Color(196, 164, 132));
         btnSearch.addActionListener(this);
         btnNoti.addActionListener(this);
         btnBack.addActionListener(this);
 
-        btnUser.addActionListener(e -> new AccountMenu(username,tracebackFunction,this).show(btnUser, -56, btnUser.getHeight()));
-
+        btnUser.addActionListener(e ->new AccountMenu(username,tracebackFunction,this).show(btnUser,-5,btnUser.getHeight()));
         forestbook.setFont(new Font("Curlz MT", Font.BOLD, 42));
         forestbook.setForeground(new Color(0, 128, 0));
 
         JPanel mutualFriendsPanel = new JPanel();
+        mutualFriendsPanel.setBackground(new Color(180, 238, 156));
         mutualFriendsPanel.setLayout(new BoxLayout(mutualFriendsPanel, BoxLayout.Y_AXIS));
         JScrollPane scrollPane = new JScrollPane(mutualFriendsPanel);
-        scrollPane.setPreferredSize(new Dimension(630,500));
+        scrollPane.setPreferredSize(new Dimension(630,460));
         scrollPane.getVerticalScrollBar().setUnitIncrement(10);
         scrollPane.getVerticalScrollBar().setBlockIncrement(100);
 
@@ -225,7 +228,7 @@ public class HomePage extends JFrame implements Page,ActionListener {
         centerGBC.gridy = 0;
         centerPanel.add(searchPanel,centerGBC);
         centerGBC.gridy = 1;
-        lblSuggestedFriend.setText("Suggested Friends: " + suggestedFriend);
+        lblSuggestedFriend.setText("Suggested Friend(s): " + suggestedFriend);
         centerPanel.add(lblSuggestedFriend,centerGBC);
         centerGBC.gridy = 2;
         centerGBC.weightx = 1;
@@ -277,6 +280,8 @@ public class HomePage extends JFrame implements Page,ActionListener {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setResizable(true);
         setVisible(true);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
     }
     private Image resizeImage(Image originalImage) {
         int width = originalImage.getWidth(null);
@@ -309,7 +314,7 @@ public class HomePage extends JFrame implements Page,ActionListener {
         }
         else if (e.getSource() == btnNoti){
             NotificationScrollPane scrollPane = new NotificationScrollPane(userID);
-            scrollPane.show(btnNoti, 0, btnNoti.getHeight());
+            scrollPane.show(btnNoti, -15, btnNoti.getHeight());
         }
         else if (e.getSource() == btnBack){
             tracebackFunction.popPeek();

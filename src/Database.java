@@ -763,11 +763,13 @@ public class Database {
     public List<Message> retrieveMessage(int from, int to){
         List<Message> messages = new LinkedList<>();
         String query =
-                "SELECT * FROM user_messages WHERE from_id = ? AND to_id = ? ORDER BY timestamp ASC";
+                "SELECT * FROM user_messages WHERE (from_id = ? AND to_id = ?) OR (from_id = ? AND to_id = ?) ORDER BY timestamp ASC";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1,from);
             statement.setInt(2,to);
+            statement.setInt(3,to);
+            statement.setInt(4,from);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()){
                 String text = resultSet.getString("message");

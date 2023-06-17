@@ -15,7 +15,7 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
     private final JTextArea txtJobHistory, txtAddress;
     private JButton btnHome, btnNoti, btnUser, btnEditAcc, btnStatus, btnBack;
     private final Database database;
-    private final int userID;// viewing account's ID
+    private final int userID;// current account's ID
     private final int friendID;// friend's account ID
     private final String username;// current user's username
     private final TracebackFunction tracebackFunction;
@@ -26,30 +26,53 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
         this.database = new Database();
         this.tracebackFunction = tracebackFunction;
         this.friendID = friendID;
-        if (friendID == 0) {// viewing own account
-            this.userID = database.getUserId(username);
-        }
-        else {// viewing friend's account
-            this.userID = friendID;
-        }
+        this.userID = database.getUserId(username);
 
         // Initialize GUI components
         forestbook = new JLabel("ForestBook");
-        lblFriendReq = new JLabel("My Friend Requests: " + database.getNumberOfFriendRequests(database.getUserId(username)));
-        lblFriend = new JLabel(database.get("name",userID) + "'s Friends: " + database.getNumberOfFriends(userID));
+        lblFriendReq = new JLabel("My Friend Requests: " + database.getNumberOfFriendRequests(userID));
         lblUsername = new JLabel("Username:");
-        txtUsername = new JLabel(database.get("username", userID));
-        txtName = new JLabel(database.get("name", userID));
         lblName = new JLabel("Name:");
         lblEmail = new JLabel("Email address:");
-        txtEmail = new JLabel(database.get("email_address", userID));
         lblContactNo = new JLabel("Contact No.:");
-        txtContactNo = new JLabel(database.get("contact_no", userID));
         lblAddress = new JLabel("Address:");
         lblProfilePicture = new JLabel(new ImageIcon("src/default_profile_pic.jpg"));
         Border border = LineBorder.createBlackLineBorder();
         lblProfilePicture.setBorder(border);
-        byte[] profilePictureData = database.getProfilePicture(userID);
+        byte[] profilePictureData;
+        LocalDate birthDate;
+        Stack<Job> jobs;
+        List<String> hobbies;
+        if (friendID == 0){
+            lblFriend = new JLabel(database.get("name",userID) + "'s Friends: " + database.getNumberOfFriends(userID));
+            txtUsername = new JLabel(database.get("username", userID));
+            txtName = new JLabel(database.get("name", userID));
+            txtEmail = new JLabel(database.get("email_address", userID));
+            txtContactNo = new JLabel(database.get("contact_no", userID));
+            profilePictureData = database.getProfilePicture(userID);
+            txtAddress = new JTextArea(database.get("address",userID));
+            txtDOB = new JLabel(database.get("birthdate", userID));
+            birthDate = LocalDate.parse(database.get("birthdate",userID));
+            txtGender = new JLabel(database.get("gender",userID));
+            txtNoOfFriends = new JLabel("No. of friends:    " + database.getNumberOfFriends(userID) + "          ");
+            jobs = database.viewUserJobs(userID);
+            hobbies = database.viewUserHobbies(userID);
+        }// view own account
+        else {
+            lblFriend = new JLabel(database.get("name",friendID) + "'s Friends: " + database.getNumberOfFriends(friendID));
+            txtUsername = new JLabel(database.get("username", friendID));
+            txtName = new JLabel(database.get("name", friendID));
+            txtEmail = new JLabel(database.get("email_address", friendID));
+            txtContactNo = new JLabel(database.get("contact_no", friendID));
+            profilePictureData = database.getProfilePicture(friendID);
+            txtAddress = new JTextArea(database.get("address",friendID));
+            txtDOB = new JLabel(database.get("birthdate", friendID));
+            birthDate = LocalDate.parse(database.get("birthdate",friendID));
+            txtGender = new JLabel(database.get("gender",friendID));
+            txtNoOfFriends = new JLabel("No. of friends:    " + database.getNumberOfFriends(friendID) + "          ");
+            jobs = database.viewUserJobs(friendID);
+            hobbies = database.viewUserHobbies(friendID);
+        }// view friend's account
         ImageIcon profilePicture;
         Image resizedImage;
         if (profilePictureData != null){
@@ -61,23 +84,17 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
         resizedImage = resizeImage(profilePicture.getImage());
         lblProfilePicture.setIcon(new ImageIcon(resizedImage));
 
-        txtAddress = new JTextArea(database.get("address",userID));
         txtAddress.setEditable(false);
         txtAddress.setLineWrap(true);
         txtAddress.setWrapStyleWord(true);
         txtAddress.setPreferredSize(new Dimension(200, 50));
 
         lblDOB = new JLabel("Date Of Birth:");
-        txtDOB = new JLabel(database.get("birthdate", userID));
-        LocalDate birthDate = LocalDate.parse(database.get("birthdate",userID));
         int age = calculateAge(birthDate);
         txtAge = new JLabel("Age:    " + age + "          ");
         lblGender = new JLabel("Gender:");
-        txtGender = new JLabel(database.get("gender",userID));
-        txtNoOfFriends = new JLabel("No. of friends:    " + database.getNumberOfFriends(userID) + "          ");
 
         lblJobHistory = new JLabel("Job History:");
-        Stack<Job> jobs = database.viewUserJobs(userID);
         StringBuilder jobList = new StringBuilder();
         for (int i = 0; i < jobs.size(); i++) {
             jobList.append(jobs.get(i).getJobName()).append(" (");
@@ -102,7 +119,6 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
         txtJobHistory.setBackground(SystemColor.window);
 
         lblHobbies = new JLabel("Hobbies:");
-        List<String> hobbies = database.viewUserHobbies(userID);
         StringBuilder hobbyList = new StringBuilder();
         int hobbiesCount = Math.min(hobbies.size(), 3);
         for (int i = 0; i < hobbiesCount; i++) {
@@ -136,9 +152,11 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
                 btnUser.setForeground(new Color(58,30,0)); // Change back to the default color
             }
         });
-        btnUser.addActionListener(e -> new AccountMenu(username,tracebackFunction,this).show(btnUser, -56, btnUser.getHeight()));
+        btnUser.addActionListener(e -> new AccountMenu(username,tracebackFunction,this).show(btnUser, -5, btnUser.getHeight()));
         btnEditAcc = new JButton("Edit Account");
         btnEditAcc.addActionListener(this);
+        btnEditAcc.setBackground(new Color(58,30,0));
+        btnEditAcc.setForeground(white);
         btnBack = new JButton("Back");
         btnBack.setBackground(new Color(196, 164, 132));
         btnBack.addActionListener(this);
@@ -225,7 +243,7 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
         gbc.gridx = 2;
         gbc.gridy = 9;
         if (friendID != 0){
-            ArrayList<Friend> friendList = (ArrayList<Friend>) database.viewFriendsRequests(database.getUserId(username));
+            ArrayList<Friend> friendList = (ArrayList<Friend>) database.viewFriendsRequests(userID);
             boolean friendFound = false;
             for (Friend friend : friendList){
                 if(friend.getUserId() == friendID){
@@ -252,10 +270,10 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
                 btnStatus.addActionListener(this);
                 centerPanel.add(btnStatus, gbc);
             }
-        }
+        }// other user's account - btnStatus
         else {
             centerPanel.add(btnEditAcc,gbc);
-        }
+        }// own account - enable edit account feature
 
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.WEST;
@@ -277,7 +295,7 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (e.getSource() == btnSend){
-                        SendMessageDialog dialog = new SendMessageDialog(ViewAccountPage.this,database.getUserId(username),friendID);
+                        SendMessageDialog dialog = new SendMessageDialog(ViewAccountPage.this,userID,friendID);
                         dialog.setVisible(true);
                     }
                 }
@@ -293,7 +311,7 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
         westGBC.gridy = 0;
         westPanel.add(lblFriendReq,westGBC);
         westGBC.gridy = 1;
-        westPanel.add(new FriendsProfilePicturePanel(this,database.getUserId(username),false,tracebackFunction),westGBC);
+        westPanel.add(new FriendsProfilePicturePanel(this,userID,false,tracebackFunction),westGBC);
         westPanel.setBackground(new Color(180, 238, 156));
 
         JPanel eastPanel = new JPanel(new GridBagLayout());
@@ -311,7 +329,12 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
         eastGBC.gridwidth = 2;
         eastPanel.add(lblFriend,eastGBC);
         eastGBC.gridy = 2;
-        eastPanel.add(new FriendsProfilePicturePanel(this,userID,true,tracebackFunction),eastGBC);
+        if (friendID == 0){
+            eastPanel.add(new FriendsProfilePicturePanel(this,userID,true,tracebackFunction),eastGBC);
+        }// own account
+        else {
+            eastPanel.add(new FriendsProfilePicturePanel(this,friendID,userID,true,tracebackFunction),eastGBC);
+        }// stranger account
         eastPanel.setBackground(new Color(180, 238, 156));
 
         JPanel bottomPanel = new JPanel();
@@ -357,7 +380,12 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
         new ViewAccountPage(username,friendID,tracebackFunction);
     }
     public String getTitle(){
-        return "View Account Page (" + database.get("username",userID) + ")";
+        if (friendID == 0){
+            return "View Account Page (" + database.get("username",userID) + ")";
+        }
+        else {
+            return "View Account Page (" + database.get("username",friendID) + ")";
+        }
     }
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -379,8 +407,8 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
         }
         else if (e.getSource() == btnStatus){
             if (btnStatus.getText().equals("Add Friend")){
-                database.insertStatus(database.getUserId(username), userID, 1);// send request
-                database.insertStatus(userID, database.getUserId(username), 2);// receive request
+                database.insertStatus(userID, friendID, 1);// send request
+                database.insertStatus(friendID, userID, 2);// receive request
                 JOptionPane.showMessageDialog(this, "Your friend request is sent!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 btnStatus.setText("Friend request sent");
                 btnStatus.setBackground(new Color(0,0,102));
@@ -389,7 +417,7 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
             else if (btnStatus.getText().equals("Friend request sent")) {
                 int response = JOptionPane.showConfirmDialog(this, "Are you sure you want to cancel your friend request?", "Confirm", JOptionPane.YES_NO_OPTION);
                 if (response == JOptionPane.YES_OPTION) {
-                    database.removeStatus(database.getUserId(username),userID);// delete request
+                    database.removeStatus(userID,friendID);// delete request
                     JOptionPane.showMessageDialog(this, "Friend request cancelled.", "Success", JOptionPane.INFORMATION_MESSAGE);
                     btnStatus.setText("Add Friend");
                     btnStatus.setBackground(new Color(0,102,204));
@@ -401,14 +429,14 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
                 int response = JOptionPane.showOptionDialog(this, "Confirm friend request?", "Confirm",
                         JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
                 if (response == 0){//confirm
-                    database.updateStatus(database.getUserId(username),userID,3);// Update status to friends
+                    database.updateStatus(userID,friendID,3);// Update status to friends
                     JOptionPane.showMessageDialog(this, "You two are now friends!", "Success", JOptionPane.INFORMATION_MESSAGE);
                     btnStatus.setText("Friend");
                     btnStatus.setBackground(new Color(0,204,0));
                     btnStatus.setForeground(Color.WHITE);
                 }
                 else if (response == 1){//delete
-                    database.removeStatus(database.getUserId(username),userID);
+                    database.removeStatus(userID,friendID);
                     JOptionPane.showMessageDialog(this, "You deleted the friend request...", "Success", JOptionPane.INFORMATION_MESSAGE);
                     btnStatus.setText("Add Friend");
                     btnStatus.setBackground(new Color(0,102,204));
@@ -418,7 +446,7 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
             else if (btnStatus.getText().equals("Friend")){
                 int response = JOptionPane.showConfirmDialog(this, "UNFRIEND?", "Confirm", JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null);
                 if(response == JOptionPane.YES_OPTION) {
-                    database.removeStatus(database.getUserId(username),userID);
+                    database.removeStatus(userID,friendID);
                     btnStatus.setText("Add Friend");
                     btnStatus.setBackground(new Color(0,102,204));
                     btnStatus.setForeground(Color.white);

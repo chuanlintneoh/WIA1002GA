@@ -28,17 +28,20 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
         btnSearch = new JButton("Search");
         btnUser = new JButton(username);
         btnNoti = new JButton("Notifications");
-        lblFriendReq = new JLabel("Friend Requests: " + database.getNumberOfFriendRequests(userID));
-        lblFriend = new JLabel("Friends: " + database.getNumberOfFriends(userID));
+        lblFriendReq = new JLabel("Friend Request(s): " + database.getNumberOfFriendRequests(userID));
+        lblFriend = new JLabel("Friend(s): " + database.getNumberOfFriends(userID));
         lblResult = new JLabel("Results: 0");
         btnHome = new JButton("Home");
         btnHome.setBackground(new Color(0, 128, 0));
         btnHome.setForeground(Color.white);
         btnBack = new JButton("Back");
-        btnBack.setBackground(new Color(196, 164, 132));
+        btnBack.setBackground(new Color(92, 94, 41));
+        btnBack.setForeground(white);
 
         btnSearch.setBackground(new Color(46,138,87));
         btnSearch.setForeground(white);
+        btnNoti.setBackground(new Color(46,138,87));
+        btnNoti.setForeground(white);
 
         btnUser.setFont(new Font(btnUser.getFont().getName(), Font.BOLD, 16));
         btnUser.setBackground(new Color(180, 238, 156));
@@ -54,20 +57,20 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
             }
         });
 
+        btnUser.addActionListener(e -> new AccountMenu(username,tracebackFunction,this).show(btnUser,-5,btnUser.getHeight()));
         btnSearch.addActionListener(this);
         btnNoti.addActionListener(this);
         btnHome.addActionListener(this);
         btnBack.addActionListener(this);
 
-        btnUser.addActionListener(e -> new AccountMenu(username,tracebackFunction,this).show(btnUser, -56, btnUser.getHeight()));
-
         forestbook.setFont(new Font("Curlz MT", Font.BOLD, 42));
         forestbook.setForeground(new Color(0, 128, 0));
 
         JPanel searchResultsPanel = new JPanel();
+        searchResultsPanel.setBackground(new Color(180, 238, 156));
         searchResultsPanel.setLayout(new BoxLayout(searchResultsPanel, BoxLayout.Y_AXIS));
         JScrollPane scrollPane = new JScrollPane(searchResultsPanel);
-        scrollPane.setPreferredSize(new Dimension(630,500));
+        scrollPane.setPreferredSize(new Dimension(630,460));
         scrollPane.getVerticalScrollBar().setUnitIncrement(10);
         scrollPane.getVerticalScrollBar().setBlockIncrement(100);
 
@@ -124,6 +127,18 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
                     btnStatus.setForeground(Color.WHITE);
                 }else if (btnStatus.getText().equals("Received friend request")) {
                     btnStatus.setBackground(new Color(255,255,153));
+                    btnStatus.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseEntered(MouseEvent e) {
+                            btnStatus.setForeground(Color.WHITE); // Change to the desired color
+                            btnStatus.setBackground(new Color(155, 155, 53));
+                        }
+                        @Override
+                        public void mouseExited(MouseEvent e) {
+                            btnStatus.setForeground(Color.black); // Change back to the default color
+                            btnStatus.setBackground(new Color(255, 255, 153));
+                        }
+                    });
                 }else if(btnStatus.getText().equals("Friend")){
                     btnStatus.setBackground(new Color(0,204,0));
                     btnStatus.setForeground(Color.WHITE);
@@ -230,7 +245,7 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
         centerGBC.gridy = 0;
         centerPanel.add(searchPanel,centerGBC);
         centerGBC.gridy = 1;
-        lblResult.setText("Results: " + results);
+        lblResult.setText("Result(s): " + results);
         centerPanel.add(lblResult,centerGBC);
         centerGBC.gridy = 2;
         centerGBC.weightx = 1;
@@ -298,9 +313,6 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
     @Override
     public void showPage() {
         new SearchResultsPage(userID,keyword,tracebackFunction);
-    }
-    public String getTitle(){
-        return "Search Result Page for \"" + keyword + "\"";
     }
     @Override
     public void actionPerformed(ActionEvent e) {

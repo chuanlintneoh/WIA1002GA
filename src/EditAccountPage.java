@@ -110,6 +110,8 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
         });
         btnUser.addActionListener(e -> new AccountMenu(username,tracebackFunction,this).show(btnUser, -56, btnUser.getHeight()));
         btnNoti = new JButton("Notifications");
+        btnNoti.setBackground(new Color(46,138,87));
+        btnNoti.setForeground(white);
         btnNoti.addActionListener(this);
         if (database.isAdmin(userID)){
             btnAdmin = new JButton("Administrator Control");
@@ -363,6 +365,10 @@ public class EditAccountPage extends JFrame implements Page,ActionListener {
         else if (e.getSource() == btnBack){
             tracebackFunction.popPeek();
             dispose();
+        }
+        else if(e.getSource() ==btnNoti){
+            NotificationScrollPane scrollPane = new NotificationScrollPane(userID);
+            scrollPane.show(btnNoti, 0, btnNoti.getHeight());
         }
     }
 }

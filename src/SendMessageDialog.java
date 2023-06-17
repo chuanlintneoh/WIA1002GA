@@ -2,6 +2,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import static java.awt.Color.WHITE;
+
 public class SendMessageDialog extends JDialog implements ActionListener {
     private final JLabel lblFrom, lblTo, lblMessage;
     private final JTextField txtTo;
@@ -29,9 +34,22 @@ public class SendMessageDialog extends JDialog implements ActionListener {
         JScrollPane messageScrollPane = new JScrollPane(txtMessage);
         messageScrollPane.setPreferredSize(new Dimension(220,100));
         btnSend = new JButton("Send");
+        btnSend.setBackground(new Color(46,138,87));
+        btnSend.setForeground(Color.white);
+        btnSend.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnSend.setBackground(new Color(0,100,0));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnSend.setBackground(new Color(46,138,87));
+            }
+        });
         btnSend.addActionListener(this);
 
         JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(new Color(225, 203, 143));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10,10,10,10);
         gbc.gridy = 0;

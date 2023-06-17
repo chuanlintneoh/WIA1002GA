@@ -37,5 +37,6 @@ public class TracebackFunction {
     }
     public void clear(){
         pageStack.clear();
+        pageHistory.clear();
     }
 }
