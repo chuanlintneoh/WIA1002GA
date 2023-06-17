@@ -142,9 +142,29 @@ public class FriendsProfilePicturePanel extends JPanel implements ActionListener
                 JButton btnConfirm = new JButton("Confirm");
                 btnConfirm.setBackground(new Color(46,138,87));
                 btnConfirm.setForeground(Color.white);
+                btnConfirm.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        btnConfirm.setBackground(new Color(20,75,30));
+                    }
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        btnConfirm.setBackground(new Color(46, 138, 87));
+                    }
+                });
                 JButton btnDelete = new JButton("Delete");
                 btnDelete.setBackground(new Color(200, 7, 14));
                 btnDelete.setForeground(Color.white);
+                btnDelete.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        btnDelete.setBackground(new Color(166,100,100));
+                    }
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        btnDelete.setBackground(new Color(200, 7, 14));
+                    }
+                });
 
                 Dimension buttonSize = new Dimension(100, 30);
                 btnConfirm.setMaximumSize(buttonSize);
@@ -165,6 +185,9 @@ public class FriendsProfilePicturePanel extends JPanel implements ActionListener
                 respondPanel.add(btnConfirm);
                 respondPanel.add(spacingPanel2);
                 respondPanel.add(btnDelete);
+
+                btnConfirm.addActionListener(this);
+                btnDelete.addActionListener(this);
 
                 btnFriend.setBorder(LineBorder.createBlackLineBorder());
                 btnFriend.setPreferredSize(new Dimension(maxWidth, maxHeight));
@@ -188,21 +211,42 @@ public class FriendsProfilePicturePanel extends JPanel implements ActionListener
                         if (e.getSource() == btnConfirm) {
                             int response = JOptionPane.showConfirmDialog(FriendsProfilePicturePanel.this, "Confirm friend request?", "Confirm", JOptionPane.YES_NO_OPTION);
                             if (response == JOptionPane.YES_OPTION) {
-                                database.updateStatus(myID, correspondingIDs.get(index), 3);
-                                tracebackFunction.addHistory("Became friends with " + database.get("username",correspondingIDs.get(index)) + ".");
+                                database.updateStatus(correspondingIDs.get(index), myID, 3);
                                 JOptionPane.showMessageDialog(FriendsProfilePicturePanel.this, "You two are now friends!", "Success", JOptionPane.INFORMATION_MESSAGE);
                                 tracebackFunction.peek();// refresh page
-                                parent.dispose();
+//                                Container parent = getParent();
+//                                Window window = SwingUtilities.getWindowAncestor(FriendsProfilePicturePanel.this);
+//                                if (window != null) {
+//                                    window.dispose();
+//                                }
+//                                if (parent != null) {
+//                                    parent.removeAll();
+//                                    parent.add(new HomePage(database.get("username",myID),tracebackFunction)); // Create a new homepage panel
+//                                    parent.revalidate();
+//                                    parent.repaint();
+//                                }
                             }
                         } else if (e.getSource() == btnDelete) {
                             int response = JOptionPane.showConfirmDialog(FriendsProfilePicturePanel.this, "Delete Friend Request?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null);
                             if (response == JOptionPane.YES_OPTION) {
                                 database.removeStatus(correspondingIDs.get(index), myID);
-                                tracebackFunction.addHistory("Deleted friend request from " + database.get("username",correspondingIDs.get(index)) + ".");
                                 tracebackFunction.peek();// refresh page
-                                parent.dispose();
+//                                Container parent = getParent();
+//                                Window window = SwingUtilities.getWindowAncestor(FriendsProfilePicturePanel.this);
+//                                if (window != null) {
+//                                    window.dispose();
+//                                }
+//                                if (parent != null) {
+//                                    parent.removeAll();
+//                                    parent.add(new HomePage(database.get("username",userID),tracebackFunction)); // Create a new homepage panel
+//                                    parent.revalidate();
+//                                    parent.repaint();
+//                                }
                             }
                         }
+                        int correspondingID = Integer.parseInt(e.getActionCommand());
+                        tracebackFunction.pushPage(new ViewAccountPage(database.get("username", myID), correspondingID, tracebackFunction));
+                        parent.dispose();
                     }
                 };
                 btnConfirm.addActionListener(buttonActionListener);

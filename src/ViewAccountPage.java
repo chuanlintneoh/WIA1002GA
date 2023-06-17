@@ -136,8 +136,30 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
         btnHome.setBackground(new Color(0, 128, 0));
         btnHome.setForeground(Color.white);
         btnHome.addActionListener(this);
+        btnHome.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnHome.setBackground(new Color(20,75,30));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnHome.setBackground(new Color(46, 138, 87));
+            }
+        });
         btnNoti = new JButton("Notifications");
+        btnNoti.setForeground(white);
+        btnNoti.setBackground(new Color(46,138,87));
         btnNoti.addActionListener(this);
+        btnNoti.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnNoti.setBackground(new Color(20,75,30));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnNoti.setBackground(new Color(46, 138, 87));
+            }
+        });
         btnUser = new JButton(username);
         btnUser.setFont(new Font(btnUser.getFont().getName(), Font.BOLD, 16));
         btnUser.setBackground(new Color(180, 238, 156));
@@ -157,9 +179,32 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
         btnEditAcc.addActionListener(this);
         btnEditAcc.setBackground(new Color(58,30,0));
         btnEditAcc.setForeground(white);
+        btnEditAcc.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnEditAcc.setForeground(black);
+                btnEditAcc.setBackground(new Color(150,150,150));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnEditAcc.setBackground(Color.black);
+                btnEditAcc.setForeground(Color.white);
+            }
+        });
         btnBack = new JButton("Back");
-        btnBack.setBackground(new Color(196, 164, 132));
+        btnBack.setBackground(new Color(92, 94, 41));
+        btnBack.setForeground(white);
         btnBack.addActionListener(this);
+        btnBack.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnBack.setBackground(new Color(58,30,0));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnBack.setBackground(new Color(92, 94, 41));
+            }
+        });
 
         // Add components to the frame
         JPanel panel = new JPanel(new BorderLayout());
@@ -168,6 +213,16 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
         JPanel topPanel = new JPanel();
         forestbook.setFont(new Font("Curlz MT", Font.BOLD, 42));
         forestbook.setForeground(new Color(0, 128, 0));
+        forestbook.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                forestbook.setForeground(new Color(92, 94, 41));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                forestbook.setForeground(new Color(0, 128, 0));
+            }
+        });
         topPanel.add(forestbook);
         topPanel.setBackground(new Color(180, 238, 156));
 
@@ -253,6 +308,18 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
                         btnStatus.setForeground(Color.WHITE);
                     } else if (btnStatus.getText().equals("Received friend request")) {
                         btnStatus.setBackground(new Color(255,255,153));
+                        btnStatus.addMouseListener(new MouseAdapter() {
+                            @Override
+                            public void mouseEntered(MouseEvent e) {
+                                btnStatus.setForeground(Color.WHITE); // Change to the desired color
+                                btnStatus.setBackground(new Color(155, 155, 53));
+                            }
+                            @Override
+                            public void mouseExited(MouseEvent e) {
+                                btnStatus.setForeground(Color.black); // Change back to the default color
+                                btnStatus.setBackground(new Color(255, 255, 153));
+                            }
+                        });
                     } else if (btnStatus.getText().equals("Friend")){
                         btnStatus.setBackground(new Color(0,204,0));
                         btnStatus.setForeground(Color.WHITE);
@@ -303,6 +370,7 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
                 public void actionPerformed(ActionEvent e) {
                     if (e.getSource() == btnSend){
                         ChatBoxFrame chatBoxFrame = new ChatBoxFrame(ViewAccountPage.this,userID,friendID);
+                        chatBoxFrame.setVisible(true);
                         tracebackFunction.addHistory("Entered conversation with " + database.get("username",friendID) + ".");
                     }
                 }

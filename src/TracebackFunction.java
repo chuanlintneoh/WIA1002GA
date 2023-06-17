@@ -42,4 +42,8 @@ public class TracebackFunction {
         pageStack.clear();
         pageHistory.clear();
     }
+    public int getSize() {
+        return pageStack.size();
+    }
+
 }

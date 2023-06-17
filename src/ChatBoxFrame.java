@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.LinkedList;
 
 public class ChatBoxFrame extends JFrame implements ActionListener{
@@ -21,9 +23,22 @@ public class ChatBoxFrame extends JFrame implements ActionListener{
         chatArea.setEditable(false);
         chatArea.setWrapStyleWord(true);
         chatArea.setLineWrap(true);
+        chatArea.setBackground(new Color(238,232,182));
         txtmessage = new JTextField();
         sendButton = new JButton("Send");
+        sendButton.setBackground(new Color(46,138,87));
+        sendButton.setForeground(Color.white);
         sendButton.addActionListener(this);
+        sendButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                sendButton.setBackground(new Color(20,75,30));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                sendButton.setBackground(new Color(46, 138, 87));
+            }
+        });
 
         JScrollPane scrollPane = new JScrollPane(chatArea);
 
@@ -51,23 +66,28 @@ public class ChatBoxFrame extends JFrame implements ActionListener{
     private void refreshMessages(){
         LinkedList<Message> messages = (LinkedList<Message>) database.retrieveMessage(userID,friendID);
         chatArea.setText("");
-        for (Message message: messages){
-            String sender = database.get("username",message.getFrom());
+        for (Message message : messages) {
+            String sender = database.get("username", message.getFrom());
             String timeStamp = message.getTimeStamp();
             String text = message.getText();
             String formattedMessage = "";
-            if (message.getFrom() == friendID){
-                formattedMessage = sender + ":\n" + text + "\n[" + timeStamp + "]\n";
-            }// align left
-            else if (message.getTo() == friendID){
-                formattedMessage = sender + ":\n" + text + "\n[" + timeStamp + "]\n";
-            }// align right
+
+            if (message.getFrom() == friendID) {
+//                formattedMessage = sender + ":\n" + text + "\n[" + timeStamp + "]\n";
+                formattedMessage = sender + " : " + text;
+                formattedMessage = alignLeft(formattedMessage); // Align left
+            } else if (message.getTo() == friendID) {
+                formattedMessage = text;
+                formattedMessage = alignRight(formattedMessage); // Align right
+            }
+
             chatArea.append(formattedMessage + "\n");
         }
+
     }
     @Override
     public void actionPerformed(ActionEvent e){
-        if (e.getSource() == sendButton){
+        if (e.getSource() == sendButton|| e.getSource() == txtmessage){
             String text = txtmessage.getText().trim();
             if (text.isEmpty()){
                 JOptionPane.showMessageDialog(this, "Please enter a message.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -82,4 +102,32 @@ public class ChatBoxFrame extends JFrame implements ActionListener{
             refreshMessages();
         }
     }
+    private String alignLeft(String message) {
+        int lineWidth = 80; // Adjust this value based on your desired line width
+        StringBuilder builder = new StringBuilder();
+
+        String[] lines = message.split("\n");
+        for (String line : lines) {
+            int padding = lineWidth - line.length();
+            String paddedLine = line + " ".repeat(padding);
+            builder.append(paddedLine).append("\n");
+        }
+
+        return builder.toString();
+    }
+
+    private String alignRight(String message) {
+        int lineWidth = 90; // Adjust this value based on your desired line width
+        StringBuilder builder = new StringBuilder();
+
+        String[] lines = message.split("\n");
+        for (String line : lines) {
+            int padding = lineWidth - line.length();
+            String paddedLine = " ".repeat(padding) + line;
+            builder.append(paddedLine).append("\n");
+        }
+
+        return builder.toString();
+    }
+
 }
