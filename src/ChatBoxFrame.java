@@ -10,7 +10,7 @@ public class ChatBoxFrame extends JFrame implements ActionListener{
     private final int userID;
     private final int friendID;
     private final Database database;
-    private final JTextArea chatArea;
+    private final JPanel messagesPanel;
     private final JTextField txtmessage;
     private final JButton sendButton;
     private final Timer timer;
@@ -19,11 +19,12 @@ public class ChatBoxFrame extends JFrame implements ActionListener{
         this.friendID = friendID;
         this.database = new Database();
 
-        chatArea = new JTextArea();
-        chatArea.setEditable(false);
-        chatArea.setWrapStyleWord(true);
-        chatArea.setLineWrap(true);
-        chatArea.setBackground(new Color(238,232,182));
+        messagesPanel = new JPanel(new GridBagLayout());
+        JScrollPane scrollPane = new JScrollPane(messagesPanel);
+        scrollPane.setPreferredSize(new Dimension(375,250));
+        scrollPane.getVerticalScrollBar().setBlockIncrement(100);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(10);
+
         txtmessage = new JTextField();
         sendButton = new JButton("Send");
         sendButton.setBackground(new Color(46,138,87));
@@ -40,15 +41,19 @@ public class ChatBoxFrame extends JFrame implements ActionListener{
             }
         });
 
-        JScrollPane scrollPane = new JScrollPane(chatArea);
-
-        JPanel messagePanel = new JPanel(new BorderLayout());
-        messagePanel.add(txtmessage,BorderLayout.CENTER);
-        messagePanel.add(sendButton,BorderLayout.EAST);
+        JPanel sendPanel = new JPanel(new BorderLayout());
+        sendPanel.add(txtmessage,BorderLayout.CENTER);
+        sendPanel.add(sendButton,BorderLayout.EAST);
 
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(scrollPane,BorderLayout.CENTER);
-        panel.add(messagePanel,BorderLayout.SOUTH);
+        panel.add(sendPanel,BorderLayout.SOUTH);
+
+        timer = new Timer(30000, this);// refresh page every 30 seconds
+        timer.setInitialDelay(0);
+        timer.start();
+
+        refreshMessages();
 
         setContentPane(panel);
         setTitle("Conversation with " + database.get("username",friendID));
@@ -56,34 +61,45 @@ public class ChatBoxFrame extends JFrame implements ActionListener{
         setSize(400, 300);
         setLocationRelativeTo(parent);
         setVisible(true);
-
-        timer = new Timer(30000, this);// refresh page every 30 seconds
-        timer.setInitialDelay(0);
-        timer.start();
-
-        refreshMessages();
     }
     private void refreshMessages(){
         LinkedList<Message> messages = (LinkedList<Message>) database.retrieveMessage(userID,friendID);
-        chatArea.setText("");
+        messagesPanel.removeAll();
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10,10,10,10);
+        gbc.gridy = 0;
+
         for (Message message : messages) {
             String sender = database.get("username", message.getFrom());
             String timeStamp = message.getTimeStamp();
             String text = message.getText();
-            String formattedMessage = "";
+
+            JTextArea messageLabel = new JTextArea(sender + ": \n" + text + "\n" + timeStamp);
+            messageLabel.setLineWrap(true);
+            messageLabel.setWrapStyleWord(true);
+            messageLabel.setEditable(false);
+            messageLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 
             if (message.getFrom() == friendID) {
-//                formattedMessage = sender + ":\n" + text + "\n[" + timeStamp + "]\n";
-                formattedMessage = sender + " : " + text;
-                formattedMessage = alignLeft(formattedMessage); // Align left
-            } else if (message.getTo() == friendID) {
-                formattedMessage = text;
-                formattedMessage = alignRight(formattedMessage); // Align right
-            }
+                messageLabel.setBackground(new Color(238, 232, 182));
+                messageLabel.setOpaque(true);
+                gbc.gridx = 0;
+                gbc.anchor = GridBagConstraints.LINE_START;
+            }// received
+            else if (message.getTo() == friendID) {
+                messageLabel.setBackground(new Color(176, 224, 230));
+                messageLabel.setOpaque(true);
+                gbc.gridx = 1;
+                gbc.anchor = GridBagConstraints.LINE_END;
+            }// sent
 
-            chatArea.append(formattedMessage + "\n");
+            gbc.weightx = 0.5;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            messagesPanel.add(messageLabel,gbc);
+            gbc.gridy++;
         }
-
+        messagesPanel.revalidate();
+        messagesPanel.repaint();
     }
     @Override
     public void actionPerformed(ActionEvent e){
@@ -102,32 +118,4 @@ public class ChatBoxFrame extends JFrame implements ActionListener{
             refreshMessages();
         }
     }
-    private String alignLeft(String message) {
-        int lineWidth = 80; // Adjust this value based on your desired line width
-        StringBuilder builder = new StringBuilder();
-
-        String[] lines = message.split("\n");
-        for (String line : lines) {
-            int padding = lineWidth - line.length();
-            String paddedLine = line + " ".repeat(padding);
-            builder.append(paddedLine).append("\n");
-        }
-
-        return builder.toString();
-    }
-
-    private String alignRight(String message) {
-        int lineWidth = 90; // Adjust this value based on your desired line width
-        StringBuilder builder = new StringBuilder();
-
-        String[] lines = message.split("\n");
-        for (String line : lines) {
-            int padding = lineWidth - line.length();
-            String paddedLine = " ".repeat(padding) + line;
-            builder.append(paddedLine).append("\n");
-        }
-
-        return builder.toString();
-    }
-
 }
