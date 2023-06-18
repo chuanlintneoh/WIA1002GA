@@ -308,18 +308,18 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
                         btnStatus.setForeground(Color.WHITE);
                     } else if (btnStatus.getText().equals("Received friend request")) {
                         btnStatus.setBackground(new Color(255,255,153));
-                        btnStatus.addMouseListener(new MouseAdapter() {
-                            @Override
-                            public void mouseEntered(MouseEvent e) {
-                                btnStatus.setForeground(Color.WHITE); // Change to the desired color
-                                btnStatus.setBackground(new Color(155, 155, 53));
-                            }
-                            @Override
-                            public void mouseExited(MouseEvent e) {
-                                btnStatus.setForeground(Color.black); // Change back to the default color
-                                btnStatus.setBackground(new Color(255, 255, 153));
-                            }
-                        });
+//                        btnStatus.addMouseListener(new MouseAdapter() {
+//                            @Override
+//                            public void mouseEntered(MouseEvent e) {
+//                                btnStatus.setForeground(Color.WHITE); // Change to the desired color
+//                                btnStatus.setBackground(new Color(155, 155, 53));
+//                            }
+//                            @Override
+//                            public void mouseExited(MouseEvent e) {
+//                                btnStatus.setForeground(Color.black); // Change back to the default color
+//                                btnStatus.setBackground(new Color(255, 255, 153));
+//                            }
+//                        });
                     } else if (btnStatus.getText().equals("Friend")){
                         btnStatus.setBackground(new Color(0,204,0));
                         btnStatus.setForeground(Color.WHITE);
