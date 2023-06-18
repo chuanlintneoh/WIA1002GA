@@ -32,15 +32,11 @@ public class FriendsProfilePicturePanel extends JPanel implements ActionListener
         scrollPane.getVerticalScrollBar().setBlockIncrement(100);
         Dimension preferredSize = mainPanel.getPreferredSize();
 
-        // Compare the preferred size with the dimensions of the scroll pane
         if (preferredSize.height <= 400) {
-            // If the preferred height is less than or equal to 400, disable scrolling
             scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         } else {
-            // If the preferred height is greater than 400, enable scrolling
             scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         }
-        // Set the preferred size of the scroll pane
         scrollPane.setPreferredSize(new Dimension(260, Math.max(preferredSize.height, 400)));
 
         refreshFriendRequests(friends);
@@ -214,34 +210,12 @@ public class FriendsProfilePicturePanel extends JPanel implements ActionListener
                                 database.updateStatus(correspondingIDs.get(index), myID, 3);
                                 JOptionPane.showMessageDialog(FriendsProfilePicturePanel.this, "You two are now friends!", "Success", JOptionPane.INFORMATION_MESSAGE);
                                 tracebackFunction.peek();// refresh page
-//                                Container parent = getParent();
-//                                Window window = SwingUtilities.getWindowAncestor(FriendsProfilePicturePanel.this);
-//                                if (window != null) {
-//                                    window.dispose();
-//                                }
-//                                if (parent != null) {
-//                                    parent.removeAll();
-//                                    parent.add(new HomePage(database.get("username",myID),tracebackFunction)); // Create a new homepage panel
-//                                    parent.revalidate();
-//                                    parent.repaint();
-//                                }
                             }
                         } else if (e.getSource() == btnDelete) {
                             int response = JOptionPane.showConfirmDialog(FriendsProfilePicturePanel.this, "Delete Friend Request?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null);
                             if (response == JOptionPane.YES_OPTION) {
                                 database.removeStatus(correspondingIDs.get(index), myID);
                                 tracebackFunction.peek();// refresh page
-//                                Container parent = getParent();
-//                                Window window = SwingUtilities.getWindowAncestor(FriendsProfilePicturePanel.this);
-//                                if (window != null) {
-//                                    window.dispose();
-//                                }
-//                                if (parent != null) {
-//                                    parent.removeAll();
-//                                    parent.add(new HomePage(database.get("username",userID),tracebackFunction)); // Create a new homepage panel
-//                                    parent.revalidate();
-//                                    parent.repaint();
-//                                }
                             }
                         }
                         int correspondingID = Integer.parseInt(e.getActionCommand());

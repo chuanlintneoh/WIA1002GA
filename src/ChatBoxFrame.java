@@ -20,6 +20,7 @@ public class ChatBoxFrame extends JFrame implements ActionListener{
         this.database = new Database();
 
         messagesPanel = new JPanel(new GridBagLayout());
+        messagesPanel.setBackground(new Color(200,240,190));
         JScrollPane scrollPane = new JScrollPane(messagesPanel);
         scrollPane.setPreferredSize(new Dimension(375,250));
         scrollPane.getVerticalScrollBar().setBlockIncrement(100);
@@ -81,13 +82,21 @@ public class ChatBoxFrame extends JFrame implements ActionListener{
             messageLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 
             if (message.getFrom() == friendID) {
-                messageLabel.setBackground(new Color(238, 232, 182));
+                messageLabel.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(Color.white,2), // Outer border
+                        BorderFactory.createEmptyBorder(5, 10, 5, 10) // Inner padding
+                ));
+                messageLabel.setBackground(new Color(200,200,160));
                 messageLabel.setOpaque(true);
                 gbc.gridx = 0;
                 gbc.anchor = GridBagConstraints.LINE_START;
             }// received
             else if (message.getTo() == friendID) {
-                messageLabel.setBackground(new Color(176, 224, 230));
+                messageLabel.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(Color.white,2), // Outer border
+                        BorderFactory.createEmptyBorder(5, 10, 5, 10) // Inner padding
+                ));
+                messageLabel.setBackground(new Color(140,200,160));
                 messageLabel.setOpaque(true);
                 gbc.gridx = 1;
                 gbc.anchor = GridBagConstraints.LINE_END;
@@ -103,7 +112,7 @@ public class ChatBoxFrame extends JFrame implements ActionListener{
     }
     @Override
     public void actionPerformed(ActionEvent e){
-        if (e.getSource() == sendButton|| e.getSource() == txtmessage){
+        if (e.getSource() == sendButton){
             String text = txtmessage.getText().trim();
             if (text.isEmpty()){
                 JOptionPane.showMessageDialog(this, "Please enter a message.", "Error", JOptionPane.ERROR_MESSAGE);
