@@ -34,14 +34,54 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
         btnHome = new JButton("Home");
         btnHome.setBackground(new Color(0, 128, 0));
         btnHome.setForeground(Color.white);
+        btnHome.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnHome.setBackground(new Color(20,75,30));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnHome.setBackground(new Color(46, 138, 87));
+            }
+        });
         btnBack = new JButton("Back");
         btnBack.setBackground(new Color(92, 94, 41));
         btnBack.setForeground(white);
+        btnBack.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnBack.setBackground(new Color(58,30,0));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnBack.setBackground(new Color(92, 94, 41));
+            }
+        });
 
         btnSearch.setBackground(new Color(46,138,87));
         btnSearch.setForeground(white);
+        btnSearch.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnSearch.setBackground(new Color(20,75,30));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnSearch.setBackground(new Color(46, 138, 87));
+            }
+        });
         btnNoti.setBackground(new Color(46,138,87));
         btnNoti.setForeground(white);
+        btnNoti.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnNoti.setBackground(new Color(20,75,30));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnNoti.setBackground(new Color(46, 138, 87));
+            }
+        });
 
         btnUser.setFont(new Font(btnUser.getFont().getName(), Font.BOLD, 16));
         btnUser.setBackground(new Color(180, 238, 156));
@@ -65,6 +105,16 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
 
         forestbook.setFont(new Font("Curlz MT", Font.BOLD, 42));
         forestbook.setForeground(new Color(0, 128, 0));
+        forestbook.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                forestbook.setForeground(new Color(92, 94, 41));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                forestbook.setForeground(new Color(0, 128, 0));
+            }
+        });
 
         JPanel searchResultsPanel = new JPanel();
         searchResultsPanel.setBackground(new Color(180, 238, 156));
@@ -73,6 +123,12 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
         scrollPane.setPreferredSize(new Dimension(630,460));
         scrollPane.getVerticalScrollBar().setUnitIncrement(10);
         scrollPane.getVerticalScrollBar().setBlockIncrement(100);
+        Dimension preferredSize = searchResultsPanel.getPreferredSize();
+        if (preferredSize.height <= 460) {
+            scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        }else {
+            scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        }scrollPane.setPreferredSize(new Dimension(630, Math.max(preferredSize.height, 460)));
 
         ArrayList<Friend> searchResults = (ArrayList<Friend>) database.searchUser(userId,keyword);
         int results = searchResults.size();
@@ -113,6 +169,23 @@ public class SearchResultsPage extends JFrame implements Page, ActionListener {
             JButton btnViewAcc = new JButton("View Account");
             btnViewAcc.setBackground(new Color(200, 170, 105));
             btnViewAcc.setForeground(new Color(58,30,0));
+            Border lineBorder = BorderFactory.createLineBorder(new Color(58,30,0), 2);
+            Insets spacingInsets = new Insets(5, 10, 5, 10);
+            Border spacingBorder = BorderFactory.createEmptyBorder(spacingInsets.top, spacingInsets.left, spacingInsets.bottom, spacingInsets.right);
+            Border compoundBorder = BorderFactory.createCompoundBorder(lineBorder, spacingBorder);
+            btnViewAcc.setBorder(compoundBorder);
+            btnViewAcc.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    btnViewAcc.setForeground(WHITE);
+                    btnViewAcc.setBackground(new Color(58,30,0));
+                }
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    btnViewAcc.setForeground(new Color(58,30,0));
+                    btnViewAcc.setBackground(new Color(200, 170, 105));
+                }
+            });
 
             JButton btnStatus = new JButton();
             if (searchResult.getStatus() == null){

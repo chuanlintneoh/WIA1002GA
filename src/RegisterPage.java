@@ -23,6 +23,16 @@ public class RegisterPage extends JFrame implements ActionListener {
         forestbook = new JLabel("ForestBook");
         forestbook.setFont(new Font("Curlz MT", Font.BOLD, 30));
         forestbook.setForeground(new Color(0, 128, 0));
+        forestbook.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                forestbook.setForeground(new Color(92, 94, 41));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                forestbook.setForeground(new Color(0, 128, 0));
+            }
+        });
 
         lblName = new JLabel("Name:");
         txtName = new JTextField(20);
@@ -61,12 +71,32 @@ public class RegisterPage extends JFrame implements ActionListener {
         btnRegister = new JButton("Register");
         btnRegister.setBackground(new Color(46,138,87));
         btnRegister.setForeground(Color.WHITE);
+        btnRegister.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnRegister.setBackground(new Color(20,75,30));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnRegister.setBackground(new Color(46, 138, 87));
+            }
+        });
         btnRegister.addActionListener(this);
         btnLogin = new JButton("<html><u>Already have an Account</u></html>");
         btnLogin.setBorderPainted(false);
         btnLogin.setContentAreaFilled(false);
         btnLogin.setFont(btnLogin.getFont().deriveFont(Font.PLAIN));
         btnLogin.setForeground(Color.BLUE);
+        btnLogin.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnLogin.setForeground(new Color(20,75,30));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnLogin.setForeground(Color.blue);
+            }
+        });
         btnLogin.addActionListener(this);
 
         JPanel headerPanel = new JPanel();

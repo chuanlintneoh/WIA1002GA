@@ -1,6 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Objects;
+
 public class LoginPage extends JFrame implements ActionListener {
     private final RegisterPage registerPage;
     private final JTextField txtUsername;
@@ -24,11 +26,31 @@ public class LoginPage extends JFrame implements ActionListener {
         btnLogin = new JButton("Log In");
         btnLogin.setBackground(new Color(46,138,87));
         btnLogin.setForeground(Color.WHITE);
+        btnLogin.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnLogin.setBackground(new Color(20,75,30));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnLogin.setBackground(new Color(46, 138, 87));
+            }
+        });
         btnRegister = new JButton("<html><u>Don't have an account</u></html>");
         btnRegister.setBorderPainted(false);
         btnRegister.setContentAreaFilled(false);
         btnRegister.setFont(btnLogin.getFont().deriveFont(Font.PLAIN));
         btnRegister.setForeground(Color.BLUE);
+        btnRegister.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnRegister.setForeground(new Color(20,75,30));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnRegister.setForeground(Color.blue);
+            }
+        });
 
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(new Color(180, 238, 156));
@@ -37,6 +59,16 @@ public class LoginPage extends JFrame implements ActionListener {
         forestbook = new JLabel("ForestBook");
         forestbook.setFont(new Font("Curlz MT", Font.BOLD, 42));
         forestbook.setForeground(new Color(0, 128, 0));
+        forestbook.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                forestbook.setForeground(new Color(92, 94, 41));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                forestbook.setForeground(new Color(0, 128, 0));
+            }
+        });
 
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -78,7 +110,7 @@ public class LoginPage extends JFrame implements ActionListener {
         if (e.getSource() == btnLogin){
             String username = txtUsername.getText();
             String password = PasswordHashing.hashPassword(new String(txtPassword.getPassword()));
-            if (username.isEmpty() || password.isEmpty()){
+            if (username.isEmpty() || Objects.requireNonNull(password).isEmpty()){
                 JOptionPane.showMessageDialog(this, "All fields are required.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }

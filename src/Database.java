@@ -241,10 +241,10 @@ public class Database {
         List<Friend> friendsRequests = new ArrayList<>();
         String query =
                 "SELECT uf.user_id, uf.friend_id, s.status, u.name AS friend_name, u.username AS friend_username " +
-                "FROM user_friends uf " +
-                "JOIN status s ON uf.status = s.id " +
-                "JOIN users u ON uf.friend_id = u.user_id " +
-                "WHERE uf.user_id = ?";
+                        "FROM user_friends uf " +
+                        "JOIN status s ON uf.status = s.id " +
+                        "JOIN users u ON uf.friend_id = u.user_id " +
+                        "WHERE uf.user_id = ?";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1,userId);
@@ -431,9 +431,9 @@ public class Database {
         Stack<Job> userJobs = new Stack<>();
         String query =
                 "SELECT uj.job_id, j.job, uj.start_date, uj.end_date " +
-                "FROM user_jobs uj " +
-                "JOIN jobs j ON uj.job_id = j.id " +
-                "WHERE uj.user_id = ?";
+                        "FROM user_jobs uj " +
+                        "JOIN jobs j ON uj.job_id = j.id " +
+                        "WHERE uj.user_id = ?";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1,userId);
@@ -520,11 +520,11 @@ public class Database {
         List<Friend> searchResult = new ArrayList<>();
         String query =
                 "SELECT u.user_id, u.name, u.username, s.status " +
-                "FROM users u " +
-                "LEFT JOIN user_friends uf ON u.user_id = uf.friend_id AND uf.user_id = ? " +
-                "LEFT JOIN status s ON uf.status = s.id " +
-                "WHERE u.name LIKE ? OR u.username LIKE ? " +
-                "ORDER BY u.name ASC";
+                        "FROM users u " +
+                        "LEFT JOIN user_friends uf ON u.user_id = uf.friend_id AND uf.user_id = ? " +
+                        "LEFT JOIN status s ON uf.status = s.id " +
+                        "WHERE u.name LIKE ? OR u.username LIKE ? " +
+                        "ORDER BY u.name ASC";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1,userId);
@@ -551,16 +551,16 @@ public class Database {
         List<Friend> mutualFriends = new ArrayList<>();
         String query =
                 "SELECT u.user_id, u.name, u.username, " +
-                "CASE " +
-                "   WHEN EXISTS (SELECT 1 FROM user_friends uf3 WHERE uf3.user_id = ? AND uf3.friend_id = uf2.friend_id) THEN 'Friend' " +
-                "   WHEN EXISTS (SELECT 1 FROM user_friends uf3 WHERE uf3.user_id = uf2.friend_id AND uf3.friend_id = ?) THEN 'Received friend request' " +
-                "   ELSE 'Add Friend' " +
-                "END AS status " +
-                "FROM user_friends uf1 " +
-                "JOIN user_friends uf2 ON uf1.friend_id = uf2.user_id " +
-                "JOIN users u ON uf2.friend_id = u.user_id " +
-                "WHERE uf1.user_id = ? AND uf1.status = 3 AND uf2.status = 3 " +
-                "AND uf2.friend_id NOT IN (SELECT friend_id FROM user_friends WHERE user_id = ?)";
+                        "CASE " +
+                        "   WHEN EXISTS (SELECT 1 FROM user_friends uf3 WHERE uf3.user_id = ? AND uf3.friend_id = uf2.friend_id) THEN 'Friend' " +
+                        "   WHEN EXISTS (SELECT 1 FROM user_friends uf3 WHERE uf3.user_id = uf2.friend_id AND uf3.friend_id = ?) THEN 'Received friend request' " +
+                        "   ELSE 'Add Friend' " +
+                        "END AS status " +
+                        "FROM user_friends uf1 " +
+                        "JOIN user_friends uf2 ON uf1.friend_id = uf2.user_id " +
+                        "JOIN users u ON uf2.friend_id = u.user_id " +
+                        "WHERE uf1.user_id = ? AND uf1.status = 3 AND uf2.status = 3 " +
+                        "AND uf2.friend_id NOT IN (SELECT friend_id FROM user_friends WHERE user_id = ?)";
         //uf1 = user's friends, uf2 = user's mutual friends
         try {
             PreparedStatement statement = connection.prepareStatement(query);
@@ -753,7 +753,7 @@ public class Database {
     }
     // Messages
     public void sendMessage(Message message){
-        createNotification(new Notification(message.getFrom(),message.getTo(),get("username", message.getFrom()) + "sent you a message: " + message.getText()));
+        createNotification(new Notification(message.getFrom(),message.getTo(),get("username", message.getFrom()) + " sent you a message: " + message.getText()));
         String query =
                 "INSERT INTO user_messages (from_id, to_id, message, timestamp) VALUES (?, ?, ?, ?)";
         try {
