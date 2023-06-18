@@ -61,6 +61,7 @@ public class ChatBoxFrame extends JFrame implements ActionListener{
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(400, 300);
         setLocationRelativeTo(parent);
+        setResizable(false);
         setVisible(true);
     }
     private void refreshMessages(){
