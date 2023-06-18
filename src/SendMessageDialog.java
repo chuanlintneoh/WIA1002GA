@@ -48,7 +48,7 @@ public class SendMessageDialog extends JDialog implements ActionListener {
         btnSend.addActionListener(this);
 
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBackground(new Color(225, 203, 143));
+        panel.setBackground(new Color(190,210,240));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10,10,10,10);
         gbc.gridy = 0;

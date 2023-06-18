@@ -32,24 +32,28 @@ public class EditPasswordDialog extends JDialog implements ActionListener {
         JPanel passwordPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         passwordPanel.add(new JLabel("Current Password:"));
         passwordPanel.add(txtPassword);
+        passwordPanel.setBackground(new Color(216, 191, 216));
         dialogPanel.add(passwordPanel);
 
         // New Password label and text field
         JPanel newPasswordPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         newPasswordPanel.add(new JLabel("New Password:"));
         newPasswordPanel.add(txtNewPassword);
+        newPasswordPanel.setBackground(new Color(216, 191, 216));
         dialogPanel.add(newPasswordPanel);
 
         // Confirm New Password label and text field
         JPanel confirmNewPasswordPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         confirmNewPasswordPanel.add(new JLabel("Confirm New Password:"));
         confirmNewPasswordPanel.add(txtConfirmNewPassword);
+        confirmNewPasswordPanel.setBackground(new Color(216, 191, 216));
         dialogPanel.add(confirmNewPasswordPanel);
 
         // Save button
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.add(btnSave);
         buttonPanel.add(btnCancel);
+        buttonPanel.setBackground(new Color(216, 191, 216));
         dialogPanel.add(buttonPanel);
 
         btnCancel.setBackground(new Color(200, 7, 14));

@@ -11,7 +11,7 @@ import javax.swing.border.*;
 import java.time.*;
 import static java.awt.Color.*;
 public class ViewAccountPage extends JFrame implements Page,ActionListener {
-    private final JLabel forestbook, lblFriendReq, lblFriend, lblName, txtName, lblUsername, txtUsername, lblEmail, txtEmail, lblContactNo, txtContactNo, lblDOB, txtDOB, lblGender, txtGender, lblHobbies, txtHobbies, lblJobHistory, lblAddress, txtAge, lblProfilePicture, txtNoOfFriends;
+    private final JLabel forestbook, lblFriendReq, lblFriend, lblName, txtName, lblUsername, txtUsername, lblEmail, txtEmail, lblContactNo, txtContactNo, lblDOB, txtDOB, lblGender, txtGender, lblHobbies, txtHobbies, lblJobHistory, lblAddress, txtAge, lblProfilePicture;
     private final JTextArea txtJobHistory, txtAddress;
     private JButton btnHome, btnNoti, btnUser, btnEditAcc, btnStatus, btnBack;
     private final Database database;
@@ -54,7 +54,6 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
             txtDOB = new JLabel(database.get("birthdate", userID));
             birthDate = LocalDate.parse(database.get("birthdate",userID));
             txtGender = new JLabel(database.get("gender",userID));
-            txtNoOfFriends = new JLabel("No. of friends:    " + database.getNumberOfFriends(userID) + "          ");
             jobs = database.viewUserJobs(userID);
             hobbies = database.viewUserHobbies(userID);
         }// view own account
@@ -69,7 +68,6 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
             txtDOB = new JLabel(database.get("birthdate", friendID));
             birthDate = LocalDate.parse(database.get("birthdate",friendID));
             txtGender = new JLabel(database.get("gender",friendID));
-            txtNoOfFriends = new JLabel("No. of friends:    " + database.getNumberOfFriends(friendID) + "          ");
             jobs = database.viewUserJobs(friendID);
             hobbies = database.viewUserHobbies(friendID);
         }// view friend's account
@@ -272,8 +270,6 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
         centerPanel.add(lblGender, gbc);
         gbc.gridx = 1;
         centerPanel.add(txtGender,gbc);
-        gbc.anchor = GridBagConstraints.EAST;
-        centerPanel.add(txtNoOfFriends, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 6;
@@ -308,18 +304,6 @@ public class ViewAccountPage extends JFrame implements Page,ActionListener {
                         btnStatus.setForeground(Color.WHITE);
                     } else if (btnStatus.getText().equals("Received friend request")) {
                         btnStatus.setBackground(new Color(255,255,153));
-//                        btnStatus.addMouseListener(new MouseAdapter() {
-//                            @Override
-//                            public void mouseEntered(MouseEvent e) {
-//                                btnStatus.setForeground(Color.WHITE); // Change to the desired color
-//                                btnStatus.setBackground(new Color(155, 155, 53));
-//                            }
-//                            @Override
-//                            public void mouseExited(MouseEvent e) {
-//                                btnStatus.setForeground(Color.black); // Change back to the default color
-//                                btnStatus.setBackground(new Color(255, 255, 153));
-//                            }
-//                        });
                     } else if (btnStatus.getText().equals("Friend")){
                         btnStatus.setBackground(new Color(0,204,0));
                         btnStatus.setForeground(Color.WHITE);
