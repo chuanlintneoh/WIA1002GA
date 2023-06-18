@@ -221,22 +221,6 @@ public class Database {
         }
     }
     //status & user_friends
-    public String getStatus(int statusId){
-        String query =
-                "SELECT status FROM status WHERE id = ?";
-        try {
-            PreparedStatement statement = connection.prepareStatement(query);
-            statement.setInt(1,statusId);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()){
-                return resultSet.getString("status");
-            }
-        }
-        catch (SQLException e){
-            e.printStackTrace();
-        }
-        return "Undefined Status";
-    }// view available status
     public List<Friend> viewFriendsRequests(int userId){
         List<Friend> friendsRequests = new ArrayList<>();
         String query =
@@ -415,18 +399,6 @@ public class Database {
         }
         return "Undefined Job";
     }
-    public void insertJob(String job){
-        String query =
-                "INSERT INTO jobs (job) VALUES (?)";
-        try {
-            PreparedStatement statement = connection.prepareStatement(query);
-            statement.setString(1,job);
-            statement.executeUpdate();
-        }
-        catch (SQLException e){
-            e.printStackTrace();
-        }
-    }// insert a new job into database
     public Stack<Job> viewUserJobs(int userId){
         Stack<Job> userJobs = new Stack<>();
         String query =
@@ -523,13 +495,14 @@ public class Database {
                         "FROM users u " +
                         "LEFT JOIN user_friends uf ON u.user_id = uf.friend_id AND uf.user_id = ? " +
                         "LEFT JOIN status s ON uf.status = s.id " +
-                        "WHERE u.name LIKE ? OR u.username LIKE ? " +
+                        "WHERE u.name LIKE ? OR u.username LIKE ? OR u.email_address LIKE ?" +
                         "ORDER BY u.name ASC";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1,userId);
             statement.setString(2,"%"+keyword+"%");
             statement.setString(3,"%"+keyword+"%");
+            statement.setString(4,"%"+keyword+"%");
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()){
                 int user_id = resultSet.getInt("user_id");
